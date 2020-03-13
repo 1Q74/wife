@@ -1,5 +1,7 @@
 package wife.heartcough;
 
+import java.io.File;
+
 import javax.swing.JFrame;
 import javax.swing.JScrollPane;
 import javax.swing.JSplitPane;
@@ -7,6 +9,7 @@ import javax.swing.SwingUtilities;
 import javax.swing.UIManager;
 import javax.swing.UnsupportedLookAndFeelException;
 
+import wife.heartcough.system.FileSystem;
 import wife.heartcough.table.FileTable;
 import wife.heartcough.tree.FileTree;
 
@@ -17,6 +20,10 @@ public class Explorer {
 
 	private FileTable fileTable = new FileTable();
 	private FileTree fileTree = new FileTree(fileTable);
+	
+	private static File[] FILE_TREE_CURRENT_PATH = FileSystem.VIEW.getRoots();
+	private static File FILE_TABLE_CURRENT_PATH = FileSystem.DEFAULT;
+	public static File CURRENT_PATH;
 	
 	private JSplitPane getSplitter() {
 		JSplitPane splitter = new JSplitPane(JSplitPane.HORIZONTAL_SPLIT);
@@ -42,6 +49,10 @@ public class Explorer {
 		window.setContentPane(getSplitter());
 		window.setSize(1024, 768);
 		window.setVisible(true);
+	}
+	
+	public static boolean isDesktopFolder() {
+		return CURRENT_PATH == null;
 	}
 	
 	public static void main(String[] args) {

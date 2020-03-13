@@ -1,0 +1,16 @@
+
+
+Version:	3.12
+CmdLine:	F:\project\tekville\t2\workspace\HeartCough\target\HeartCoughExplorer.exe --l4j-debug
+WOW64:		yes
+Working dir:	F:\project\tekville\t2\workspace\HeartCough\target\.
+Java min ver:	1.006.000_045
+Java max ver:	
+Bundled JRE:	jre
+Check launcher:	F:\project\tekville\t2\workspace\HeartCough\target\jre\bin\javaw.exe (OK)
+Main class:	wife.heartcough.Explorer
+Info:		Classpath not defined.
+Launcher:	F:\project\tekville\t2\workspace\HeartCough\target\jre\bin\javaw.exe
+Launcher args:	-classpath "F:\project\tekville\t2\workspace\HeartCough\target\HeartCoughExplorer.exe" wife.heartcough.Explorer
+Args length:	111/32768 chars
+Exit code:	0

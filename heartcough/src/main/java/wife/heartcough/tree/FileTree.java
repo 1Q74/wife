@@ -14,6 +14,7 @@ import javax.swing.event.TreeSelectionEvent;
 import javax.swing.event.TreeSelectionListener;
 import javax.swing.tree.DefaultMutableTreeNode;
 
+import wife.heartcough.Explorer;
 import wife.heartcough.system.FileSystem;
 import wife.heartcough.table.FileTable;
 
@@ -22,7 +23,9 @@ import wife.heartcough.table.FileTable;
 
 public class FileTree {
 	
+	private JTree fileTree;
 	private FileTable fileTable;
+	private File currentPath;
 	
 	public FileTree(FileTable fileTable) {
 		this.fileTable = fileTable;
@@ -42,7 +45,7 @@ public class FileTree {
 	private Map<File, List<File>> getParentFolders() {
 		Map<File, List<File>> parentFolders = new HashMap<File, List<File>>();
 	
-		for(File parent : FileSystem.VIEW.getRoots()) {
+		for(File parent : getCurrentPath()) {
 			parentFolders.put(parent, getChildFolders(parent, true));
 		}
 		
@@ -50,12 +53,12 @@ public class FileTree {
 	}
 	
 	private DefaultMutableTreeNode getFolderTreeItem(File entry) {
-		DefaultMutableTreeNode item = new DefaultMutableTreeNode(entry.getName());
+		DefaultMutableTreeNode item = new DefaultMutableTreeNode();
 		item.setUserObject(entry);
 		return item;
 	}
 	
-	public DefaultMutableTreeNode getFolderNodes() {
+	public DefaultMutableTreeNode getDesktopFolderNodes() {
 		Set<Entry<File, List<File>>> entrySet = getParentFolders().entrySet();
 		Iterator<Entry<File, List<File>>> iter = entrySet.iterator();
 		
@@ -63,7 +66,7 @@ public class FileTree {
 		while(iter.hasNext()) {
 			Map.Entry<File, List<File>> entries = (Entry<File, List<File>>)iter.next();
 			nodes = getFolderTreeItem(entries.getKey());
-			
+
 			for(File entry : entries.getValue()) {
 				nodes.add(getFolderTreeItem(entry));
 			}
@@ -72,20 +75,43 @@ public class FileTree {
 		return nodes;
 	}
 	
+	private void setCurrentPath(File currentPath) {
+		this.currentPath = currentPath;
+	}
+	
+	private File[] getCurrentPath() {
+		File[] systemRoots = FileSystem.VIEW.getRoots();
+		return currentPath == null ? systemRoots : new File[] { currentPath };
+	}
+	
+	private void getChildFolderNodes(DefaultMutableTreeNode parentNode, boolean hiddenAttr) {
+		List<File> childFolders = getChildFolders((File)parentNode.getUserObject(), hiddenAttr);
+		for(File childFolder : childFolders) {
+			parentNode.add(getFolderTreeItem(childFolder));
+		}
+	}
+	
 	public JTree getDesktopFolderTree() {
-		JTree desktopFolderTree = new JTree(getFolderNodes());
+		fileTree = new JTree(getDesktopFolderNodes());
 		
-		desktopFolderTree.setCellRenderer(new CellRenender());
-		desktopFolderTree.addTreeSelectionListener(new TreeSelectionListener() {
+		fileTree.setCellRenderer(new CellRenender());
+		fileTree.addTreeSelectionListener(new TreeSelectionListener() {
 			@Override
 			public void valueChanged(TreeSelectionEvent e) {
 				DefaultMutableTreeNode node = (DefaultMutableTreeNode)e.getPath().getLastPathComponent();
-				fileTable.setCurrentPath((File)node.getUserObject());
+				currentPath = (File)node.getUserObject();
+				Explorer.CURRENT_PATH = currentPath;
+				setCurrentPath(currentPath);
+				
+				getChildFolderNodes(node, false);
+				
+				
+				fileTable.setCurrentPath(currentPath);
 				fileTable.load();
 			}
 		});
 		
-		return desktopFolderTree;
+		return fileTree;
 	}
 
 }

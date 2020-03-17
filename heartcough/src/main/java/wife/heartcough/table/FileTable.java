@@ -132,7 +132,6 @@ public class FileTable {
             @Override
             public Void doInBackground() {
 				for(File file : listFiles) {
-//					System.out.println(file.getAbsolutePath());
 					publish(file);
 				}
 				

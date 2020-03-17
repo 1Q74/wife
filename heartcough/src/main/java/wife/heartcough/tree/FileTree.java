@@ -1,9 +1,16 @@
 package wife.heartcough.tree;
 
+import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
+import java.awt.event.ComponentEvent;
+import java.awt.event.ComponentListener;
 import java.awt.event.HierarchyEvent;
 import java.awt.event.HierarchyListener;
 import java.io.File;
+import java.io.FileFilter;
+import java.io.FilenameFilter;
 import java.util.ArrayList;
+import java.util.Enumeration;
 import java.util.HashMap;
 import java.util.Iterator;
 import java.util.List;
@@ -12,6 +19,7 @@ import java.util.Set;
 import java.util.Map.Entry;
 
 import javax.swing.JTree;
+import javax.swing.SwingUtilities;
 import javax.swing.event.TreeExpansionEvent;
 import javax.swing.event.TreeExpansionListener;
 import javax.swing.event.TreeSelectionEvent;
@@ -19,6 +27,8 @@ import javax.swing.event.TreeSelectionListener;
 import javax.swing.event.TreeWillExpandListener;
 import javax.swing.tree.DefaultMutableTreeNode;
 import javax.swing.tree.ExpandVetoException;
+
+import org.apache.commons.lang3.StringUtils;
 
 import wife.heartcough.system.FileSystem;
 import wife.heartcough.table.FileTable;
@@ -82,18 +92,27 @@ public class FileTree {
 	
 	private void getChildFolderNodes(DefaultMutableTreeNode parentNode, boolean hiddenAttr, int treeDepth) {
 		List<File> childFolders = getChildFolders((File)parentNode.getUserObject(), hiddenAttr, treeDepth);
+		
 		for(File childFolder : childFolders) {
 			DefaultMutableTreeNode childNode = getFolderTreeItem(childFolder);
 			parentNode.add(childNode);
 			
-			if(treeDepth == 3) {
-				System.out.println(treeDepth + ", " + childNode);
-				break;
-			}
-			
-			if(childFolder.isDirectory()) {
-				getChildFolderNodes(childNode, false, treeDepth + 1);
-			}
+			(new Runnable() {
+				@Override
+				public void run() {
+					File[] folders = childFolder.listFiles(new FileFilter() {
+						@Override
+						public boolean accept(File pathname) {
+							return pathname.isDirectory();
+						}
+					});
+					if(folders != null && folders.length > 0) {
+						DefaultMutableTreeNode node = new DefaultMutableTreeNode();
+						node.setUserObject(new String("__TEMP__"));
+						childNode.add(node);
+					}
+				}
+			}).run();
 		}
 	}
 	
@@ -105,11 +124,27 @@ public class FileTree {
 			@Override
 			public void valueChanged(TreeSelectionEvent e) {
 				DefaultMutableTreeNode node = (DefaultMutableTreeNode)e.getPath().getLastPathComponent();
+				
+				if(node.getChildCount() > 0) {
+					DefaultMutableTreeNode firstChildNode = node.getFirstLeaf();
+					Object userObject = firstChildNode.getUserObject();
+					boolean isTempNode =	(userObject instanceof String)
+											&& StringUtils.equals((String)userObject, "__TEMP__"); 
+					if(isTempNode) {
+						node.remove(0);
+					}
+				}
 		
 				System.out.println("== valueChanged ==" + " leaf = " + node.isLeaf());
-//				if(node.isLeaf()) {
-					getChildFolderNodes(node, false, 1);
-//				}
+				if(node.isLeaf()) {
+					SwingUtilities.invokeLater(new Runnable() {
+						@Override
+						public void run() {
+							getChildFolderNodes(node, false, 3);							
+						}
+					});
+
+				}
 				
 				fileTable.setCurrentPath((File)node.getUserObject());
 				fileTable.load();

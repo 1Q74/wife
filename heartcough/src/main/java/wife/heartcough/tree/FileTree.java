@@ -1,13 +1,6 @@
 package wife.heartcough.tree;
 
 import java.io.File;
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.Iterator;
-import java.util.List;
-import java.util.Map;
-import java.util.Set;
-import java.util.Map.Entry;
 
 import javax.swing.JTree;
 import javax.swing.SwingUtilities;
@@ -30,58 +23,34 @@ public class FileTree {
 		this.fileTable = fileTable;
 	}
 	
-	private List<File> getChildFolders(File parent) {
-		List<File> childFolders = new ArrayList<File>();
-
-		for(File child : FileSystem.VIEW.getFiles(parent, false)) {
-			if(child.isFile()) continue;
-			childFolders.add(child);
-		}
-		
-		return childFolders;
-	}
-	
-	private Map<File, List<File>> getParentFolders() {
-		Map<File, List<File>> parentFolders = new HashMap<File, List<File>>();
-	
-		for(File parent : FileSystem.VIEW.getRoots()) {
-			parentFolders.put(parent, getChildFolders(parent));
-		}
-		
-		return parentFolders;
-	}
-	
 	private DefaultMutableTreeNode getFolderTreeItem(File entry) {
 		DefaultMutableTreeNode item = new DefaultMutableTreeNode();
 		item.setUserObject(entry);
 		return item;
 	}
 	
-	public DefaultMutableTreeNode getDesktopFolderNodes() {
-		Set<Entry<File, List<File>>> entrySet = getParentFolders().entrySet();
-		Iterator<Entry<File, List<File>>> iter = entrySet.iterator();
-		
-		DefaultMutableTreeNode nodes = null;
-		while(iter.hasNext()) {
-			Map.Entry<File, List<File>> entries = (Entry<File, List<File>>)iter.next();
-			nodes = getFolderTreeItem(entries.getKey());
-
-			for(File entry : entries.getValue()) {
-				nodes.add(getFolderTreeItem(entry));
+	private void setChildNode(DefaultMutableTreeNode nodes, File parent) {
+		for(File child : FileSystem.VIEW.getFiles(parent, false)) {
+			if(child.isDirectory()) {
+				nodes.add(getFolderTreeItem(child));
 			}
+		}
+	}
+	
+	public DefaultMutableTreeNode getDesktopFolderNodes() {
+		DefaultMutableTreeNode nodes = null;
+		
+		for(File parent : FileSystem.VIEW.getRoots()) {
+			nodes = getFolderTreeItem(parent);
+			setChildNode(nodes, parent);
 		}
 		
 		return nodes;
 	}
 	
-	private void getChildFolderNodes(DefaultMutableTreeNode parentNode, boolean hiddenAttr, int treeDepth) {
-		File userObject = (File)parentNode.getUserObject();
-		List<File> childFolders = getChildFolders(userObject);
-
-		for(File childFolder : childFolders) {
-			DefaultMutableTreeNode childNode = getFolderTreeItem(childFolder);
-			parentNode.add(childNode);
-		}
+	private void getChildFolderNodes(DefaultMutableTreeNode parentNode) {
+		File parent = (File)parentNode.getUserObject();
+		setChildNode(parentNode, parent);
 	}
 	
 	public JTree getDesktopFolderTree() {
@@ -97,7 +66,7 @@ public class FileTree {
 					@Override
 					public void run() {
 						if(node.isLeaf()) {
-							getChildFolderNodes(node, false, 3);							
+							getChildFolderNodes(node);							
 						}
 						
 						fileTable.setCurrentPath((File)node.getUserObject());

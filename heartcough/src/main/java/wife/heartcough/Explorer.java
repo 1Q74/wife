@@ -1,6 +1,6 @@
 package wife.heartcough;
 
-import java.io.File;
+import java.io.IOException;
 
 import javax.swing.JFrame;
 import javax.swing.JScrollPane;
@@ -9,7 +9,6 @@ import javax.swing.SwingUtilities;
 import javax.swing.UIManager;
 import javax.swing.UnsupportedLookAndFeelException;
 
-import wife.heartcough.system.FileSystem;
 import wife.heartcough.table.FileTable;
 import wife.heartcough.tree.FileTree;
 
@@ -21,14 +20,10 @@ public class Explorer {
 	private FileTable fileTable = new FileTable();
 	private FileTree fileTree = new FileTree(fileTable);
 	
-	private static File[] FILE_TREE_CURRENT_PATH = FileSystem.VIEW.getRoots();
-	private static File FILE_TABLE_CURRENT_PATH = FileSystem.DEFAULT;
-	public static File CURRENT_PATH;
-	
 	private JSplitPane getSplitter() {
 		JSplitPane splitter = new JSplitPane(JSplitPane.HORIZONTAL_SPLIT);
 		
-		splitter.setLeftComponent(fileTree.getDesktopFolderTree());
+		splitter.setLeftComponent(new JScrollPane(fileTree.getDesktopFolderTree()));
 
 		fileTable.load();
 		splitter.setRightComponent(new JScrollPane(fileTable.getFileTable()));
@@ -51,11 +46,7 @@ public class Explorer {
 		window.setVisible(true);
 	}
 	
-	public static boolean isDesktopFolder() {
-		return CURRENT_PATH == null;
-	}
-	
-	public static void main(String[] args) {
+	public static void main(String[] args) throws IOException {
 		SwingUtilities.invokeLater(new Runnable() {
 			@Override
 			public void run() {

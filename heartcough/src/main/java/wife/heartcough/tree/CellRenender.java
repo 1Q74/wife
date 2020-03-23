@@ -32,7 +32,17 @@ public class CellRenender extends DefaultTreeCellRenderer {
 											        , boolean hasFocus) {
 
         DefaultMutableTreeNode node = (DefaultMutableTreeNode)value;
-        File file = (File)node.getUserObject();
+//        File file = (File)node.getUserObject();
+        Object userObject = node.getUserObject();
+        File file = null;
+        if(userObject instanceof File) {
+        	file = (File)userObject;
+        } else {
+        	file = new File((String)userObject);
+        }
+        System.out.println(file);
+        
+        
         label.setIcon(fileSystemView.getSystemIcon(file));
         label.setText(fileSystemView.getSystemDisplayName(file));
         label.setToolTipText(file.getPath());

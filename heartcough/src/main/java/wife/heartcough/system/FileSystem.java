@@ -26,8 +26,7 @@ public class FileSystem {
 	}
 	
 	public static boolean isDesktopPath(String path) {
-//		return StringUtils.equals(DEFAULT.getRoot().getAbsolutePath(), path);
-		return false;
+		return StringUtils.equals(DEFAULT.getAbsolutePath(), path);
 	}
 	
 	public static boolean isWindowsSpecialFolder(String path) {

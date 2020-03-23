@@ -4,6 +4,7 @@ import java.io.File;
 
 import javax.swing.JTable;
 import javax.swing.table.TableColumn;
+import javax.swing.tree.DefaultMutableTreeNode;
 
 import wife.heartcough.system.FileSystem;
 
@@ -11,9 +12,10 @@ import wife.heartcough.system.FileSystem;
 
 
 public class FileTable {
-	
+
 	private File currentPath;
 	private JTable table = new JTable();
+	private File[] listFiles;
 	
 	public void setCurrentPath(File path) {
 		this.currentPath = path;
@@ -58,13 +60,18 @@ public class FileTable {
 	}
 	
 	public void load() {
-		File[] listFiles = getTableFileList();
+//		File[] listFiles = getTableFileList();
+		listFiles = getTableFileList();
 		FileListModel model = new FileListModel(listFiles);
-		
+
 		table.setModel(model);
 		setFileTableColumn();
 		
 		table.repaint();
+	}
+	
+	public File[] getListFiles() {
+		return listFiles;
 	}
 	
 	public JTable getFileTable() {

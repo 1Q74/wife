@@ -4,7 +4,6 @@ import java.io.File;
 
 import javax.swing.JTable;
 import javax.swing.table.TableColumn;
-import javax.swing.tree.DefaultMutableTreeNode;
 
 import wife.heartcough.system.FileSystem;
 
@@ -16,6 +15,9 @@ public class FileTable {
 	private File currentPath;
 	private JTable table = new JTable();
 	private File[] listFiles;
+	
+	private int fileCount = 0;
+	private int directoryCount = 0;
 	
 	public void setCurrentPath(File path) {
 		this.currentPath = path;
@@ -32,6 +34,7 @@ public class FileTable {
 		String[] fileList = getCurrentPath().list();
 		File[] listFiles = null;
 		
+		// 윈도우즈의 [내 PC]폴더
 		if(fileList == null) {
 			listFiles = getCurrentPath().listFiles();
 		} else {
@@ -42,7 +45,14 @@ public class FileTable {
 				String filePath = 	getCurrentPath().getAbsolutePath()
 									+ File.separatorChar
 									+ fileList[i];
-				listFiles[i] = new File(filePath);
+				
+				File file = new File(filePath);
+				if(file.isDirectory()) {
+					++directoryCount;
+				} else {
+					++fileCount;
+				}
+				listFiles[i] = file;
 			}
 		}
 		
@@ -60,7 +70,6 @@ public class FileTable {
 	}
 	
 	public void load() {
-//		File[] listFiles = getTableFileList();
 		listFiles = getTableFileList();
 		FileListModel model = new FileListModel(listFiles);
 
@@ -68,6 +77,11 @@ public class FileTable {
 		setFileTableColumn();
 		
 		table.repaint();
+	}
+	
+	// 디렉토리 개수가 많은지 파일 개수가 많은지 판단한다.
+	public boolean haveMoreDirecories() {
+		return directoryCount > fileCount;
 	}
 	
 	public File[] getListFiles() {

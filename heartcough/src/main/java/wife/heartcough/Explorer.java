@@ -1,5 +1,6 @@
 package wife.heartcough;
 
+import java.io.File;
 import java.io.IOException;
 
 import javax.swing.JFrame;
@@ -8,6 +9,9 @@ import javax.swing.JSplitPane;
 import javax.swing.SwingUtilities;
 import javax.swing.UIManager;
 import javax.swing.UnsupportedLookAndFeelException;
+import javax.swing.tree.DefaultMutableTreeNode;
+import javax.swing.tree.DefaultTreeModel;
+import javax.swing.tree.TreePath;
 
 import wife.heartcough.table.FileTable;
 import wife.heartcough.tree.FileTree;

@@ -1,23 +1,37 @@
 package wife.heartcough.table;
 
+import java.awt.event.MouseEvent;
+import java.awt.event.MouseListener;
 import java.io.File;
 
 import javax.swing.JTable;
+import javax.swing.SwingUtilities;
+import javax.swing.event.TreeSelectionEvent;
 import javax.swing.table.TableColumn;
+import javax.swing.tree.DefaultMutableTreeNode;
+import javax.swing.tree.DefaultTreeModel;
+import javax.swing.tree.ExpandVetoException;
+import javax.swing.tree.TreePath;
 
 import wife.heartcough.system.FileSystem;
+import wife.heartcough.tree.FileTree;
 
 
 
 
 public class FileTable {
 
+	private FileTree fileTree;
 	private File currentPath;
 	private JTable table = new JTable();
 	private File[] listFiles;
 	
 	private int fileCount = 0;
 	private int directoryCount = 0;
+	
+	public void setFileTree(FileTree fileTree) {
+		this.fileTree = fileTree;
+	}
 	
 	public void setCurrentPath(File path) {
 		this.currentPath = path;
@@ -59,6 +73,86 @@ public class FileTable {
 		return listFiles;
 	}
 	
+	private MouseListener getMouseListener() {
+		return 
+			new MouseListener() {
+
+			@Override
+			public void mouseClicked(MouseEvent e) {
+				JTable table = (JTable)e.getSource();
+				
+				int rowIndex = table.getSelectedRow();
+				if(rowIndex == -1) return;
+				
+				File file = listFiles[rowIndex];
+				if(file.isDirectory()) {
+//					setCurrentPath(file);
+//					load();
+					
+
+//					DefaultMutableTreeNode[] treeNode = new DefaultMutableTreeNode[2];
+//					treeNode[0] = new DefaultMutableTreeNode();
+//					treeNode[0].add(new DefaultMutableTreeNode(new File("C:/Users/jdk/Desktop")));
+//					
+//					treeNode[1] = new DefaultMutableTreeNode();
+//					treeNode[1].add(new DefaultMutableTreeNode(new File("C:/Users/jdk/Desktop/jna-master")));
+//					TreePath treePath = new TreePath(treeNode);
+//					
+//					SwingUtilities.invokeLater(new Runnable() {  
+//					    public void run() { 
+//					    	fileTree.getInstance().setSelectionPath(treePath);
+//					    }
+//					});
+					
+					
+//					try {
+//						((DefaultTreeModel)fileTree.getInstance().getModel()).nodeStructureChanged(new DefaultMutableTreeNode(new File("C:/Users/jdk/Desktop/jna-master")));
+//						fileTree.getInstance().fireTreeWillExpand(treePath);
+//					} catch (ExpandVetoException e1) {
+//						// TODO Auto-generated catch block
+//						e1.printStackTrace();
+//					}
+					
+					
+//					System.out.println("tree selection listener count = " + fileTree.getInstance().getTreeSelectionListeners().length);
+//					fileTree.getInstance().getTreeSelectionListeners()[0].valueChanged(
+//						new TreeSelectionEvent(
+//							fileTree.getInstance()
+//							, treePath
+//							, true
+//							, new TreePath(new DefaultMutableTreeNode(new File("C:/Users/jdk/Desktop")))
+//							, new TreePath(new DefaultMutableTreeNode(new File("C:/Users/jdk/Desktop/jna-master")))
+//						)
+//					);
+				}
+			}
+
+			@Override
+			public void mousePressed(MouseEvent e) {
+				// TODO Auto-generated method stub
+				
+			}
+
+			@Override
+			public void mouseReleased(MouseEvent e) {
+				// TODO Auto-generated method stub
+				
+			}
+
+			@Override
+			public void mouseEntered(MouseEvent e) {
+				// TODO Auto-generated method stub
+				
+			}
+
+			@Override
+			public void mouseExited(MouseEvent e) {
+				// TODO Auto-generated method stub
+				
+			}
+		};
+	}
+	
 	private void setFileTableColumn() {
 		Integer[] width = FileListModel.COLUMN_WIDTH;
 		int index = 0;
@@ -76,6 +170,7 @@ public class FileTable {
 		table.setModel(model);
 		setFileTableColumn();
 		
+		table.addMouseListener(getMouseListener());
 		table.repaint();
 	}
 	

@@ -9,6 +9,11 @@ import javax.swing.SwingWorker;
 import javax.swing.event.TreeSelectionEvent;
 import javax.swing.event.TreeSelectionListener;
 import javax.swing.tree.DefaultMutableTreeNode;
+import javax.swing.tree.DefaultTreeModel;
+import javax.swing.tree.ExpandVetoException;
+import javax.swing.tree.TreePath;
+
+import org.apache.commons.lang3.ArrayUtils;
 
 import wife.heartcough.system.FileSystem;
 import wife.heartcough.table.FileTable;
@@ -20,9 +25,11 @@ public class FileTree {
 	
 	private JTree fileTree;
 	private FileTable fileTable;
+	public DefaultMutableTreeNode currentNode;
 	
 	public FileTree(FileTable fileTable) {
 		this.fileTable = fileTable;
+		this.fileTable.setFileTree(this);
 	}
 	
 	private DefaultMutableTreeNode getFolderTreeItem(File entry) {
@@ -68,6 +75,7 @@ public class FileTree {
             @Override
             protected void process(List<File> chunks) {
                 for(File child : chunks) {
+                	System.out.println("::::::::: " + child);
                 	nodes.add(getFolderTreeItem(child));
                 }
             }
@@ -75,7 +83,9 @@ public class FileTree {
             @Override
             protected void done() {
             	fileTree.setEnabled(true);
-            }
+				fileTree.fireTreeExpanded(new TreePath(nodes.getPath()));
+			
+             }
         };
         worker.execute();
 	}
@@ -99,6 +109,10 @@ public class FileTree {
 			public void valueChanged(TreeSelectionEvent e) {
 				DefaultMutableTreeNode node = (DefaultMutableTreeNode)e.getPath().getLastPathComponent();
 				
+				for(TreePath path : e.getPaths()) {
+					System.out.println(path.toString());
+				}
+				
 				SwingUtilities.invokeLater(new Runnable() {
 					@Override
 					public void run() {
@@ -118,6 +132,37 @@ public class FileTree {
 		    }
 		});
 		
+
+		/////////////////////////////////////////////////////////////////////
+		// Example #1
+		/////////////////////////////////////////////////////////////////////
+		Object[] obj = new Object[] {
+			new DefaultMutableTreeNode(new File("C:/Users/jdk/Desktop"))
+			, new DefaultMutableTreeNode(new File("C:/Users/jdk/Desktop/jna-master"))
+		};
+		TreePath treePath = new TreePath(obj);
+		fileTree.setSelectionPath(treePath);
+		fileTree.treeDidChange();
+		
+		/////////////////////////////////////////////////////////////////////
+		// Example #2
+		/////////////////////////////////////////////////////////////////////
+		//fileTree.setSelectionPath(new TreePath(new DefaultMutableTreeNode(new File("C:/Users/jdk/Desktop/jna-master"))));
+		/////////////////////////////////////////////////////////////////////
+		
+		
+		/////////////////////////////////////////////////////////////////////
+		// Example #3
+		/////////////////////////////////////////////////////////////////////
+//		DefaultTreeModel model = (DefaultTreeModel)fileTree.getModel();
+//		model.nodeStructureChanged(currentNode);
+		/////////////////////////////////////////////////////////////////////
+
+
+		return fileTree;
+	}
+	
+	public JTree getInstance() {
 		return fileTree;
 	}
 

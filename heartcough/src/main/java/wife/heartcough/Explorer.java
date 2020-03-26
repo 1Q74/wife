@@ -1,6 +1,5 @@
 package wife.heartcough;
 
-import java.io.File;
 import java.io.IOException;
 
 import javax.swing.JFrame;
@@ -9,10 +8,6 @@ import javax.swing.JSplitPane;
 import javax.swing.SwingUtilities;
 import javax.swing.UIManager;
 import javax.swing.UnsupportedLookAndFeelException;
-import javax.swing.event.TreeSelectionEvent;
-import javax.swing.tree.DefaultMutableTreeNode;
-import javax.swing.tree.DefaultTreeModel;
-import javax.swing.tree.TreePath;
 
 import wife.heartcough.table.FileTable;
 import wife.heartcough.tree.FileTree;
@@ -23,7 +18,7 @@ import wife.heartcough.tree.FileTree;
 public class Explorer {
 
 	private FileTable fileTable = new FileTable();
-	private FileTree fileTree = new FileTree(fileTable);
+	private FileTree fileTree = new FileTree();
 	
 	private JSplitPane getSplitter() {
 		JSplitPane splitter = new JSplitPane(JSplitPane.HORIZONTAL_SPLIT);
@@ -34,6 +29,14 @@ public class Explorer {
 		splitter.setRightComponent(new JScrollPane(fileTable.getFileTable()));
 
 		return splitter;
+	}
+	
+	public FileTree getFileTree() {
+		return fileTree;
+	}
+	
+	public FileTable getFileTable() {
+		return fileTable;
 	}
 	
 	private void show() {
@@ -57,6 +60,9 @@ public class Explorer {
 			public void run() {
 				Explorer explorer = new Explorer();
 				explorer.show();
+				
+				explorer.fileTree.setExplorer(explorer);
+				explorer.fileTable.setExplorer(explorer);
 			}
 		});
 	}

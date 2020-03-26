@@ -3,25 +3,22 @@ package wife.heartcough.table;
 import java.awt.event.MouseEvent;
 import java.awt.event.MouseListener;
 import java.io.File;
+import java.util.ArrayList;
+import java.util.List;
 
 import javax.swing.JTable;
-import javax.swing.SwingUtilities;
-import javax.swing.event.TreeSelectionEvent;
 import javax.swing.table.TableColumn;
 import javax.swing.tree.DefaultMutableTreeNode;
-import javax.swing.tree.DefaultTreeModel;
-import javax.swing.tree.ExpandVetoException;
-import javax.swing.tree.TreePath;
 
+import wife.heartcough.Explorer;
 import wife.heartcough.system.FileSystem;
-import wife.heartcough.tree.FileTree;
 
 
 
 
 public class FileTable {
 
-	private FileTree fileTree;
+	private Explorer explorer;
 	private File currentPath;
 	private JTable table = new JTable();
 	private File[] listFiles;
@@ -29,8 +26,8 @@ public class FileTable {
 	private int fileCount = 0;
 	private int directoryCount = 0;
 	
-	public void setFileTree(FileTree fileTree) {
-		this.fileTree = fileTree;
+	public void setExplorer(Explorer explorer) {
+		this.explorer = explorer;
 	}
 	
 	public void setCurrentPath(File path) {
@@ -48,12 +45,18 @@ public class FileTable {
 		String[] fileList = getCurrentPath().list();
 		File[] listFiles = null;
 		
-		// ¿©µµøÏ¡Ó¿« [≥ª PC]∆˙¥ı
+		// ÏúàÎèÑÏö∞Ïùò [ÎÇ¥ PC]
 		if(fileList == null) {
 			listFiles = getCurrentPath().listFiles();
 		} else {
 			int end = fileList.length;
 			listFiles = new File[end];
+			
+			directoryCount = 0;
+			fileCount = 0;
+			
+			List<File> directories = new ArrayList<File>();
+			List<File> files = new ArrayList<File>();
 			
 			for(int i = 0; i < end; i++) {
 				String filePath = 	getCurrentPath().getAbsolutePath()
@@ -63,11 +66,15 @@ public class FileTable {
 				File file = new File(filePath);
 				if(file.isDirectory()) {
 					++directoryCount;
+					directories.add(file);
 				} else {
 					++fileCount;
+					files.add(file);
 				}
-				listFiles[i] = file;
 			}
+			
+			System.arraycopy(directories.toArray(), 0, listFiles, 0, directoryCount);
+			System.arraycopy(files.toArray(), 0, listFiles, directoryCount, fileCount);
 		}
 		
 		return listFiles;
@@ -79,39 +86,33 @@ public class FileTable {
 
 			@Override
 			public void mouseClicked(MouseEvent e) {
-				JTable table = (JTable)e.getSource();
-				
-				int rowIndex = table.getSelectedRow();
-				if(rowIndex == -1) return;
-				
-				File file = listFiles[rowIndex];
-				if(file.isDirectory()) {
-					fileTree.synchronizeToFileTable(file);
+				if(e.getClickCount() == 2) {
+					JTable table = (JTable)e.getSource();
+					
+					int rowIndex = table.getSelectedRow();
+					if(rowIndex == -1) return;
+					
+					File file = listFiles[rowIndex];
+					if(file.isDirectory()) {
+						explorer.getFileTree().synchronizeToFileTable(file);
+					}
 				}
 			}
 
 			@Override
 			public void mousePressed(MouseEvent e) {
-				// TODO Auto-generated method stub
-				
 			}
 
 			@Override
 			public void mouseReleased(MouseEvent e) {
-				// TODO Auto-generated method stub
-				
 			}
 
 			@Override
 			public void mouseEntered(MouseEvent e) {
-				// TODO Auto-generated method stub
-				
 			}
 
 			@Override
 			public void mouseExited(MouseEvent e) {
-				// TODO Auto-generated method stub
-				
 			}
 		};
 	}
@@ -127,7 +128,15 @@ public class FileTable {
 	}
 	
 	public void load() {
+		load(null);
+	}
+	
+	public void load(DefaultMutableTreeNode selectedNode) {
 		listFiles = getTableFileList();
+		
+		if(selectedNode != null && selectedNode.isLeaf()) {
+			explorer.getFileTree().setChildNode(selectedNode, explorer.getFileTree().getChildFiles((File)selectedNode.getUserObject()));
+		}
 		FileListModel model = new FileListModel(listFiles);
 
 		table.setModel(model);
@@ -137,7 +146,7 @@ public class FileTable {
 		table.repaint();
 	}
 	
-	// µ∑∫≈‰∏Æ ∞≥ºˆ∞° ∏π¿∫¡ˆ ∆ƒ¿œ ∞≥ºˆ∞° ∏π¿∫¡ˆ ∆«¥‹«—¥Ÿ.
+	// Ìè¥ÎçîÏôÄ ÌååÏùº Ï§ëÏóêÏÑú Ïñ¥Îäê Í≤ÉÏù¥ Îçî ÎßéÏùÄÏßÄÏóê Îî∞Îùº Î°úÏßÅÏùÑ Îã¨Î¶¨ÌïúÎã§.
 	public boolean haveMoreDirecories() {
 		return directoryCount > fileCount;
 	}

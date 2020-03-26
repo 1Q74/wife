@@ -13,7 +13,7 @@ public class FileListModel extends AbstractTableModel {
 
 	private static final Object[][] COLUMN_SET = new Object[][] {
 		{ 25,		""		}
-		, { 400,	"¿Ã∏ß"	}
+		, { 400,	"Name"	}
 	};
 	public static final Integer[] COLUMN_WIDTH = new Integer[COLUMN_SET.length];
 	public static final String[] COLUMN_NAME = new String[COLUMN_SET.length];

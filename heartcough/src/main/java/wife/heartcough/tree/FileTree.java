@@ -118,69 +118,16 @@ public class FileTree {
 					System.out.println(path.toString());
 				}
 				
-				       	fileTable.setCurrentPath((File)node.getUserObject());
-						fileTable.load();
-				
+		       	fileTable.setCurrentPath((File)node.getUserObject());
+				fileTable.load();
+		
 
-		            	if(node.isLeaf()) {
-		            		setChildNode(node, getChildFiles((File)node.getUserObject()));
-						}
+            	if(node.isLeaf()) {
+            		setChildNode(node, getChildFiles((File)node.getUserObject()));
+				}
 
 		    }
 		});
-		
-
-		/////////////////////////////////////////////////////////////////////
-		// Example #1
-		/////////////////////////////////////////////////////////////////////
-//		Object[] obj = new Object[] {
-//			new DefaultMutableTreeNode(new File("C:/Users/jdk/Desktop"))
-//			, new DefaultMutableTreeNode(new File("C:/Users/jdk/Desktop/jna-master"))
-//		};
-//		
-//		TreePath treePath = new TreePath(obj);
-//		fileTree.setSelectionPath(treePath);
-	
-		
-		/////////////////////////////////////////////////////////////////////
-		// Example #2
-		/////////////////////////////////////////////////////////////////////
-		//fileTree.setSelectionPath(new TreePath(new DefaultMutableTreeNode(new File("C:/Users/jdk/Desktop/jna-master"))));
-		/////////////////////////////////////////////////////////////////////
-		
-		
-		/////////////////////////////////////////////////////////////////////
-		// Example #3
-		/////////////////////////////////////////////////////////////////////
-//		DefaultTreeModel model = (DefaultTreeModel)fileTree.getModel();
-//		model.nodeStructureChanged(currentNode);
-		/////////////////////////////////////////////////////////////////////
-
-		
-		/////////////////////////////////////////////////////////////////////
-		// Example #4
-		/////////////////////////////////////////////////////////////////////
-//		DefaultMutableTreeNode desktopTreeNode = new DefaultMutableTreeNode(new File("C:/Users/jdk/Desktop"));
-//		DefaultMutableTreeNode jnaMasterTreeNode = new DefaultMutableTreeNode(new File("C:/Users/jdk/Desktop/jna-master"));
-//		
-//		Object[] obj = new Object[] { desktopTreeNode, jnaMasterTreeNode };
-//		TreePath treePath = new TreePath(obj);
-//		TreeSelectionEvent e = new TreeSelectionEvent(
-//				fileTree
-//				, treePath
-//				, true
-//				, new TreePath(desktopTreeNode)
-//				, new TreePath(jnaMasterTreeNode)
-//			);
-//		fileTree.fireValueChanged(e);
-//		
-//		try {
-//			fileTree.fireTreeWillExpand(treePath);
-//		} catch (ExpandVetoException e1) {
-//			// TODO Auto-generated catch block
-//			e1.printStackTrace();
-//		}
-		
 		
 		return fileTree;
 	}
@@ -194,12 +141,10 @@ public class FileTree {
 		while(e.hasMoreElements()) {
 			DefaultMutableTreeNode childNode = (DefaultMutableTreeNode)e.nextElement();
 			File file = (File)childNode.getUserObject();
-//			System.out.println("[ origin ] " + file + " / [ selected ] " + selectedPath + ", isEqual = " + selectedPath.equals(file));
 			
 			if(selectedPath.equals(file)) {
 				TreePath childNodePath = new TreePath((Object[])childNode.getPath());
 				fileTree.setSelectionPath(childNodePath);
-//				fileTree.expandPath(childNodePath);
 				break;
 			}
 		}

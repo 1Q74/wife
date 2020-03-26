@@ -86,45 +86,6 @@ public class FileTable {
 				
 				File file = listFiles[rowIndex];
 				if(file.isDirectory()) {
-//					setCurrentPath(file);
-//					load();
-					
-
-//					DefaultMutableTreeNode[] treeNode = new DefaultMutableTreeNode[2];
-//					treeNode[0] = new DefaultMutableTreeNode();
-//					treeNode[0].add(new DefaultMutableTreeNode(new File("C:/Users/jdk/Desktop")));
-//					
-//					treeNode[1] = new DefaultMutableTreeNode();
-//					treeNode[1].add(new DefaultMutableTreeNode(new File("C:/Users/jdk/Desktop/jna-master")));
-//					TreePath treePath = new TreePath(treeNode);
-//					
-//					SwingUtilities.invokeLater(new Runnable() {  
-//					    public void run() { 
-//					    	fileTree.getInstance().setSelectionPath(treePath);
-//					    }
-//					});
-					
-					
-//					try {
-//						((DefaultTreeModel)fileTree.getInstance().getModel()).nodeStructureChanged(new DefaultMutableTreeNode(new File("C:/Users/jdk/Desktop/jna-master")));
-//						fileTree.getInstance().fireTreeWillExpand(treePath);
-//					} catch (ExpandVetoException e1) {
-//						// TODO Auto-generated catch block
-//						e1.printStackTrace();
-//					}
-					
-					
-//					System.out.println("tree selection listener count = " + fileTree.getInstance().getTreeSelectionListeners().length);
-//					fileTree.getInstance().getTreeSelectionListeners()[0].valueChanged(
-//						new TreeSelectionEvent(
-//							fileTree.getInstance()
-//							, treePath
-//							, true
-//							, new TreePath(new DefaultMutableTreeNode(new File("C:/Users/jdk/Desktop")))
-//							, new TreePath(new DefaultMutableTreeNode(new File("C:/Users/jdk/Desktop/jna-master")))
-//						)
-//					);
-					
 					fileTree.synchronizeToFileTable(file);
 				}
 			}

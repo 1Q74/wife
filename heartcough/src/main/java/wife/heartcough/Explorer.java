@@ -1,13 +1,19 @@
 package wife.heartcough;
 
+import java.awt.BorderLayout;
+import java.awt.Rectangle;
+import java.io.File;
 import java.io.IOException;
 
 import javax.swing.JFrame;
+import javax.swing.JPanel;
 import javax.swing.JScrollPane;
 import javax.swing.JSplitPane;
+import javax.swing.JTextField;
 import javax.swing.SwingUtilities;
 import javax.swing.UIManager;
 import javax.swing.UnsupportedLookAndFeelException;
+import javax.swing.border.EmptyBorder;
 
 import wife.heartcough.table.FileTable;
 import wife.heartcough.tree.FileTree;
@@ -19,16 +25,37 @@ public class Explorer {
 
 	private FileTable fileTable = new FileTable();
 	private FileTree fileTree = new FileTree();
+	private DirectoryPath directoryPath = new DirectoryPath();
 	
 	private JSplitPane getSplitter() {
-		JSplitPane splitter = new JSplitPane(JSplitPane.HORIZONTAL_SPLIT);
-		
-		splitter.setLeftComponent(new JScrollPane(fileTree.getDesktopFolderTree()));
-
 		fileTable.load();
-		splitter.setRightComponent(new JScrollPane(fileTable.getFileTable()));
-
+		
+		
+		JSplitPane body = new JSplitPane(JSplitPane.HORIZONTAL_SPLIT);
+		body.setLeftComponent(new JScrollPane(fileTree.getDesktopFolderTree()));
+		body.setRightComponent(new JScrollPane(fileTable.getFileTable()));
+		
+		JPanel bodyPanel = new JPanel(new BorderLayout());
+		bodyPanel.setBorder(new EmptyBorder(5, 5, 5, 5));
+		bodyPanel.add(body);
+		
+		directoryPath.setPath(fileTree.getCurrentPath());
+		JPanel pathPanel = new JPanel(new BorderLayout());
+		pathPanel.setBorder(new EmptyBorder(5, 5, 0, 5));
+		pathPanel.add(directoryPath.getPath());
+		
+		
+		JSplitPane splitter = new JSplitPane(JSplitPane.VERTICAL_SPLIT);
+		splitter.setDividerSize(0);
+		splitter.setTopComponent(pathPanel);
+		splitter.setBottomComponent(bodyPanel);
+		
+		
 		return splitter;
+	}
+	
+	public DirectoryPath getDirectoryPath() {
+		return directoryPath;
 	}
 	
 	public FileTree getFileTree() {

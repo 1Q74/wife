@@ -12,6 +12,7 @@ import javax.swing.tree.DefaultMutableTreeNode;
 
 import wife.heartcough.Explorer;
 import wife.heartcough.system.FileSystem;
+import wife.heartcough.tree.FileTree;
 
 
 
@@ -19,6 +20,7 @@ import wife.heartcough.system.FileSystem;
 public class FileTable {
 
 	private Explorer explorer;
+	private FileTree fileTree;
 	private File currentPath;
 	private JTable table = new JTable();
 	private File[] listFiles;
@@ -28,6 +30,7 @@ public class FileTable {
 	
 	public void setExplorer(Explorer explorer) {
 		this.explorer = explorer;
+		this.fileTree = this.explorer.getFileTree();
 	}
 	
 	public void setCurrentPath(File path) {
@@ -94,7 +97,7 @@ public class FileTable {
 					
 					File file = listFiles[rowIndex];
 					if(file.isDirectory()) {
-						explorer.getFileTree().synchronizeToFileTable(file);
+						fileTree.synchronizeToFileTable(file);
 					}
 				}
 			}
@@ -135,7 +138,7 @@ public class FileTable {
 		listFiles = getTableFileList();
 		
 		if(selectedNode != null && selectedNode.isLeaf()) {
-			explorer.getFileTree().setChildNode(selectedNode, explorer.getFileTree().getChildFiles((File)selectedNode.getUserObject()));
+			fileTree.setChildNode(selectedNode, fileTree.getChildFiles((File)selectedNode.getUserObject()));
 		}
 		FileListModel model = new FileListModel(listFiles);
 

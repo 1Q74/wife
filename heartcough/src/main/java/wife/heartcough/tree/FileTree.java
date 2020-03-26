@@ -12,9 +12,10 @@ import javax.swing.event.TreeSelectionListener;
 import javax.swing.tree.DefaultMutableTreeNode;
 import javax.swing.tree.TreePath;
 
+import wife.heartcough.DirectoryPath;
 import wife.heartcough.Explorer;
 import wife.heartcough.system.FileSystem;
-//import wife.heartcough.table.FileTable;
+import wife.heartcough.table.FileTable;
 
 
 
@@ -22,11 +23,15 @@ import wife.heartcough.system.FileSystem;
 public class FileTree {
 	
 	private Explorer explorer;
+	private DirectoryPath directoryPath;
+	private FileTable fileTable;
 	private JTree fileTree;
 	public DefaultMutableTreeNode currentNode;
 	
 	public void setExplorer(Explorer explorer) {
 		this.explorer = explorer;
+		this.directoryPath = this.explorer.getDirectoryPath();
+		this.fileTable = this.explorer.getFileTable();
 	}
 	
 	private void setSystemChildNode(DefaultMutableTreeNode nodes, File parent) {
@@ -41,7 +46,7 @@ public class FileTree {
 		String name = parent.getName();
 		
 		File[] files = null;
-		if(FileSystem.isWindowsSpecialFolder(name)|| FileSystem.isDesktopPath(name) || explorer.getFileTable().haveMoreDirecories()) {
+		if(FileSystem.isWindowsSpecialFolder(name)|| FileSystem.isDesktopPath(name) || fileTable.haveMoreDirecories()) {
 			files = FileSystem.VIEW.getFiles(parent, false);
 		} else {
 			files = explorer.getFileTable().getListFiles();
@@ -103,8 +108,11 @@ public class FileTree {
 				SwingUtilities.invokeLater(new Runnable() {
 					public void run() {
 						currentNode = (DefaultMutableTreeNode)e.getPath().getLastPathComponent();
-						explorer.getFileTable().setCurrentPath((File)currentNode.getUserObject());
-						explorer.getFileTable().load(currentNode);
+						File file = (File)currentNode.getUserObject();
+						fileTable.setCurrentPath(file);
+						fileTable.load(currentNode);
+						
+						directoryPath.setPath(file);
 					}
 				});
 		    }
@@ -126,6 +134,10 @@ public class FileTree {
 				break;
 			}
 		}
+	}
+	
+	public File getCurrentPath() {
+		return (File)currentNode.getUserObject();
 	}
 
 }

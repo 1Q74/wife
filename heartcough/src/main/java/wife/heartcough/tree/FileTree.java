@@ -1,6 +1,9 @@
 package wife.heartcough.tree;
 
+import java.awt.event.MouseAdapter;
+import java.awt.event.MouseEvent;
 import java.io.File;
+import java.util.Enumeration;
 import java.util.List;
 
 import javax.swing.JTree;
@@ -11,6 +14,8 @@ import javax.swing.event.TreeSelectionListener;
 import javax.swing.tree.DefaultMutableTreeNode;
 import javax.swing.tree.DefaultTreeModel;
 import javax.swing.tree.ExpandVetoException;
+import javax.swing.tree.MutableTreeNode;
+import javax.swing.tree.TreeNode;
 import javax.swing.tree.TreePath;
 
 import org.apache.commons.lang3.ArrayUtils;
@@ -31,7 +36,7 @@ public class FileTree {
 		this.fileTable = fileTable;
 		this.fileTable.setFileTree(this);
 	}
-	
+
 	private DefaultMutableTreeNode getFolderTreeItem(File entry) {
 		DefaultMutableTreeNode item = new DefaultMutableTreeNode();
 		item.setUserObject(entry);
@@ -75,7 +80,6 @@ public class FileTree {
             @Override
             protected void process(List<File> chunks) {
                 for(File child : chunks) {
-                	System.out.println("::::::::: " + child);
                 	nodes.add(getFolderTreeItem(child));
                 }
             }
@@ -83,8 +87,7 @@ public class FileTree {
             @Override
             protected void done() {
             	fileTree.setEnabled(true);
-				fileTree.fireTreeExpanded(new TreePath(nodes.getPath()));
-			
+            	currentNode = nodes;
              }
         };
         worker.execute();
@@ -96,6 +99,8 @@ public class FileTree {
 		for(File parent : FileSystem.VIEW.getRoots()) {
 			nodes = getFolderTreeItem(parent);
 			setSystemChildNode(nodes, parent);
+			
+			currentNode = nodes;
 		}
 		
 		return nodes;
@@ -113,22 +118,14 @@ public class FileTree {
 					System.out.println(path.toString());
 				}
 				
-				SwingUtilities.invokeLater(new Runnable() {
-					@Override
-					public void run() {
 				       	fileTable.setCurrentPath((File)node.getUserObject());
 						fileTable.load();
-					}
-				});
 				
-				SwingUtilities.invokeLater(new Runnable() {
-					@Override
-					public void run() {
+
 		            	if(node.isLeaf()) {
 		            		setChildNode(node, getChildFiles((File)node.getUserObject()));
 						}
-					}
-				});
+
 		    }
 		});
 		
@@ -136,13 +133,14 @@ public class FileTree {
 		/////////////////////////////////////////////////////////////////////
 		// Example #1
 		/////////////////////////////////////////////////////////////////////
-		Object[] obj = new Object[] {
-			new DefaultMutableTreeNode(new File("C:/Users/jdk/Desktop"))
-			, new DefaultMutableTreeNode(new File("C:/Users/jdk/Desktop/jna-master"))
-		};
-		TreePath treePath = new TreePath(obj);
-		fileTree.setSelectionPath(treePath);
-		fileTree.treeDidChange();
+//		Object[] obj = new Object[] {
+//			new DefaultMutableTreeNode(new File("C:/Users/jdk/Desktop"))
+//			, new DefaultMutableTreeNode(new File("C:/Users/jdk/Desktop/jna-master"))
+//		};
+//		
+//		TreePath treePath = new TreePath(obj);
+//		fileTree.setSelectionPath(treePath);
+	
 		
 		/////////////////////////////////////////////////////////////////////
 		// Example #2
@@ -158,12 +156,53 @@ public class FileTree {
 //		model.nodeStructureChanged(currentNode);
 		/////////////////////////////////////////////////////////////////////
 
-
+		
+		/////////////////////////////////////////////////////////////////////
+		// Example #4
+		/////////////////////////////////////////////////////////////////////
+//		DefaultMutableTreeNode desktopTreeNode = new DefaultMutableTreeNode(new File("C:/Users/jdk/Desktop"));
+//		DefaultMutableTreeNode jnaMasterTreeNode = new DefaultMutableTreeNode(new File("C:/Users/jdk/Desktop/jna-master"));
+//		
+//		Object[] obj = new Object[] { desktopTreeNode, jnaMasterTreeNode };
+//		TreePath treePath = new TreePath(obj);
+//		TreeSelectionEvent e = new TreeSelectionEvent(
+//				fileTree
+//				, treePath
+//				, true
+//				, new TreePath(desktopTreeNode)
+//				, new TreePath(jnaMasterTreeNode)
+//			);
+//		fileTree.fireValueChanged(e);
+//		
+//		try {
+//			fileTree.fireTreeWillExpand(treePath);
+//		} catch (ExpandVetoException e1) {
+//			// TODO Auto-generated catch block
+//			e1.printStackTrace();
+//		}
+		
+		
 		return fileTree;
 	}
 	
 	public JTree getInstance() {
 		return fileTree;
+	}
+	
+	public void synchronizeToFileTable(File selectedPath) {
+		Enumeration<?> e = currentNode.children();
+		while(e.hasMoreElements()) {
+			DefaultMutableTreeNode childNode = (DefaultMutableTreeNode)e.nextElement();
+			File file = (File)childNode.getUserObject();
+//			System.out.println("[ origin ] " + file + " / [ selected ] " + selectedPath + ", isEqual = " + selectedPath.equals(file));
+			
+			if(selectedPath.equals(file)) {
+				TreePath childNodePath = new TreePath((Object[])childNode.getPath());
+				fileTree.setSelectionPath(childNodePath);
+//				fileTree.expandPath(childNodePath);
+				break;
+			}
+		}
 	}
 
 }

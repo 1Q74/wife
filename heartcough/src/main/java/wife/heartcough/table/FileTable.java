@@ -124,6 +124,8 @@ public class FileTable {
 //							, new TreePath(new DefaultMutableTreeNode(new File("C:/Users/jdk/Desktop/jna-master")))
 //						)
 //					);
+					
+					fileTree.synchronizeToFileTable(file);
 				}
 			}
 

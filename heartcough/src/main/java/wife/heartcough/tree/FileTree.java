@@ -10,10 +10,11 @@ import javax.swing.SwingWorker;
 import javax.swing.event.TreeSelectionEvent;
 import javax.swing.event.TreeSelectionListener;
 import javax.swing.tree.DefaultMutableTreeNode;
+import javax.swing.tree.TreeNode;
 import javax.swing.tree.TreePath;
 
-import wife.heartcough.DirectoryPath;
 import wife.heartcough.Explorer;
+import wife.heartcough.path.DirectoryPath;
 import wife.heartcough.system.FileSystem;
 import wife.heartcough.table.FileTable;
 
@@ -26,7 +27,7 @@ public class FileTree {
 	private DirectoryPath directoryPath;
 	private FileTable fileTable;
 	private JTree fileTree;
-	public DefaultMutableTreeNode currentNode;
+	private DefaultMutableTreeNode currentNode;
 	
 	public void setExplorer(Explorer explorer) {
 		this.explorer = explorer;
@@ -121,17 +122,39 @@ public class FileTree {
 		return fileTree;
 	}
 	
+	public void searchAndChangePath(File selectedPath) {
+		for(TreeNode node : currentNode.getPath()) {
+			DefaultMutableTreeNode elementNode = (DefaultMutableTreeNode)node;
+			File userObject = (File)elementNode.getUserObject();
+			
+			if(selectedPath.equals(userObject)) {
+				System.out.println(userObject);
+				DefaultMutableTreeNode parentNode = (DefaultMutableTreeNode)elementNode.getParent();
+				// 윈도우에서 부모노드가 없는 경우는 desktop폴더를 현재 노드로 지정한다.
+				if(parentNode == null) {
+					parentNode = (DefaultMutableTreeNode)currentNode.getRoot();
+					TreePath desktopTreePath = new TreePath((Object[])parentNode.getPath());
+					fileTree.setSelectionPath(desktopTreePath);
+				} else {
+					setCurrentNode(parentNode);
+					synchronizeToFileTable(selectedPath);
+				}
+				return;
+			}
+		};
+	}
+	
 	public void synchronizeToFileTable(File selectedPath) {
-		Enumeration<?> e = currentNode.children();
+		Enumeration<?> children = currentNode.children();
 		
-		while(e.hasMoreElements()) {
-			DefaultMutableTreeNode childNode = (DefaultMutableTreeNode)e.nextElement();
+		while(children.hasMoreElements()) {
+			DefaultMutableTreeNode childNode = (DefaultMutableTreeNode)children.nextElement();
 			File file = (File)childNode.getUserObject();
 
 			if(selectedPath.equals(file)) {
 				TreePath childNodePath = new TreePath((Object[])childNode.getPath());
 				fileTree.setSelectionPath(childNodePath);
-				break;
+				return;
 			}
 		}
 	}

@@ -1,20 +1,18 @@
 package wife.heartcough;
 
 import java.awt.BorderLayout;
-import java.awt.Rectangle;
-import java.io.File;
 import java.io.IOException;
 
 import javax.swing.JFrame;
 import javax.swing.JPanel;
 import javax.swing.JScrollPane;
 import javax.swing.JSplitPane;
-import javax.swing.JTextField;
 import javax.swing.SwingUtilities;
 import javax.swing.UIManager;
 import javax.swing.UnsupportedLookAndFeelException;
 import javax.swing.border.EmptyBorder;
 
+import wife.heartcough.path.DirectoryPath;
 import wife.heartcough.table.FileTable;
 import wife.heartcough.tree.FileTree;
 
@@ -88,6 +86,7 @@ public class Explorer {
 				Explorer explorer = new Explorer();
 				explorer.show();
 				
+				explorer.directoryPath.setExplorer(explorer);
 				explorer.fileTree.setExplorer(explorer);
 				explorer.fileTable.setExplorer(explorer);
 			}

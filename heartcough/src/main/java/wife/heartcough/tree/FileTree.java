@@ -9,6 +9,7 @@ import javax.swing.SwingUtilities;
 import javax.swing.SwingWorker;
 import javax.swing.event.TreeSelectionEvent;
 import javax.swing.event.TreeSelectionListener;
+import javax.swing.filechooser.FileSystemView;
 import javax.swing.tree.DefaultMutableTreeNode;
 import javax.swing.tree.TreeNode;
 import javax.swing.tree.TreePath;
@@ -47,7 +48,7 @@ public class FileTree {
 		String name = parent.getName();
 		
 		File[] files = null;
-		if(FileSystem.isWindowsSpecialFolder(name)|| FileSystem.isDesktopPath(name) || fileTable.haveMoreDirecories()) {
+		if(FileSystem.isDesktopPath(name) || fileTable.haveMoreDirecories()) {
 			files = FileSystem.VIEW.getFiles(parent, false);
 		} else {
 			files = explorer.getFileTable().getListFiles();
@@ -128,8 +129,8 @@ public class FileTree {
 			File userObject = (File)elementNode.getUserObject();
 			
 			if(selectedPath.equals(userObject)) {
-				System.out.println(userObject);
 				DefaultMutableTreeNode parentNode = (DefaultMutableTreeNode)elementNode.getParent();
+				
 				// 윈도우에서 부모노드가 없는 경우는 desktop폴더를 현재 노드로 지정한다.
 				if(parentNode == null) {
 					parentNode = (DefaultMutableTreeNode)currentNode.getRoot();

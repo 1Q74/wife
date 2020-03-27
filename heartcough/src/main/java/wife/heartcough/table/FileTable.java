@@ -11,6 +11,7 @@ import javax.swing.table.TableColumn;
 import javax.swing.tree.DefaultMutableTreeNode;
 
 import wife.heartcough.Explorer;
+import wife.heartcough.command.Command;
 import wife.heartcough.system.FileSystem;
 import wife.heartcough.tree.FileTree;
 
@@ -83,6 +84,13 @@ public class FileTable {
 		return listFiles;
 	}
 	
+	public File getFile(JTable source) {
+		int rowIndex = table.getSelectedRow();
+		if(rowIndex == -1) return null;
+		
+		return listFiles[rowIndex];
+	}
+	
 	private MouseListener getMouseListener() {
 		return 
 			new MouseListener() {
@@ -90,12 +98,9 @@ public class FileTable {
 			@Override
 			public void mouseClicked(MouseEvent e) {
 				if(e.getClickCount() == 2) {
-					JTable table = (JTable)e.getSource();
+					File file = getFile((JTable)e.getSource());
+					if(file == null) return;
 					
-					int rowIndex = table.getSelectedRow();
-					if(rowIndex == -1) return;
-					
-					File file = listFiles[rowIndex];
 					if(file.isDirectory()) {
 						fileTree.synchronizeToFileTable(file);
 					}
@@ -146,6 +151,7 @@ public class FileTable {
 		setFileTableColumn();
 		
 		table.addMouseListener(getMouseListener());
+		table.addKeyListener(new Command(this));
 		table.repaint();
 	}
 	

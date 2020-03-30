@@ -10,11 +10,11 @@ import javax.swing.JTable;
 import org.apache.commons.io.FileUtils;
 import org.apache.commons.io.FilenameUtils;
 
-import wife.heartcough.table.FileTable;
+import wife.heartcough.Explorer;
 
 public class Command implements KeyListener {
 
-	private FileTable fileTable;
+	private Explorer explorer;
 	
 	private static final int CTRL = 2;
 	private static final int C = 67;
@@ -22,15 +22,15 @@ public class Command implements KeyListener {
 	
 	private File source;
 	
-	public Command(FileTable fileTable) {
-		this.fileTable = fileTable;
+	public Command(Explorer explorer) {
+		this.explorer = explorer;
 	}
 	
 	private File getFile(Object source) {
 		File file = null;
 		
 		if(source instanceof JTable) {
-			file = fileTable.getFile((JTable)source);
+			file = explorer.getFileTable().getFile((JTable)source);
 		} 
 		
 		return file;
@@ -52,9 +52,10 @@ public class Command implements KeyListener {
 		switch(keyCodeSum) {
 			case (CTRL + C):
 				source = getFile(e.getSource());
+				System.out.println(source);
 				break;
 			case (CTRL + V):
-				copy(getFile(e.getSource()));
+				copy(new File(explorer.getDirectoryPath().getPath().getText()));
 				break;
 		}
 	}
@@ -66,13 +67,12 @@ public class Command implements KeyListener {
 	private void copy(File target) {
 		if(target.isFile()) return;
 		
-		File createdFile = getCreatedFile(target);
-		
 		if(target.isDirectory()) {
+			System.out.println(source + " / " + target);
 			if(source.isDirectory()) {
 				try {
-					System.out.println(source + " / " + createdFile);
-					
+
+					File createdFile = getCreatedFile(target);
 					FileUtils.copyDirectory(source, createdFile);
 				} catch (IOException e) {
 					e.printStackTrace();

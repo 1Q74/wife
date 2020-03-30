@@ -4,6 +4,7 @@ import java.io.File;
 
 import javax.swing.Icon;
 import javax.swing.table.AbstractTableModel;
+import javax.swing.table.TableColumn;
 
 import wife.heartcough.system.FileSystem;
 
@@ -11,29 +12,13 @@ public class FileListModel extends AbstractTableModel {
 
 	private static final long serialVersionUID = 1L;
 
-	private static final Object[][] COLUMN_SET = new Object[][] {
-		{ 25,		""		}
-		, { 400,	"Name"	}
-	};
-	public static final Integer[] COLUMN_WIDTH = new Integer[COLUMN_SET.length];
-	public static final String[] COLUMN_NAME = new String[COLUMN_SET.length];
+	private static final String[] COLUMN_NAME = new String[] { "", "Name" };
 	private File[] files;
 	
 	public FileListModel(File[] files) {
 		this.files = files;
-		
-		setColumn();
 	}
 	
-	private void setColumn() {
-		int index = 0;
-		for(Object[] column : COLUMN_SET) {
-			COLUMN_WIDTH[index] = new Integer((int)column[0]);
-			COLUMN_NAME[index] = new String((String)column[1]);
-			++index;
-		}
-	}
-
 	@Override
     public Class<?> getColumnClass(int column) {
 		switch(column) {
@@ -48,7 +33,7 @@ public class FileListModel extends AbstractTableModel {
 	
 	@Override
 	public String getColumnName(int column) {
-		return (String)COLUMN_NAME[column];
+		return COLUMN_NAME[column];
 	}
 
 	@Override
@@ -73,7 +58,7 @@ public class FileListModel extends AbstractTableModel {
 	
 	@Override
 	public int getColumnCount() {
-		return COLUMN_SET.length;
+		return COLUMN_NAME.length;
 	}
 	
 };

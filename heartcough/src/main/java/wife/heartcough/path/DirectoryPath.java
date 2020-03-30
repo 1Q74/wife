@@ -2,6 +2,8 @@ package wife.heartcough.path;
 
 import java.awt.event.KeyEvent;
 import java.awt.event.KeyListener;
+import java.awt.event.MouseEvent;
+import java.awt.event.MouseListener;
 import java.io.File;
 
 import wife.heartcough.Explorer;
@@ -11,6 +13,7 @@ public class DirectoryPath {
 	
 	private Explorer explorer;
 	private IconTextField path = new IconTextField();
+	private File previousPath;
 	
 	public void setExplorer(Explorer explorer) {
 		this.explorer = explorer;
@@ -31,8 +34,11 @@ public class DirectoryPath {
 				if(e.getKeyCode() == KeyEvent.VK_ENTER) {
 					String currentPath = path.getText();
 					File file = new File(currentPath);
-				
-					explorer.getFileTree().searchAndChangePath(file);
+
+					if(file.isDirectory()) {
+						explorer.getFileTree().searchAndChangePath(file);
+						previousPath = file;
+					}
 				}
 			}
 		}; 

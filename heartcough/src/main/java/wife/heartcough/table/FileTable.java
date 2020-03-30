@@ -32,6 +32,8 @@ public class FileTable {
 	public void setExplorer(Explorer explorer) {
 		this.explorer = explorer;
 		this.fileTree = this.explorer.getFileTree();
+		
+		table.addKeyListener(new Command(explorer));
 	}
 	
 	public void setCurrentPath(File path) {
@@ -125,14 +127,11 @@ public class FileTable {
 		};
 	}
 	
-	private void setFileTableColumn() {
-		Integer[] width = FileListModel.COLUMN_WIDTH;
-		int index = 0;
-		for(Integer w : width) {
-			TableColumn column = table.getColumnModel().getColumn(index++);
-			column.setMaxWidth(w);
-			column.setPreferredWidth(w);
-		}
+	private void setFileIconColumn() {
+		int width = 25;
+		TableColumn column = table.getColumnModel().getColumn(0);
+		column.setMaxWidth(width);
+		column.setPreferredWidth(width);
 	}
 	
 	public void load() {
@@ -148,10 +147,11 @@ public class FileTable {
 		FileListModel model = new FileListModel(listFiles);
 
 		table.setModel(model);
-		setFileTableColumn();
+		setFileIconColumn();
 		
 		table.addMouseListener(getMouseListener());
-		table.addKeyListener(new Command(this));
+		table.setAutoResizeMode(JTable.AUTO_RESIZE_LAST_COLUMN);
+		table.setFillsViewportHeight(true);
 		table.repaint();
 	}
 	

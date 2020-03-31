@@ -81,11 +81,12 @@ public class FileTable {
 
 			@Override
 			public void mouseClicked(MouseEvent e) {
+				int rowIndex = ((JTable)e.getSource()).getSelectedRow();
+				if(rowIndex == -1) return;
+				
+				Synchronizer.setCurrentFile(rowElement[rowIndex]);
+				
 				if(e.getClickCount() == 2) {
-					int rowIndex = ((JTable)e.getSource()).getSelectedRow();
-					if(rowIndex == -1) return;
-					
-					Synchronizer.setCurrentFile(rowElement[rowIndex]);
 					if(Synchronizer.getCurrentFile().isDirectory()) {
 						Synchronizer.synchronize(Synchronizer.getCurrentFile());
 					}

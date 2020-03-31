@@ -8,9 +8,7 @@ import java.io.IOException;
 import org.apache.commons.io.FileUtils;
 import org.apache.commons.io.FilenameUtils;
 
-import wife.heartcough.Explorer;
 import wife.heartcough.Synchronizer;
-import wife.heartcough.tree.FileTree;
 
 public class Command implements KeyListener {
 
@@ -19,16 +17,6 @@ public class Command implements KeyListener {
 	private static final int V = 86;
 	
 	private File source;
-	
-//	private File getFile(Object source) {
-//		File file = null;
-//		
-//		if(source instanceof JTable) {
-//			file = explorer.getFileTable().getFile((JTable)source);
-//		} 
-//		
-//		return file;
-//	}
 	
 	private File getCreatedFile(File target) {
 		String sourceName = FilenameUtils.getName(source.getAbsolutePath());
@@ -48,9 +36,9 @@ public class Command implements KeyListener {
 				source = Synchronizer.getCurrentFile();
 				break;
 			case (CTRL + V):
-//				File target = new File(explorer.getDirectoryPath().getPath().getText());
-//				copy(target);
-//				fileTree.reload();
+				File target = Synchronizer.getCurrentDirectory();
+				copy(target);
+				Synchronizer.reload();
 				break;
 		}
 	}
@@ -61,10 +49,10 @@ public class Command implements KeyListener {
 	
 	private void copy(File target) {
 		if(target.isFile()) return;
+		System.out.println(source + " / " + target);
 		
 		if(target.isDirectory()) {
 			if(source.isDirectory()) {
-				System.out.println(source + " / " + target);
 				try {
 					File createdFile = getCreatedFile(target);
 					FileUtils.copyDirectory(source, createdFile);

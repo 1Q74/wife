@@ -8,7 +8,7 @@ import javax.swing.SwingUtilities;
 import javax.swing.event.TreeSelectionEvent;
 import javax.swing.event.TreeSelectionListener;
 import javax.swing.tree.DefaultMutableTreeNode;
-import javax.swing.tree.TreeNode;
+import javax.swing.tree.DefaultTreeModel;
 import javax.swing.tree.TreePath;
 
 import wife.heartcough.Synchronizer;
@@ -47,34 +47,53 @@ public class FileTree {
 		}
 	}
 	
-	public void reload() {
-//		currentNode.removeAllChildren();
+	public void refresh() {
+		DefaultMutableTreeNode currentTreeNode = Synchronizer.getCurrentNode();
+		Enumeration<?> children = currentTreeNode.children();
 		
-		File currentPath = Synchronizer.getCurrentNodeDirectory();
-//		fileTable.setCurrentPath(currentPath);
-//		fileTable.load(currentNode);
+		while(children.hasMoreElements()) {
+			DefaultMutableTreeNode childNode = (DefaultMutableTreeNode)children.nextElement();
+			File file = (File)childNode.getUserObject();
+
+			if(!file.exists()) {
+				currentTreeNode.remove(childNode);
+			}
+		}
+		
+		DefaultTreeModel model = (DefaultTreeModel)tree.getModel();
+		model.reload(currentTreeNode);
+	}
+	
+	public void removeCurrentNodeChildren() {
+		Synchronizer.getCurrentNode().removeAllChildren();
+		DefaultTreeModel model = (DefaultTreeModel)getTree().getModel();
+		model.reload(Synchronizer.getCurrentNode());
+	}
+	
+	public boolean search(DefaultMutableTreeNode parentNode) {
+		boolean isFound = false;
+		Enumeration<?> children = parentNode.children();
+		
+		while(children.hasMoreElements()) {
+			DefaultMutableTreeNode childNode = (DefaultMutableTreeNode)children.nextElement();
+			System.out.println(childNode);
+			File userObject = (File)childNode.getUserObject();
+			
+			if(Synchronizer.getCurrentDirectory().equals(userObject)) {
+				Synchronizer.synchronize((DefaultMutableTreeNode)childNode.getParent());
+				return true;
+			} else {
+				isFound = search(childNode);
+				if(isFound) break;
+			}
+		}
+		
+		return isFound;
 	}
 	
 	public void change() {
-		for(TreeNode node : Synchronizer.getCurrentNode().getPath()) {
-			DefaultMutableTreeNode elementNode = (DefaultMutableTreeNode)node;
-			File userObject = (File)elementNode.getUserObject();
-			
-			if(Synchronizer.getCurrentDirectory().equals(userObject)) {
-				DefaultMutableTreeNode parentNode = (DefaultMutableTreeNode)elementNode.getParent();
-				
-				// 윈도우에서 부모노드가 없는 경우는 desktop폴더를 현재 노드로 지정한다.
-				if(parentNode == null) {
-					parentNode = (DefaultMutableTreeNode)Synchronizer.getCurrentNode().getRoot();
-					TreePath desktopTreePath = new TreePath((Object[])parentNode.getPath());
-					tree.setSelectionPath(desktopTreePath);
-				} else {
-					Synchronizer.synchronize(parentNode);
-				}
-			} else {
-				Synchronizer.synchronize(Synchronizer.getCurrentDirectory());
-			}
-		};
+		DefaultMutableTreeNode root = (DefaultMutableTreeNode)tree.getModel().getRoot();
+		search(root);
 	}
 	
 	public void synchronize() {

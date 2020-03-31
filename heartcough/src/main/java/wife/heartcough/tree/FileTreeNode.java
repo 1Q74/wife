@@ -5,6 +5,7 @@ import java.util.List;
 
 import javax.swing.SwingWorker;
 import javax.swing.tree.DefaultMutableTreeNode;
+import javax.swing.tree.TreePath;
 
 import wife.heartcough.Synchronizer;
 import wife.heartcough.system.FileSystem;
@@ -61,6 +62,7 @@ public class FileTreeNode {
             @Override
             protected void done() {
 //            	fileTree.setEnabled(true);
+            	Synchronizer.getFileTree().getTree().expandPath(new TreePath(Synchronizer.getCurrentNode().getPath()));
             	Synchronizer.getFileTree().getTree().repaint();
              }
         };

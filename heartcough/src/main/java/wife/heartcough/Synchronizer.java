@@ -3,6 +3,10 @@ package wife.heartcough;
 import java.io.File;
 
 import javax.swing.tree.DefaultMutableTreeNode;
+import javax.swing.tree.DefaultTreeModel;
+import javax.swing.tree.ExpandVetoException;
+import javax.swing.tree.TreeNode;
+import javax.swing.tree.TreePath;
 
 import wife.heartcough.path.DirectoryPath;
 import wife.heartcough.table.FileTable;
@@ -90,6 +94,11 @@ public class Synchronizer {
 	
 	public static boolean haveMoreDirecories() {
 		return DIRECTORIES.length > FILES.length;
+	}
+	
+	public static void reload() {
+		FILE_TREE.removeCurrentNodeChildren();
+		load(getCurrentNode());
 	}
 	
 	public static void load(DefaultMutableTreeNode selectedNode) {

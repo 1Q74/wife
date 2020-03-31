@@ -11,10 +11,12 @@ import org.apache.commons.io.FileUtils;
 import org.apache.commons.io.FilenameUtils;
 
 import wife.heartcough.Explorer;
+import wife.heartcough.tree.FileTree;
 
 public class Command implements KeyListener {
 
 	private Explorer explorer;
+	private FileTree fileTree;
 	
 	private static final int CTRL = 2;
 	private static final int C = 67;
@@ -24,6 +26,7 @@ public class Command implements KeyListener {
 	
 	public Command(Explorer explorer) {
 		this.explorer = explorer;
+		this.fileTree = this.explorer.getFileTree();
 	}
 	
 	private File getFile(Object source) {
@@ -52,10 +55,11 @@ public class Command implements KeyListener {
 		switch(keyCodeSum) {
 			case (CTRL + C):
 				source = getFile(e.getSource());
-				System.out.println(source);
 				break;
 			case (CTRL + V):
-				copy(new File(explorer.getDirectoryPath().getPath().getText()));
+				File target = new File(explorer.getDirectoryPath().getPath().getText());
+				copy(target);
+				fileTree.reload();
 				break;
 		}
 	}
@@ -68,10 +72,9 @@ public class Command implements KeyListener {
 		if(target.isFile()) return;
 		
 		if(target.isDirectory()) {
-			System.out.println(source + " / " + target);
 			if(source.isDirectory()) {
+				System.out.println(source + " / " + target);
 				try {
-
 					File createdFile = getCreatedFile(target);
 					FileUtils.copyDirectory(source, createdFile);
 				} catch (IOException e) {

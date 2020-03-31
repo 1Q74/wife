@@ -1,15 +1,21 @@
 package wife.heartcough.tree;
 
+import java.awt.event.FocusEvent;
+import java.awt.event.FocusListener;
+import java.awt.event.MouseEvent;
+import java.awt.event.MouseListener;
 import java.io.File;
 import java.util.Enumeration;
 import java.util.List;
 
+import javax.swing.JTable;
 import javax.swing.JTree;
 import javax.swing.SwingUtilities;
 import javax.swing.SwingWorker;
 import javax.swing.event.TreeSelectionEvent;
 import javax.swing.event.TreeSelectionListener;
 import javax.swing.tree.DefaultMutableTreeNode;
+import javax.swing.tree.DefaultTreeModel;
 import javax.swing.tree.TreeNode;
 import javax.swing.tree.TreePath;
 
@@ -83,6 +89,7 @@ public class FileTree {
             @Override
             protected void done() {
             	fileTree.setEnabled(true);
+            	fileTree.repaint();
              }
         };
         worker.execute();
@@ -98,6 +105,51 @@ public class FileTree {
 		}
 		
 		return desktopNode;
+	}
+	
+	private MouseListener getMouseListener() {
+		return 
+			new MouseListener() {
+
+			@Override
+			public void mouseClicked(MouseEvent e) {
+				directoryPath.restorePath();
+			}
+
+			@Override
+			public void mousePressed(MouseEvent e) {
+			}
+
+			@Override
+			public void mouseReleased(MouseEvent e) {
+			}
+
+			@Override
+			public void mouseEntered(MouseEvent e) {
+			}
+
+			@Override
+			public void mouseExited(MouseEvent e) {
+			}
+		};
+	}
+	
+	private FocusListener getFocusListener() {
+		return
+			new FocusListener() {
+
+				@Override
+				public void focusGained(FocusEvent e) {
+					explorer.refresh();
+				}
+
+				@Override
+				public void focusLost(FocusEvent e) {
+					// TODO Auto-generated method stub
+					
+				}
+			
+		};
 	}
 	
 	public JTree getDesktopFolderTree() {
@@ -118,8 +170,19 @@ public class FileTree {
 				});
 		    }
 		});
+		fileTree.addMouseListener(getMouseListener());
+		fileTree.setFocusable(true);
+		fileTree.addFocusListener(getFocusListener());
 		
 		return fileTree;
+	}
+	
+	public void reload() {
+		currentNode.removeAllChildren();
+		
+		File currentPath = getCurrentPath();
+		fileTable.setCurrentPath(currentPath);
+		fileTable.load(currentNode);
 	}
 	
 	public void searchAndChangePath(File selectedPath) {
@@ -159,8 +222,16 @@ public class FileTree {
 		}
 	}
 	
+	public DefaultMutableTreeNode getCurrentNode() {
+		return currentNode;
+	}
+	
 	public File getCurrentPath() {
-		return (File)currentNode.getUserObject();
+		return (File)getCurrentNode().getUserObject();
+	}
+	
+	public JTree getTree() {
+		return fileTree;
 	}
 
 }

@@ -1,10 +1,14 @@
 package wife.heartcough.table;
 
 import java.io.File;
+import java.util.ArrayList;
+import java.util.List;
 
 import javax.swing.Icon;
 import javax.swing.table.AbstractTableModel;
 import javax.swing.table.TableColumn;
+
+import org.apache.commons.lang3.ArrayUtils;
 
 import wife.heartcough.system.FileSystem;
 
@@ -61,4 +65,24 @@ public class FileListModel extends AbstractTableModel {
 		return COLUMN_NAME.length;
 	}
 	
+	public List<Integer> refresh() {
+		int index = -1;
+		List<Integer> removedIndexes = new ArrayList<Integer>();
+		
+		for(File file : files) {
+			++index;
+			
+			if(!file.exists()) {
+				ArrayUtils.remove(files, index);
+				fireTableRowsDeleted(index, index);
+				removedIndexes.add(index);
+			}
+		}
+		
+		return removedIndexes;
+		
+		
+//		fireTableDataChanged();
+	}
+
 };

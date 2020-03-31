@@ -12,6 +12,7 @@ import javax.swing.tree.DefaultMutableTreeNode;
 
 import wife.heartcough.Explorer;
 import wife.heartcough.command.Command;
+import wife.heartcough.path.DirectoryPath;
 import wife.heartcough.system.FileSystem;
 import wife.heartcough.tree.FileTree;
 
@@ -22,9 +23,12 @@ public class FileTable {
 
 	private Explorer explorer;
 	private FileTree fileTree;
+	private DirectoryPath directoryPath;
+	
 	private File currentPath;
 	private JTable table = new JTable();
 	private File[] listFiles;
+	private FileListModel model;
 	
 	private int fileCount = 0;
 	private int directoryCount = 0;
@@ -32,6 +36,7 @@ public class FileTable {
 	public void setExplorer(Explorer explorer) {
 		this.explorer = explorer;
 		this.fileTree = this.explorer.getFileTree();
+		this.directoryPath = this.explorer.getDirectoryPath();
 		
 		table.addKeyListener(new Command(explorer));
 	}
@@ -47,7 +52,7 @@ public class FileTable {
 		return this.currentPath;
 	}
 
-	private File[] getTableFileList() {
+	public File[] getTableFileList() {
 		String[] fileList = getCurrentPath().list();
 		File[] listFiles = null;
 		
@@ -107,6 +112,8 @@ public class FileTable {
 						fileTree.synchronizeToFileTable(file);
 					}
 				}
+				
+				directoryPath.restorePath();
 			}
 
 			@Override
@@ -144,7 +151,7 @@ public class FileTable {
 		if(selectedNode != null && selectedNode.isLeaf()) {
 			fileTree.setChildNode(selectedNode, fileTree.getChildFiles((File)selectedNode.getUserObject()));
 		}
-		FileListModel model = new FileListModel(listFiles);
+		model = new FileListModel(listFiles);
 
 		table.setModel(model);
 		setFileIconColumn();
@@ -166,6 +173,10 @@ public class FileTable {
 	
 	public JTable getFileTable() {
 		return table;
+	}
+	
+	public FileListModel getFileTableModel() {
+		return model;
 	}
 	
 }

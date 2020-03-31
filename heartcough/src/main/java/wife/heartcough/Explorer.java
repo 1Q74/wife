@@ -1,9 +1,10 @@
 package wife.heartcough;
 
 import java.awt.BorderLayout;
-import java.awt.event.MouseEvent;
-import java.awt.event.MouseListener;
+import java.io.File;
 import java.io.IOException;
+import java.util.Enumeration;
+import java.util.List;
 
 import javax.swing.JFrame;
 import javax.swing.JPanel;
@@ -13,8 +14,12 @@ import javax.swing.SwingUtilities;
 import javax.swing.UIManager;
 import javax.swing.UnsupportedLookAndFeelException;
 import javax.swing.border.EmptyBorder;
+import javax.swing.table.DefaultTableModel;
+import javax.swing.tree.DefaultMutableTreeNode;
+import javax.swing.tree.DefaultTreeModel;
 
 import wife.heartcough.path.DirectoryPath;
+import wife.heartcough.table.FileListModel;
 import wife.heartcough.table.FileTable;
 import wife.heartcough.tree.FileTree;
 
@@ -85,6 +90,30 @@ public class Explorer {
 		window.setContentPane(getSplitter());
 		window.setSize(1024, 768);
 		window.setVisible(true);
+	}
+	
+	public void refresh() {
+		DefaultMutableTreeNode currentTreeNode = fileTree.getCurrentNode();
+		Enumeration<?> children = currentTreeNode.children();
+		
+		while(children.hasMoreElements()) {
+			DefaultMutableTreeNode childNode = (DefaultMutableTreeNode)children.nextElement();
+			File file = (File)childNode.getUserObject();
+
+			if(!file.exists()) {
+				currentTreeNode.remove(childNode);
+			}
+		}
+		
+		DefaultTreeModel model = (DefaultTreeModel)fileTree.getTree().getModel();
+		model.reload(currentTreeNode);
+		
+		List<Integer> removedIndexes = fileTable.getFileTableModel().refresh();
+		FileListModel tableModel = new FileListModel(fileTable.getTableFileList());
+		fileTable.getFileTable().setModel(tableModel);
+//		tableModel.fireTableDataChanged();
+//		fileTable.getFileTable().revalidate();
+		fileTable.getFileTable().repaint();
 	}
 	
 	public static void main(String[] args) throws IOException {

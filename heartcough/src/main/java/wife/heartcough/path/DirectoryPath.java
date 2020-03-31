@@ -2,21 +2,23 @@ package wife.heartcough.path;
 
 import java.awt.event.KeyEvent;
 import java.awt.event.KeyListener;
-import java.awt.event.MouseEvent;
-import java.awt.event.MouseListener;
 import java.io.File;
 
 import wife.heartcough.Explorer;
 import wife.heartcough.system.FileSystem;
+import wife.heartcough.table.FileTable;
+import wife.heartcough.tree.FileTree;
 
 public class DirectoryPath {
 	
 	private Explorer explorer;
+	private FileTree fileTree;
+	
 	private IconTextField path = new IconTextField();
-	private File previousPath;
 	
 	public void setExplorer(Explorer explorer) {
 		this.explorer = explorer;
+		this.fileTree = this.explorer.getFileTree();
 	}
 	
 	private KeyListener getKeyListener() {
@@ -37,7 +39,6 @@ public class DirectoryPath {
 
 					if(file.isDirectory()) {
 						explorer.getFileTree().searchAndChangePath(file);
-						previousPath = file;
 					}
 				}
 			}
@@ -58,6 +59,10 @@ public class DirectoryPath {
 	
 	public IconTextField getPath() {
 		return this.path;
+	}
+	
+	public void restorePath() {
+		path.setText(fileTree.getCurrentPath().getAbsolutePath());
 	}
 	
 }

@@ -14,9 +14,11 @@ public class FileSystem {
 	public static FileSystemView VIEW;
 	public static File DEFAULT;
 	public static File HOME;
+	public static final String WINDOWS_MY_PC_NAME;
 	
 	static {
 		initialize();
+		WINDOWS_MY_PC_NAME = "::{20D04FE0-3AEA-1069-A2D8-08002B30309D}";
 	}
 	
 	private static void initialize() {
@@ -27,6 +29,10 @@ public class FileSystem {
 	
 	public static boolean isDesktopPath(String path) {
 		return StringUtils.equals(DEFAULT.getAbsolutePath(), path);
+	}
+	
+	public static boolean isWindowsMyPC(String directoryName) {
+		return StringUtils.equals(directoryName, WINDOWS_MY_PC_NAME);
 	}
 	
 	public static boolean isWindowsSpecialFolder(String path) {

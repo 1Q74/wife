@@ -11,6 +11,7 @@ import javax.swing.table.TableColumn;
 import javax.swing.tree.DefaultMutableTreeNode;
 
 import wife.heartcough.Explorer;
+import wife.heartcough.Synchronizer;
 import wife.heartcough.command.Command;
 import wife.heartcough.path.DirectoryPath;
 import wife.heartcough.system.FileSystem;
@@ -25,9 +26,8 @@ public class FileTable {
 	private FileTree fileTree;
 	private DirectoryPath directoryPath;
 	
-	private File currentPath;
 	private JTable table = new JTable();
-	private File[] listFiles;
+	private File[] rowElement;
 	private FileListModel model;
 	
 	private int fileCount = 0;
@@ -41,61 +41,62 @@ public class FileTable {
 		table.addKeyListener(new Command(explorer));
 	}
 	
-	public void setCurrentPath(File path) {
-		this.currentPath = path;
-	}
-	
-	private File getCurrentPath() {
-		if(this.currentPath == null) {
-			this.currentPath = FileSystem.DEFAULT; 
-		}
-		return this.currentPath;
+	private void copyToFileArray(List<File> directoryList, List<File> fileList, File[] files) {
+		int directoryCount = directoryList.size();
+		int fileCount = fileList.size();
+		
+		File[] tmpDirectories = new File[directoryCount];
+		File[] tmpFiles = new File[fileCount];
+		
+		directoryList.toArray(tmpDirectories);
+		fileList.toArray(tmpFiles);
+		
+		Synchronizer.setDirectories(tmpDirectories);
+		Synchronizer.setFiles(tmpFiles);
+		
+		System.arraycopy(Synchronizer.getDirectories(), 0, files, 0, directoryCount);
+		System.arraycopy(Synchronizer.getFiles(), 0, files, directoryCount, fileCount);
 	}
 
 	public File[] getTableFileList() {
-		String[] fileList = getCurrentPath().list();
-		File[] listFiles = null;
+//		String[] filenames = getCurrentPath().list();
+		String[] filenames = Synchronizer.getCurrentDirectory().list();
+		File[] files = null;
 		
-		// 윈도우의 [내 PC]
-		if(fileList == null) {
-			listFiles = getCurrentPath().listFiles();
+		if(FileSystem.isWindowsMyPC(Synchronizer.getCurrentDirectoryName())) {
+			files = Synchronizer.getCurrentDirectory().listFiles();
+			Synchronizer.setDirectories(files);
 		} else {
-			int end = fileList.length;
-			listFiles = new File[end];
+			int end = filenames.length;
+			files = new File[end];
 			
-			directoryCount = 0;
-			fileCount = 0;
-			
-			List<File> directories = new ArrayList<File>();
-			List<File> files = new ArrayList<File>();
+			List<File> directoryList = new ArrayList<File>();
+			List<File> fileList = new ArrayList<File>();
 			
 			for(int i = 0; i < end; i++) {
-				String filePath = 	getCurrentPath().getAbsolutePath()
+				String filePath = 	Synchronizer.getCurrentDirectoryPath()
 									+ File.separatorChar
-									+ fileList[i];
+									+ filenames[i];
 				
 				File file = new File(filePath);
 				if(file.isDirectory()) {
-					++directoryCount;
-					directories.add(file);
+					directoryList.add(file);
 				} else {
-					++fileCount;
-					files.add(file);
+					fileList.add(file);
 				}
 			}
-			
-			System.arraycopy(directories.toArray(), 0, listFiles, 0, directoryCount);
-			System.arraycopy(files.toArray(), 0, listFiles, directoryCount, fileCount);
+
+			copyToFileArray(directoryList, fileList, files);
 		}
 		
-		return listFiles;
+		return files;
 	}
 	
 	public File getFile(JTable source) {
 		int rowIndex = table.getSelectedRow();
 		if(rowIndex == -1) return null;
 		
-		return listFiles[rowIndex];
+		return rowElement[rowIndex];
 	}
 	
 	private MouseListener getMouseListener() {
@@ -141,17 +142,17 @@ public class FileTable {
 		column.setPreferredWidth(width);
 	}
 	
-	public void load() {
-		load(null);
-	}
+//	public void load() {
+//		load(null);
+//	}
 	
-	public void load(DefaultMutableTreeNode selectedNode) {
-		listFiles = getTableFileList();
+	public void load() {
+		rowElement = getTableFileList();
 		
-		if(selectedNode != null && selectedNode.isLeaf()) {
-			fileTree.setChildNode(selectedNode, fileTree.getChildFiles((File)selectedNode.getUserObject()));
-		}
-		model = new FileListModel(listFiles);
+//		if(selectedNode != null && selectedNode.isLeaf()) {
+//			fileTree.setChildNode(selectedNode, fileTree.getChildFiles((File)selectedNode.getUserObject()));
+//		}
+		model = new FileListModel(rowElement);
 
 		table.setModel(model);
 		setFileIconColumn();
@@ -168,7 +169,7 @@ public class FileTable {
 	}
 	
 	public File[] getListFiles() {
-		return listFiles;
+		return rowElement;
 	}
 	
 	public JTable getFileTable() {

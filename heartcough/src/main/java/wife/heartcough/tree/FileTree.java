@@ -20,6 +20,7 @@ import javax.swing.tree.TreeNode;
 import javax.swing.tree.TreePath;
 
 import wife.heartcough.Explorer;
+import wife.heartcough.Synchronizer;
 import wife.heartcough.path.DirectoryPath;
 import wife.heartcough.system.FileSystem;
 import wife.heartcough.table.FileTable;
@@ -29,82 +30,23 @@ import wife.heartcough.table.FileTable;
 
 public class FileTree {
 	
+	private static final long serialVersionUID = 1L;
+	private FileTreeNode fileTreeNode = new FileTreeNode();
+	
+	
+	
+	
 	private Explorer explorer;
 	private DirectoryPath directoryPath;
 	private FileTable fileTable;
 	private JTree fileTree;
 	private DefaultMutableTreeNode currentNode;
 	
+	
 	public void setExplorer(Explorer explorer) {
 		this.explorer = explorer;
 		this.directoryPath = this.explorer.getDirectoryPath();
 		this.fileTable = this.explorer.getFileTable();
-	}
-	
-	private void setSystemChildNode(DefaultMutableTreeNode nodes, File parent) {
-		for(File child : FileSystem.VIEW.getFiles(parent, false)) {
-			if(child.isDirectory()) {
-				nodes.add(new DefaultMutableTreeNode(child));
-			}
-		}
-	}
-	
-	public File[] getChildFiles(File parent) {
-		String name = parent.getName();
-		
-		File[] files = null;
-		if(FileSystem.isDesktopPath(name) || fileTable.haveMoreDirecories()) {
-			files = FileSystem.VIEW.getFiles(parent, false);
-		} else {
-			files = explorer.getFileTable().getListFiles();
-		}
-		
-		return files;
-	}
-	
-	private void setCurrentNode(DefaultMutableTreeNode selectedNode) {
-		this.currentNode = selectedNode;
-	}
-	
-	public void setChildNode(final DefaultMutableTreeNode parentNode, File[] childFiles) {
-		fileTree.setEnabled(false);
-		SwingWorker<Void, File> worker = new SwingWorker<Void, File>() {
-            @Override
-            public Void doInBackground() {
-            	for(File file : childFiles) {
-        			if(file.isDirectory()) {
-        				publish(file);
-        			}
-                }
-                return null;
-            }
-
-            @Override
-            protected void process(List<File> chunks) {
-                for(File child : chunks) {
-                	parentNode.add(new DefaultMutableTreeNode(child));
-                }
-            }
-
-            @Override
-            protected void done() {
-            	fileTree.setEnabled(true);
-            	fileTree.repaint();
-             }
-        };
-        worker.execute();
-	}
-	
-	public DefaultMutableTreeNode getDesktopFolderNodes() {
-		DefaultMutableTreeNode desktopNode = null;
-		
-		for(File parent : FileSystem.VIEW.getRoots()) {
-			desktopNode = new DefaultMutableTreeNode(parent);
-			setSystemChildNode(desktopNode, parent);
-			setCurrentNode(desktopNode);
-		}
-		
-		return desktopNode;
 	}
 	
 	private MouseListener getMouseListener() {
@@ -140,7 +82,7 @@ public class FileTree {
 
 				@Override
 				public void focusGained(FocusEvent e) {
-					explorer.refresh();
+//					explorer.refresh();
 				}
 
 				@Override
@@ -153,19 +95,20 @@ public class FileTree {
 	}
 	
 	public JTree getDesktopFolderTree() {
-		fileTree = new JTree(getDesktopFolderNodes());
-		fileTree.setCellRenderer(new CellRenender());
+		fileTree = new JTree(fileTreeNode.getDesktopFolderNodes());
+		fileTree.setCellRenderer(new FileTreeNodeCellRenender());
 		fileTree.addTreeSelectionListener(new TreeSelectionListener() {
 			@Override
 			public void valueChanged(TreeSelectionEvent e) {
 				SwingUtilities.invokeLater(new Runnable() {
 					public void run() {
-						currentNode = (DefaultMutableTreeNode)e.getPath().getLastPathComponent();
-						File file = (File)currentNode.getUserObject();
-						fileTable.setCurrentPath(file);
-						fileTable.load(currentNode);
+						Synchronizer.load((DefaultMutableTreeNode)e.getPath().getLastPathComponent());
+//						File file = (File)currentNode.getUserObject();
+//						File file = Synchronizer.getCurrentDirectory();
+//						fileTable.setCurrentPath(Synchronizer.getCurrentDirectory());
+//						fileTable.load(Synchronizer.getCurrentNode());
 						
-						directoryPath.setPath(file);
+//						directoryPath.setPath(Synchronizer.getCurrentDirectory());
 					}
 				});
 		    }
@@ -177,12 +120,18 @@ public class FileTree {
 		return fileTree;
 	}
 	
+	public void load() {
+		if(Synchronizer.getCurrentNode() != null && Synchronizer.getCurrentNode().isLeaf()) {
+			fileTreeNode.setChildNode();
+		}
+	}
+	
 	public void reload() {
 		currentNode.removeAllChildren();
 		
-		File currentPath = getCurrentPath();
-		fileTable.setCurrentPath(currentPath);
-		fileTable.load(currentNode);
+		File currentPath = Synchronizer.getCurrentDirectory();
+//		fileTable.setCurrentPath(currentPath);
+//		fileTable.load(currentNode);
 	}
 	
 	public void searchAndChangePath(File selectedPath) {
@@ -199,7 +148,7 @@ public class FileTree {
 					TreePath desktopTreePath = new TreePath((Object[])parentNode.getPath());
 					fileTree.setSelectionPath(desktopTreePath);
 				} else {
-					setCurrentNode(parentNode);
+					Synchronizer.setCurrentNode(parentNode);
 					synchronizeToFileTable(selectedPath);
 				}
 				return;
@@ -220,14 +169,6 @@ public class FileTree {
 				return;
 			}
 		}
-	}
-	
-	public DefaultMutableTreeNode getCurrentNode() {
-		return currentNode;
-	}
-	
-	public File getCurrentPath() {
-		return (File)getCurrentNode().getUserObject();
 	}
 	
 	public JTree getTree() {

@@ -10,12 +10,12 @@ import javax.swing.tree.DefaultTreeCellRenderer;
 
 import wife.heartcough.system.FileSystem;
 
-public class CellRenender extends DefaultTreeCellRenderer {
+public class FileTreeNodeCellRenender extends DefaultTreeCellRenderer {
 
 	private static final long serialVersionUID = 1L;
     private JLabel label;
 
-    public CellRenender() {
+    public FileTreeNodeCellRenender() {
         label = new JLabel();
         label.setOpaque(true);
     }

@@ -5,6 +5,7 @@ import java.awt.event.KeyListener;
 import java.io.File;
 
 import wife.heartcough.Explorer;
+import wife.heartcough.Synchronizer;
 import wife.heartcough.system.FileSystem;
 import wife.heartcough.table.FileTable;
 import wife.heartcough.tree.FileTree;
@@ -62,7 +63,7 @@ public class DirectoryPath {
 	}
 	
 	public void restorePath() {
-		path.setText(fileTree.getCurrentPath().getAbsolutePath());
+		path.setText(Synchronizer.getCurrentDirectoryPath());
 	}
 	
 }

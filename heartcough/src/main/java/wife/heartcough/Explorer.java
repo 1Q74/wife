@@ -14,7 +14,6 @@ import javax.swing.SwingUtilities;
 import javax.swing.UIManager;
 import javax.swing.UnsupportedLookAndFeelException;
 import javax.swing.border.EmptyBorder;
-import javax.swing.table.DefaultTableModel;
 import javax.swing.tree.DefaultMutableTreeNode;
 import javax.swing.tree.DefaultTreeModel;
 
@@ -28,29 +27,34 @@ import wife.heartcough.tree.FileTree;
 
 public class Explorer {
 
-	private FileTable fileTable = new FileTable();
 	private FileTree fileTree = new FileTree();
+	private FileTable fileTable = new FileTable();
 	private DirectoryPath directoryPath = new DirectoryPath();
 	
 	public Explorer() {
+		Synchronizer.setFileTree(fileTree);
+		Synchronizer.setFileTable(fileTable);
+		Synchronizer.setDirectoryPath(directoryPath);
+		
 		directoryPath.setExplorer(this);
 		fileTree.setExplorer(this);
 		fileTable.setExplorer(this);
 	}
 	
 	private JSplitPane getSplitter() {
-		fileTable.load();
+//		fileTable.load();
 		
 		
 		JSplitPane body = new JSplitPane(JSplitPane.HORIZONTAL_SPLIT);
 		body.setLeftComponent(new JScrollPane(fileTree.getDesktopFolderTree()));
 		body.setRightComponent(new JScrollPane(fileTable.getFileTable()));
+		fileTable.load();
 		
 		JPanel bodyPanel = new JPanel(new BorderLayout());
 		bodyPanel.setBorder(new EmptyBorder(5, 5, 5, 5));
 		bodyPanel.add(body);
 		
-		directoryPath.setPath(fileTree.getCurrentPath());
+		directoryPath.setPath(Synchronizer.getCurrentDirectory());
 		JPanel pathPanel = new JPanel(new BorderLayout());
 		pathPanel.setBorder(new EmptyBorder(5, 5, 0, 5));
 		pathPanel.add(directoryPath.getPath());
@@ -92,6 +96,7 @@ public class Explorer {
 		window.setVisible(true);
 	}
 	
+	/*
 	public void refresh() {
 		DefaultMutableTreeNode currentTreeNode = fileTree.getCurrentNode();
 		Enumeration<?> children = currentTreeNode.children();
@@ -115,6 +120,7 @@ public class Explorer {
 //		fileTable.getFileTable().revalidate();
 		fileTable.getFileTable().repaint();
 	}
+	*/
 	
 	public static void main(String[] args) throws IOException {
 		SwingUtilities.invokeLater(new Runnable() {

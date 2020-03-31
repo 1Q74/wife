@@ -1,10 +1,7 @@
 package wife.heartcough;
 
 import java.awt.BorderLayout;
-import java.io.File;
 import java.io.IOException;
-import java.util.Enumeration;
-import java.util.List;
 
 import javax.swing.JFrame;
 import javax.swing.JPanel;
@@ -14,11 +11,8 @@ import javax.swing.SwingUtilities;
 import javax.swing.UIManager;
 import javax.swing.UnsupportedLookAndFeelException;
 import javax.swing.border.EmptyBorder;
-import javax.swing.tree.DefaultMutableTreeNode;
-import javax.swing.tree.DefaultTreeModel;
 
 import wife.heartcough.path.DirectoryPath;
-import wife.heartcough.table.FileListModel;
 import wife.heartcough.table.FileTable;
 import wife.heartcough.tree.FileTree;
 
@@ -35,26 +29,18 @@ public class Explorer {
 		Synchronizer.setFileTree(fileTree);
 		Synchronizer.setFileTable(fileTable);
 		Synchronizer.setDirectoryPath(directoryPath);
-		
-		directoryPath.setExplorer(this);
-		fileTree.setExplorer(this);
-		fileTable.setExplorer(this);
 	}
 	
 	private JSplitPane getSplitter() {
-//		fileTable.load();
-		
-		
 		JSplitPane body = new JSplitPane(JSplitPane.HORIZONTAL_SPLIT);
-		body.setLeftComponent(new JScrollPane(fileTree.getDesktopFolderTree()));
-		body.setRightComponent(new JScrollPane(fileTable.getFileTable()));
-		fileTable.load();
+		body.setLeftComponent(new JScrollPane(fileTree.getRoot()));
+		body.setRightComponent(new JScrollPane(fileTable.load()));
 		
 		JPanel bodyPanel = new JPanel(new BorderLayout());
 		bodyPanel.setBorder(new EmptyBorder(5, 5, 5, 5));
 		bodyPanel.add(body);
 		
-		directoryPath.setPath(Synchronizer.getCurrentDirectory());
+		directoryPath.setPath(Synchronizer.getCurrentNodeDirectory());
 		JPanel pathPanel = new JPanel(new BorderLayout());
 		pathPanel.setBorder(new EmptyBorder(5, 5, 0, 5));
 		pathPanel.add(directoryPath.getPath());
@@ -67,18 +53,6 @@ public class Explorer {
 		
 		
 		return splitter;
-	}
-	
-	public DirectoryPath getDirectoryPath() {
-		return directoryPath;
-	}
-	
-	public FileTree getFileTree() {
-		return fileTree;
-	}
-	
-	public FileTable getFileTable() {
-		return fileTable;
 	}
 	
 	private void show() {

@@ -8,37 +8,21 @@ import java.util.List;
 
 import javax.swing.JTable;
 import javax.swing.table.TableColumn;
-import javax.swing.tree.DefaultMutableTreeNode;
 
-import wife.heartcough.Explorer;
 import wife.heartcough.Synchronizer;
 import wife.heartcough.command.Command;
-import wife.heartcough.path.DirectoryPath;
 import wife.heartcough.system.FileSystem;
-import wife.heartcough.tree.FileTree;
 
 
 
 
 public class FileTable {
 
-	private Explorer explorer;
-	private FileTree fileTree;
-	private DirectoryPath directoryPath;
-	
 	private JTable table = new JTable();
 	private File[] rowElement;
-	private FileListModel model;
 	
-	private int fileCount = 0;
-	private int directoryCount = 0;
-	
-	public void setExplorer(Explorer explorer) {
-		this.explorer = explorer;
-		this.fileTree = this.explorer.getFileTree();
-		this.directoryPath = this.explorer.getDirectoryPath();
-		
-		table.addKeyListener(new Command(explorer));
+	public FileTable() {
+		table.addKeyListener(new Command());
 	}
 	
 	private void copyToFileArray(List<File> directoryList, List<File> fileList, File[] files) {
@@ -59,12 +43,11 @@ public class FileTable {
 	}
 
 	public File[] getTableFileList() {
-//		String[] filenames = getCurrentPath().list();
-		String[] filenames = Synchronizer.getCurrentDirectory().list();
+		String[] filenames = Synchronizer.getCurrentNodeDirectory().list();
 		File[] files = null;
 		
-		if(FileSystem.isWindowsMyPC(Synchronizer.getCurrentDirectoryName())) {
-			files = Synchronizer.getCurrentDirectory().listFiles();
+		if(FileSystem.isWindowsSpecialFolder(Synchronizer.getCurrentNodeDirectoryName())) {
+			files = Synchronizer.getCurrentNodeDirectory().listFiles();
 			Synchronizer.setDirectories(files);
 		} else {
 			int end = filenames.length;
@@ -74,7 +57,7 @@ public class FileTable {
 			List<File> fileList = new ArrayList<File>();
 			
 			for(int i = 0; i < end; i++) {
-				String filePath = 	Synchronizer.getCurrentDirectoryPath()
+				String filePath = 	Synchronizer.getCurrentNodeDirectoryPath()
 									+ File.separatorChar
 									+ filenames[i];
 				
@@ -92,13 +75,6 @@ public class FileTable {
 		return files;
 	}
 	
-	public File getFile(JTable source) {
-		int rowIndex = table.getSelectedRow();
-		if(rowIndex == -1) return null;
-		
-		return rowElement[rowIndex];
-	}
-	
 	private MouseListener getMouseListener() {
 		return 
 			new MouseListener() {
@@ -106,15 +82,16 @@ public class FileTable {
 			@Override
 			public void mouseClicked(MouseEvent e) {
 				if(e.getClickCount() == 2) {
-					File file = getFile((JTable)e.getSource());
-					if(file == null) return;
+					int rowIndex = ((JTable)e.getSource()).getSelectedRow();
+					if(rowIndex == -1) return;
 					
-					if(file.isDirectory()) {
-						fileTree.synchronizeToFileTable(file);
+					Synchronizer.setCurrentFile(rowElement[rowIndex]);
+					if(Synchronizer.getCurrentFile().isDirectory()) {
+						Synchronizer.synchronize(Synchronizer.getCurrentFile());
 					}
 				}
 				
-				directoryPath.restorePath();
+				Synchronizer.restorePath();
 			}
 
 			@Override
@@ -142,42 +119,17 @@ public class FileTable {
 		column.setPreferredWidth(width);
 	}
 	
-//	public void load() {
-//		load(null);
-//	}
-	
-	public void load() {
+	public JTable load() {
 		rowElement = getTableFileList();
-		
-//		if(selectedNode != null && selectedNode.isLeaf()) {
-//			fileTree.setChildNode(selectedNode, fileTree.getChildFiles((File)selectedNode.getUserObject()));
-//		}
-		model = new FileListModel(rowElement);
-
-		table.setModel(model);
+		table.setModel(new FileListModel(rowElement));
 		setFileIconColumn();
 		
 		table.addMouseListener(getMouseListener());
 		table.setAutoResizeMode(JTable.AUTO_RESIZE_LAST_COLUMN);
 		table.setFillsViewportHeight(true);
 		table.repaint();
-	}
-	
-	// 폴더와 파일 중에서 어느 것이 더 많은지에 따라 로직을 달리한다.
-	public boolean haveMoreDirecories() {
-		return directoryCount > fileCount;
-	}
-	
-	public File[] getListFiles() {
-		return rowElement;
-	}
-	
-	public JTable getFileTable() {
+		
 		return table;
-	}
-	
-	public FileListModel getFileTableModel() {
-		return model;
 	}
 	
 }

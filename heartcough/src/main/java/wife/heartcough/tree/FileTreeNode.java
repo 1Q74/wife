@@ -1,37 +1,19 @@
 package wife.heartcough.tree;
 
-import java.awt.event.FocusEvent;
-import java.awt.event.FocusListener;
-import java.awt.event.MouseEvent;
-import java.awt.event.MouseListener;
 import java.io.File;
-import java.util.Enumeration;
 import java.util.List;
-import java.util.concurrent.SynchronousQueue;
 
-import javax.swing.JTable;
-import javax.swing.JTree;
-import javax.swing.SwingUtilities;
 import javax.swing.SwingWorker;
-import javax.swing.event.TreeSelectionEvent;
-import javax.swing.event.TreeSelectionListener;
 import javax.swing.tree.DefaultMutableTreeNode;
-import javax.swing.tree.DefaultTreeModel;
-import javax.swing.tree.TreeNode;
-import javax.swing.tree.TreePath;
 
-import wife.heartcough.Explorer;
 import wife.heartcough.Synchronizer;
-import wife.heartcough.path.DirectoryPath;
 import wife.heartcough.system.FileSystem;
-import wife.heartcough.table.FileTable;
 
 
 
 
 public class FileTreeNode {
 	
-	private DefaultMutableTreeNode currentNode;
 	private File[] nodeElement;
 	
 	public void nodeElement(File[] files) {
@@ -47,11 +29,10 @@ public class FileTreeNode {
 	}
 	
 	public File[] selectNodeElementSource() {
-		System.out.println("currentdirectoryPath = " + Synchronizer.getCurrentDirectoryPath());
 		return
-			FileSystem.isDesktopPath(Synchronizer.getCurrentDirectoryPath())
+			FileSystem.isDesktopPath(Synchronizer.getCurrentNodeDirectoryPath())
 			|| Synchronizer.haveMoreDirecories()
-			? FileSystem.VIEW.getFiles(Synchronizer.getCurrentDirectory(), false)
+			? FileSystem.VIEW.getFiles(Synchronizer.getCurrentNodeDirectory(), false)
 			: Synchronizer.getDirectories();
 	}
 	
@@ -73,7 +54,6 @@ public class FileTreeNode {
             @Override
             protected void process(List<File> chunks) {
                 for(File child : chunks) {
-                	System.out.println(child);
                 	Synchronizer.getCurrentNode().add(new DefaultMutableTreeNode(child));
                 }
             }

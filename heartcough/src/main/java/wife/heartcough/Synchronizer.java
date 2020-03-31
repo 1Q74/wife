@@ -5,13 +5,14 @@ import java.io.File;
 import javax.swing.tree.DefaultMutableTreeNode;
 
 import wife.heartcough.path.DirectoryPath;
-import wife.heartcough.system.FileSystem;
 import wife.heartcough.table.FileTable;
 import wife.heartcough.tree.FileTree;
 
 public class Synchronizer {
 	
 	private static DefaultMutableTreeNode CURRENT_NODE;
+	private static File CURRENT_DIRECTORY;
+	private static File CURRENT_FILE;
 	private static File[] DIRECTORIES;
 	private static File[] FILES;
 	
@@ -42,17 +43,33 @@ public class Synchronizer {
 	public static DefaultMutableTreeNode getCurrentNode() {
 		return CURRENT_NODE;
 	}
-
+	
+	public static void setCurrentDirectory(File currentDirectory) {
+		CURRENT_DIRECTORY = currentDirectory;
+	}
+	
 	public static File getCurrentDirectory() {
+		return CURRENT_DIRECTORY;
+	}
+	
+	public static void setCurrentFile(File currentFile) {
+		CURRENT_FILE = currentFile;
+	}
+	
+	public static File getCurrentFile() {
+		return CURRENT_FILE;
+	}
+
+	public static File getCurrentNodeDirectory() {
 		return (File)getCurrentNode().getUserObject();
 	}
 	
-	public static String getCurrentDirectoryPath() {
-		return getCurrentDirectory().getAbsolutePath();
+	public static String getCurrentNodeDirectoryPath() {
+		return getCurrentNodeDirectory().getAbsolutePath();
 	}
 	
-	public static String getCurrentDirectoryName() {
-		return getCurrentDirectory().getName();
+	public static String getCurrentNodeDirectoryName() {
+		return getCurrentNodeDirectory().getName();
 	}
 	
 	public static void setDirectories(File[] directories) {
@@ -80,7 +97,26 @@ public class Synchronizer {
 		
 		FILE_TABLE.load();
 		FILE_TREE.load();
-		DIRECTORY_PATH.setPath(Synchronizer.getCurrentDirectory());
+		DIRECTORY_PATH.setPath(Synchronizer.getCurrentNodeDirectory());
+	}
+	
+	public static void synchronize(File currentDirectory) {
+		setCurrentDirectory(currentDirectory);
+		FILE_TREE.synchronize();
+	}
+	
+	public static void synchronize(DefaultMutableTreeNode currnetNode) {
+		setCurrentNode(currnetNode);
+		FILE_TREE.synchronize();
+	}
+	
+	public static void change(File changedDirectory) {
+		setCurrentDirectory(changedDirectory);
+		FILE_TREE.change();
+	}
+	
+	public static void restorePath() {
+		DIRECTORY_PATH.restorePath();
 	}
 	
 }

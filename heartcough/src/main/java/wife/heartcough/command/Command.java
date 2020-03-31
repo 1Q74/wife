@@ -5,39 +5,30 @@ import java.awt.event.KeyListener;
 import java.io.File;
 import java.io.IOException;
 
-import javax.swing.JTable;
-
 import org.apache.commons.io.FileUtils;
 import org.apache.commons.io.FilenameUtils;
 
 import wife.heartcough.Explorer;
+import wife.heartcough.Synchronizer;
 import wife.heartcough.tree.FileTree;
 
 public class Command implements KeyListener {
 
-	private Explorer explorer;
-	private FileTree fileTree;
-	
 	private static final int CTRL = 2;
 	private static final int C = 67;
 	private static final int V = 86;
 	
 	private File source;
 	
-	public Command(Explorer explorer) {
-		this.explorer = explorer;
-		this.fileTree = this.explorer.getFileTree();
-	}
-	
-	private File getFile(Object source) {
-		File file = null;
-		
-		if(source instanceof JTable) {
-			file = explorer.getFileTable().getFile((JTable)source);
-		} 
-		
-		return file;
-	}
+//	private File getFile(Object source) {
+//		File file = null;
+//		
+//		if(source instanceof JTable) {
+//			file = explorer.getFileTable().getFile((JTable)source);
+//		} 
+//		
+//		return file;
+//	}
 	
 	private File getCreatedFile(File target) {
 		String sourceName = FilenameUtils.getName(source.getAbsolutePath());
@@ -54,12 +45,12 @@ public class Command implements KeyListener {
 		
 		switch(keyCodeSum) {
 			case (CTRL + C):
-				source = getFile(e.getSource());
+				source = Synchronizer.getCurrentFile();
 				break;
 			case (CTRL + V):
-				File target = new File(explorer.getDirectoryPath().getPath().getText());
-				copy(target);
-				fileTree.reload();
+//				File target = new File(explorer.getDirectoryPath().getPath().getText());
+//				copy(target);
+//				fileTree.reload();
 				break;
 		}
 	}

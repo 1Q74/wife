@@ -5,9 +5,11 @@ import java.io.File;
 import wife.heartcough.Synchronizer;
 import wife.heartcough.system.FileSystem;
 
-
-
-
+/**
+ * 파일 경로를 구성합니다.
+ * 
+ * @author jdk
+ */
 public class DirectoryPath {
 	
 	private IconTextField path = new IconTextField();

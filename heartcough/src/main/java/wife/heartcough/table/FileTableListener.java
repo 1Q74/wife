@@ -5,13 +5,16 @@ import java.awt.event.KeyListener;
 import java.awt.event.MouseEvent;
 import java.awt.event.MouseListener;
 import java.io.File;
+import java.io.FileFilter;
 import java.io.IOException;
 
 import javax.swing.JTable;
+import javax.swing.SwingWorker;
 
 import org.apache.commons.io.FileUtils;
 import org.apache.commons.io.FilenameUtils;
 
+import wife.heartcough.CommandProgressBar;
 import wife.heartcough.Synchronizer;
 
 
@@ -98,12 +101,40 @@ public class FileTableListener {
 			
 			if(target.isDirectory()) {
 				if(source.isDirectory()) {
-					try {
-						File createdFile = getCreatedFile(target);
-						FileUtils.copyDirectory(source, createdFile);
-					} catch (IOException e) {
-						e.printStackTrace();
-					}
+					CommandProgressBar.show();
+					
+					SwingWorker<Void, File> worker = new SwingWorker<Void, File>() {
+						private int percent = 0;
+						
+			            @Override
+			            public Void doInBackground() {
+			            	File createdFile = getCreatedFile(target);
+			            	
+			            	try {
+								FileUtils.copyDirectory(source, createdFile, new FileFilter() {
+									private long sizeSum = FileUtils.sizeOfDirectory(source);
+									
+									@Override
+									public boolean accept(File file) {
+//										if(file.isFile()) {
+//											percent += Math.round(((double)FileUtils.sizeOf(file) / (double)sizeSum) * 100);
+//										}
+										CommandProgressBar.progress(file, sizeSum);
+										return true;
+									}
+								});
+							} catch (IOException e) {
+								e.printStackTrace();
+							}
+			                return null;
+			            }
+
+			            @Override
+			            protected void done() {
+			            	System.out.println("== done ==");
+			            }
+			        };
+			        worker.execute();
 				}
 			}
 		}

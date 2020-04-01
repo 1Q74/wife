@@ -6,9 +6,11 @@ import java.io.File;
 
 import wife.heartcough.Synchronizer;
 
-
-
-
+/**
+ * 파일 탐색기 상단에 있는 IconTextField의 리스너입니다. 
+ * 
+ * @author jdk
+ */
 public class DirectoryPathListener {
 	
 	public static KeyListener getKeyListener() {

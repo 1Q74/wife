@@ -6,9 +6,11 @@ import javax.swing.filechooser.FileSystemView;
 
 import org.apache.commons.lang3.StringUtils;
 
-
-
-
+/**
+ * FileSystemView와 같이 파일 시스템과 관련된 처리를 합니다.
+ * 
+ * @author jdk
+ */
 public class FileSystem {
 	
 	public static FileSystemView VIEW;

@@ -8,9 +8,14 @@ import javax.swing.Icon;
 import javax.swing.border.Border;
 import javax.swing.text.JTextComponent;
 
-
-
-
+/**
+ * -------------------------------------------------------------------
+ * 다음 URL을 참고해서 만들었습니다.
+ *   https://stackoverflow.com/questions/6089410/decorating-a-jtextfield-with-an-image-and-hint
+ *   [mneri], [Eli Sadoff]님께 감사의 마음을 전합니다.
+ * -------------------------------------------------------------------
+ * @author jdk
+ */
 public class IconTextComponentHelper {
     private static final int ICON_SPACING = 4;
 

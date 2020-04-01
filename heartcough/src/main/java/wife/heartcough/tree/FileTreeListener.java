@@ -53,8 +53,6 @@ public class FileTreeListener {
 
 				@Override
 				public void focusLost(FocusEvent e) {
-					// TODO Auto-generated method stub
-					
 				}
 		};
 	}

@@ -8,6 +8,9 @@ import javax.swing.Icon;
 import javax.swing.border.Border;
 import javax.swing.text.JTextComponent;
 
+
+
+
 public class IconTextComponentHelper {
     private static final int ICON_SPACING = 4;
 

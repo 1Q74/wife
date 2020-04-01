@@ -45,7 +45,10 @@ public class FileTreeListener {
 
 				@Override
 				public void focusGained(FocusEvent e) {
-//					explorer.refresh();
+					if(Synchronizer.isDirectoryChanged()) {
+						Synchronizer.reload();
+						Synchronizer.initDirectoryChanged();
+					}
 				}
 
 				@Override

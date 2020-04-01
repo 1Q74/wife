@@ -76,7 +76,6 @@ public class FileTree {
 		
 		while(children.hasMoreElements()) {
 			DefaultMutableTreeNode childNode = (DefaultMutableTreeNode)children.nextElement();
-			System.out.println(childNode);
 			File userObject = (File)childNode.getUserObject();
 			
 			if(Synchronizer.getCurrentDirectory().equals(userObject)) {

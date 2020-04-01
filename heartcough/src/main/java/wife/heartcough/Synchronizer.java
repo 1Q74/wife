@@ -3,26 +3,31 @@ package wife.heartcough;
 import java.io.File;
 
 import javax.swing.tree.DefaultMutableTreeNode;
-import javax.swing.tree.DefaultTreeModel;
-import javax.swing.tree.ExpandVetoException;
-import javax.swing.tree.TreeNode;
-import javax.swing.tree.TreePath;
 
 import wife.heartcough.path.DirectoryPath;
 import wife.heartcough.table.FileTable;
 import wife.heartcough.tree.FileTree;
+
+
+
 
 public class Synchronizer {
 	
 	private static DefaultMutableTreeNode CURRENT_NODE;
 	private static File CURRENT_DIRECTORY;
 	private static File CURRENT_FILE;
+	private static File[] FILE_LIST;
 	private static File[] DIRECTORIES;
 	private static File[] FILES;
 	
 	private static FileTree FILE_TREE;
 	private static FileTable FILE_TABLE;
 	private static DirectoryPath DIRECTORY_PATH;
+	
+	private static File[] PREVIOUS_DIRECTORIES;
+	private static File[] PREVIOUS_FILES;
+	private static boolean IS_DIRECTORY_CHANGED = false;
+	private static boolean IS_FILE_CHANGED = false;
 	
 	public static void setFileTree(FileTree fileTree) {
 		FILE_TREE = fileTree;
@@ -56,8 +61,8 @@ public class Synchronizer {
 		return CURRENT_DIRECTORY;
 	}
 	
-	public static void setCurrentFile(File currentFile) {
-		CURRENT_FILE = currentFile;
+	public static void setCurrentFile(int rowIndex) {
+		CURRENT_FILE = FILE_LIST[rowIndex];
 	}
 	
 	public static File getCurrentFile() {
@@ -76,8 +81,18 @@ public class Synchronizer {
 		return getCurrentNodeDirectory().getName();
 	}
 	
+	public static void setFileList(File[] fileList) {
+		FILE_LIST = fileList;
+	}
+	
+	public static File[] getFileList() {
+		return FILE_LIST;
+	}
+	
 	public static void setDirectories(File[] directories) {
 		DIRECTORIES = directories;
+		IS_DIRECTORY_CHANGED = PREVIOUS_DIRECTORIES != null && !DIRECTORIES.equals(PREVIOUS_DIRECTORIES); 
+		PREVIOUS_DIRECTORIES = DIRECTORIES;
 	}
 	
 	public static File[] getDirectories() {
@@ -86,6 +101,8 @@ public class Synchronizer {
 	
 	public static void setFiles(File[] files) {
 		FILES = files;
+		IS_FILE_CHANGED = PREVIOUS_FILES != null && !FILES.equals(PREVIOUS_FILES);
+		PREVIOUS_FILES = FILES;
 	}
 	
 	public static File[] getFiles() {
@@ -94,6 +111,22 @@ public class Synchronizer {
 	
 	public static boolean haveMoreDirecories() {
 		return DIRECTORIES.length > FILES.length;
+	}
+	
+	public static boolean isDirectoryChanged() {
+		return IS_DIRECTORY_CHANGED;
+	}
+	
+	public static boolean isFileChanged() {
+		return IS_FILE_CHANGED;
+	}
+	
+	public static void initDirectoryChanged() {
+		IS_DIRECTORY_CHANGED = false;
+	}
+	
+	public static void initFileChanged() {
+		IS_FILE_CHANGED = false;
 	}
 	
 	public static void reload() {

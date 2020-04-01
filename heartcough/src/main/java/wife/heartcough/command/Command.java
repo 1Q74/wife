@@ -10,6 +10,9 @@ import org.apache.commons.io.FilenameUtils;
 
 import wife.heartcough.Synchronizer;
 
+
+
+
 public class Command implements KeyListener {
 
 	private static final int CTRL = 2;

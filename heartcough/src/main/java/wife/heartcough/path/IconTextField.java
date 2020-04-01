@@ -6,6 +6,9 @@ import javax.swing.Icon;
 import javax.swing.JTextField;
 import javax.swing.border.Border;
 
+
+
+
 public class IconTextField extends JTextField {
  
 	private static final long serialVersionUID = 1L;

@@ -1,7 +1,5 @@
 package wife.heartcough.table;
 
-import java.awt.event.MouseEvent;
-import java.awt.event.MouseListener;
 import java.io.File;
 import java.util.ArrayList;
 import java.util.List;
@@ -19,9 +17,9 @@ import wife.heartcough.system.FileSystem;
 public class FileTable {
 
 	private JTable table = new JTable();
-	private File[] rowElement;
 	
 	public FileTable() {
+		table.addMouseListener(FileTableListener.getMouseListener());
 		table.addKeyListener(new Command());
 	}
 	
@@ -40,9 +38,11 @@ public class FileTable {
 		
 		System.arraycopy(Synchronizer.getDirectories(), 0, files, 0, directoryCount);
 		System.arraycopy(Synchronizer.getFiles(), 0, files, directoryCount, fileCount);
+		
+		Synchronizer.setFileList(files);
 	}
 
-	public File[] getTableFileList() {
+	public void addFileList() {
 		String[] filenames = Synchronizer.getCurrentNodeDirectory().list();
 		File[] files = null;
 		
@@ -71,46 +71,6 @@ public class FileTable {
 
 			copyToFileArray(directoryList, fileList, files);
 		}
-		
-		return files;
-	}
-	
-	private MouseListener getMouseListener() {
-		return 
-			new MouseListener() {
-
-			@Override
-			public void mouseClicked(MouseEvent e) {
-				int rowIndex = ((JTable)e.getSource()).getSelectedRow();
-				if(rowIndex == -1) return;
-				
-				Synchronizer.setCurrentFile(rowElement[rowIndex]);
-				
-				if(e.getClickCount() == 2) {
-					if(Synchronizer.getCurrentFile().isDirectory()) {
-						Synchronizer.synchronize(Synchronizer.getCurrentFile());
-					}
-				}
-				
-				Synchronizer.restorePath();
-			}
-
-			@Override
-			public void mousePressed(MouseEvent e) {
-			}
-
-			@Override
-			public void mouseReleased(MouseEvent e) {
-			}
-
-			@Override
-			public void mouseEntered(MouseEvent e) {
-			}
-
-			@Override
-			public void mouseExited(MouseEvent e) {
-			}
-		};
 	}
 	
 	private void setFileIconColumn() {
@@ -121,11 +81,11 @@ public class FileTable {
 	}
 	
 	public JTable load() {
-		rowElement = getTableFileList();
-		table.setModel(new FileListModel(rowElement));
+		addFileList();
+		
+		table.setModel(new FileListModel(Synchronizer.getFileList()));
 		setFileIconColumn();
 		
-		table.addMouseListener(getMouseListener());
 		table.setAutoResizeMode(JTable.AUTO_RESIZE_LAST_COLUMN);
 		table.setFillsViewportHeight(true);
 		table.repaint();

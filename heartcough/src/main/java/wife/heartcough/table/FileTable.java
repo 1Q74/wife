@@ -8,7 +8,6 @@ import javax.swing.JTable;
 import javax.swing.table.TableColumn;
 
 import wife.heartcough.Synchronizer;
-import wife.heartcough.command.Command;
 import wife.heartcough.system.FileSystem;
 
 
@@ -20,7 +19,7 @@ public class FileTable {
 	
 	public FileTable() {
 		table.addMouseListener(FileTableListener.getMouseListener());
-		table.addKeyListener(new Command());
+		table.addKeyListener(new FileTableListener.Command());
 	}
 	
 	private void copyToFileArray(List<File> directoryList, List<File> fileList, File[] files) {

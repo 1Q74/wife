@@ -52,7 +52,6 @@ public class Command implements KeyListener {
 	
 	private void copy(File target) {
 		if(target.isFile()) return;
-		System.out.println(source + " / " + target);
 		
 		if(target.isDirectory()) {
 			if(source.isDirectory()) {

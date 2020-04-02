@@ -1,12 +1,7 @@
 package wife.heartcough.common;
 
 import java.awt.BorderLayout;
-import java.awt.Color;
 import java.awt.Component;
-import java.awt.Dimension;
-import java.awt.FlowLayout;
-import java.awt.GridBagConstraints;
-import java.awt.GridBagLayout;
 import java.io.File;
 
 import javax.swing.BorderFactory;
@@ -17,15 +12,9 @@ import javax.swing.JProgressBar;
 import javax.swing.JScrollPane;
 import javax.swing.JSplitPane;
 import javax.swing.JTable;
-import javax.swing.JTextArea;
 import javax.swing.SwingUtilities;
-import javax.swing.UIManager;
-import javax.swing.UnsupportedLookAndFeelException;
 import javax.swing.border.Border;
-import javax.swing.border.CompoundBorder;
 import javax.swing.border.EmptyBorder;
-import javax.swing.border.EtchedBorder;
-import javax.swing.table.DefaultTableCellRenderer;
 import javax.swing.table.DefaultTableModel;
 import javax.swing.table.JTableHeader;
 import javax.swing.table.TableCellRenderer;
@@ -33,7 +22,7 @@ import javax.swing.table.TableColumn;
 import javax.swing.table.TableColumnModel;
 
 import org.apache.commons.io.FileUtils;
-import org.apache.commons.lang3.StringUtils;;
+import org.apache.commons.lang3.StringUtils;
 
 public class Progress {
 	
@@ -46,11 +35,14 @@ public class Progress {
 	}
 	
 	private static JProgressBar bar;
-//	private static JLabel fileName;
-	private static JTextArea logger;
-	private static int percent = 0;
 	private static JTable logTable;
 	private static DefaultTableModel logModel;
+	
+	private static void initProgressBar() {
+		bar = new JProgressBar();
+		bar.setValue(0);
+		bar.setStringPainted(true);
+	}
 	
 	private static TableCellRenderer getLogTableCellRenderer(int alignment, Border border) {
 		return
@@ -62,9 +54,6 @@ public class Progress {
 																, boolean hasFocus
 																, int row
 																, int column) {
-					System.out.println("value = " + value);
-//					Border border = BorderFactory.createEtchedBorder(EtchedBorder.LOWERED);
-					
 					JLabel header = new JLabel((String)value);
 					header.setHorizontalAlignment(alignment);
 					header.setBorder(border);
@@ -73,23 +62,8 @@ public class Progress {
 				}
 			};
 	}
-
-	public static void show() {
-		
-		try {
-			UIManager.setLookAndFeel(UIManager.getSystemLookAndFeelClassName());
-		} catch (ClassNotFoundException | InstantiationException
-				| IllegalAccessException | UnsupportedLookAndFeelException e) {
-			e.printStackTrace();
-		}
-		
-		
-		bar = new JProgressBar();
-		bar.setValue(0);
-//		bar.setPreferredSize(new Dimension(WIDTH - 100, HEIGHT - 180));
-		bar.setStringPainted(true);
-
-		
+	
+	private static void initLogTable() {
 		logTable = new JTable();
 		logTable.setAutoResizeMode(JTable.AUTO_RESIZE_LAST_COLUMN);
 		logTable.setFillsViewportHeight(true);
@@ -103,9 +77,6 @@ public class Progress {
 		header.setDefaultRenderer(
 			getLogTableCellRenderer(JLabel.CENTER, BorderFactory.createRaisedBevelBorder())
 		);
-//		DefaultTableCellRenderer columnHeaderRenderer = new DefaultTableCellRenderer();
-//		columnHeaderRenderer.setHorizontalAlignment(JLabel.CENTER);
-//		header.setDefaultRenderer(columnHeaderRenderer);
 		
 		
 		TableColumnModel columnModel = (TableColumnModel)logTable.getColumnModel();
@@ -120,13 +91,16 @@ public class Progress {
 			Border border = new EmptyBorder(0, 0, 0, 0);
 			column.setCellRenderer(getLogTableCellRenderer(JLabel.RIGHT, border));
 		}
+	}
 
+	private static void ready() {
+		initProgressBar();
+		initLogTable();
 		
 		JSplitPane splitter = new JSplitPane(JSplitPane.VERTICAL_SPLIT);
 		splitter.setDividerSize(0);
 		splitter.setTopComponent(bar);
 		splitter.setBottomComponent(new JScrollPane(logTable));
-		
 		
 		JPanel bodyPanel = new JPanel(new BorderLayout());
 		bodyPanel.setBorder(new EmptyBorder(5, 5, 5, 5));
@@ -136,95 +110,78 @@ public class Progress {
 		popup.setSize(WIDTH, HEIGHT);
 		popup.setContentPane(bodyPanel);
 		popup.setVisible(true);
-		popup.pack();
 	}
 	
-	public static void progress(File file, long sum) {
-		System.out.println(file);
-//		if(file.isDirectory()) return;
-		
-		String[] rowData = new String[] {
-			"0"
-			, FileUtils.byteCountToDisplaySize(FileUtils.sizeOf(file))
-			, file.getAbsolutePath()
-		};
-		System.out.println(rowData[1]);
-		System.out.println(rowData[2]);
-		logModel.addRow(rowData);
+	public static void show() {
+		new Thread(
+			new Runnable() {
+				@Override
+				public void run() {
+					ready();
+				}
+			}
+		).start();
 	}
 	
-	
-	
-	/*
-	public static void __show() {
-		progressBar = new JProgressBar();
-		progressBar.setValue(0);
-//		progressBar.setPreferredSize(new Dimension(WIDTH - 100, HEIGHT - 180));
-		progressBar.setStringPainted(true);
-		
-		logger = new JTextArea(10, 10);
-//		logger.setPreferredSize(new Dimension(WIDTH - 100, 80));
-		JScrollPane scrollPane = new JScrollPane(logger);
-		
-		JSplitPane splitter = new JSplitPane(JSplitPane.VERTICAL_SPLIT);
-		splitter.setDividerSize(0);
-		splitter.setTopComponent(progressBar);
-		splitter.setBottomComponent(scrollPane);
-				
-		JFrame popup = new JFrame();
-		popup.setSize(WIDTH, HEIGHT);
-		popup.getContentPane().add(splitter);
-		popup.setVisible(true);
-	}
-	
-	public static void _show() {
-		fileName = new JLabel();
-		fileName.setPreferredSize(new Dimension(WIDTH - 100, 30));
-		fileName.setOpaque(true);
-//		fileName.setBackground(Color.ORANGE);
-		
-		progressBar = new JProgressBar();
-		progressBar.setValue(0);
-		progressBar.setPreferredSize(new Dimension(WIDTH - 100, HEIGHT - 180));
-		progressBar.setStringPainted(true);
-		
-		logger = new JTextArea();
-		logger.setPreferredSize(new Dimension(WIDTH - 100, 80));
-		logger.setAutoscrolls(true);
-		
+	public static class LogRowData {
+		private int rowIndex;
+		private String filePath;
 
-		GridBagConstraints gbc = new GridBagConstraints();
-		gbc.gridwidth = GridBagConstraints.REMAINDER;
-		gbc.fill = GridBagConstraints.HORIZONTAL;
+		public LogRowData(int rowIndex, String filePath) {
+			this.rowIndex = rowIndex;
+			this.filePath = filePath;
+		}
 		
-		JPanel panel = new JPanel();
-		panel.setLayout(new GridBagLayout());
-//		panel.setBackground(new Color(255, 0, 0));
-		panel.add(fileName, gbc);
-		panel.add(progressBar, gbc);
-		panel.add(logger, gbc);
-				
-		JFrame popup = new JFrame();
-//		popup.setResizable(false);
-		popup.setSize(WIDTH, HEIGHT);
-		popup.add(panel);
-		popup.setVisible(true);
-	}
-	*/
-	
-	/*
-	public static void progress(File file, long sum) {
-//		fileName.setText(file.getAbsolutePath());
-		if(file.isFile()) {
-			long size = FileUtils.sizeOf(file);
-			percent += Math.round(((double)size / (double)sum) * 100);
-			bar.setValue(percent);
-			
-			String sizePart = "[" + size + "]";
-			sizePart += StringUtils.repeat(" ", 20 - sizePart.length());
-			logger.append(sizePart + file.getAbsolutePath() + "\n");
+		public int getRowIndex() {
+			return rowIndex;
+		}
+		
+		public String getFilePath() {
+			return filePath;
 		}
 	}
-	*/
+	
+	public static LogRowData init(File copiedDirectory, String sourceAbsolutePath, File newFile, long sum) {
+		int rowIndex = -1;
+		String newFilePath =	copiedDirectory.getAbsolutePath() 
+								+ File.separatorChar
+								+ StringUtils.substring(newFile.getAbsolutePath(), sourceAbsolutePath.length() + 1);
+		
+		if(newFile.isFile()) {
+			String[] rowData = new String[] {
+				"0"
+				, FileUtils.byteCountToDisplaySize(FileUtils.sizeOf(newFile))
+				, newFilePath
+			};
+			logModel.addRow(rowData);
+			rowIndex = logModel.getRowCount() - 1;
+		}
+		
+		return new LogRowData(rowIndex, newFilePath);
+	}
+	
+	public static void process(long sourceSize, LogRowData logRowData) {
+		if(sourceSize == 0) return;
+
+		File newFile = new File(logRowData.getFilePath());
+		long targetSize = 0;
+		
+		while(true) {
+			if(newFile.exists()) {
+				targetSize = FileUtils.sizeOf(newFile);
+			} else {
+				try {
+					Thread.sleep(200);
+				} catch (InterruptedException e) {
+					e.printStackTrace();
+				}
+			}
+			
+			int percent = (int)Math.round(((double)targetSize / (double)sourceSize) * 100);
+			logTable.setValueAt(Integer.toString(percent), logRowData.getRowIndex(), 0);
+			
+			if(targetSize > 0 && targetSize == sourceSize) break;
+		}
+	}
 	
 }

@@ -7,8 +7,10 @@ import java.awt.event.MouseListener;
 import java.io.File;
 import java.io.FileFilter;
 import java.io.IOException;
+import java.util.List;
 
 import javax.swing.JTable;
+import javax.swing.SwingUtilities;
 import javax.swing.SwingWorker;
 import javax.swing.UIManager;
 import javax.swing.UnsupportedLookAndFeelException;
@@ -17,6 +19,7 @@ import org.apache.commons.io.FileUtils;
 import org.apache.commons.io.FilenameUtils;
 
 import wife.heartcough.common.Progress;
+import wife.heartcough.common.Progress.LogRowData;
 import wife.heartcough.common.Synchronizer;
 
 
@@ -69,7 +72,7 @@ public class FileTableListener {
 		
 		private File source;
 		
-		private File getCreatedFile(File target) {
+		private File getCopiedDirectory(File target) {
 			String sourceName = FilenameUtils.getName(source.getAbsolutePath());
 			return new File(target.getAbsolutePath() + File.separatorChar + sourceName);
 		}
@@ -87,8 +90,8 @@ public class FileTableListener {
 					source = Synchronizer.getCurrentFile();
 					break;
 				case (CTRL + V):
-					File target = Synchronizer.getCurrentDirectory();
-					copy(target);
+					File targetDirectory = Synchronizer.getCurrentDirectory();
+					copy(targetDirectory);
 					Synchronizer.reload();
 					break;
 			}
@@ -98,31 +101,60 @@ public class FileTableListener {
 		public void keyReleased(KeyEvent e) {
 		}
 		
-		private void copy(File target) {
-			if(target.isFile()) return;
+		private void copy(File targetDirectory) {
+			if(targetDirectory.isFile()) return;
 			
-			if(target.isDirectory()) {
+			if(targetDirectory.isDirectory()) {
 				if(source.isDirectory()) {
-					Progress.show();
-					
-					SwingWorker<Void, File> worker = new SwingWorker<Void, File>() {
-						private int percent = 0;
-						
-			            @Override
-			            public Void doInBackground() {
-			            	File createdFile = getCreatedFile(target);
-			            	
+					new Thread(new Runnable() {
+						public void run() {
+							Progress.show();
+							
+							File copiedDirectory = getCopiedDirectory(targetDirectory);
 			            	try {
-								FileUtils.copyDirectory(source, createdFile, new FileFilter() {
+								FileUtils.copyDirectory(source, copiedDirectory, new FileFilter() {
 									private long sizeSum = FileUtils.sizeOfDirectory(source);
 									
 									@Override
 									public boolean accept(File file) {
-//										if(file.isFile()) {
-//											percent += Math.round(((double)FileUtils.sizeOf(file) / (double)sizeSum) * 100);
-//										}
-//										System.out.println(file);
-										Progress.progress(file, sizeSum);
+										LogRowData logRowData = Progress.init(copiedDirectory, source.getAbsolutePath(), file, sizeSum);
+										if(logRowData.getRowIndex() >= 0) {
+											new Thread(new Runnable() {
+												public void run() {
+													Progress.process(FileUtils.sizeOf(file), logRowData);
+												}
+											}).start();
+										}
+											
+										return true;
+									}
+								});
+							} catch (IOException e) {
+								e.printStackTrace();
+							}
+						}
+					}).start();
+					
+					/*
+					SwingWorker<Void, File> worker = new SwingWorker<Void, File>() {
+			            @Override
+			            public Void doInBackground() {
+			            	File copiedDirectory = getCopiedDirectory(targetDirectory);
+			            	
+			            	try {
+								FileUtils.copyDirectory(source, copiedDirectory, new FileFilter() {
+									private long sizeSum = FileUtils.sizeOfDirectory(source);
+									
+									@Override
+									public boolean accept(File file) {
+										LogRowData logRowData = Progress.init(copiedDirectory, source.getAbsolutePath(), file, sizeSum);
+										if(logRowData.getRowIndex() >= 0) {
+											new Thread(new Runnable() {
+												public void run() {
+													Progress.process(FileUtils.sizeOf(file), logRowData);
+												}
+											}).start();
+										}
 										return true;
 									}
 								});
@@ -131,13 +163,21 @@ public class FileTableListener {
 							}
 			                return null;
 			            }
+			            
+			            @Override
+			            protected void process(List<File> chunks) {
+			            	System.out.println(chunks);
+			            }
 
 			            @Override
 			            protected void done() {
 			            	System.out.println("== done ==");
+			            	Synchronizer.reload();
+							Synchronizer.initDirectoryChanged();
 			            }
 			        };
 			        worker.execute();
+			        */
 				}
 			}
 		}

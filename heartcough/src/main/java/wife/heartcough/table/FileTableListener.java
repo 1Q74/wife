@@ -10,12 +10,14 @@ import java.io.IOException;
 
 import javax.swing.JTable;
 import javax.swing.SwingWorker;
+import javax.swing.UIManager;
+import javax.swing.UnsupportedLookAndFeelException;
 
 import org.apache.commons.io.FileUtils;
 import org.apache.commons.io.FilenameUtils;
 
-import wife.heartcough.CommandProgressBar;
-import wife.heartcough.Synchronizer;
+import wife.heartcough.common.Progress;
+import wife.heartcough.common.Synchronizer;
 
 
 
@@ -101,7 +103,7 @@ public class FileTableListener {
 			
 			if(target.isDirectory()) {
 				if(source.isDirectory()) {
-					CommandProgressBar.show();
+					Progress.show();
 					
 					SwingWorker<Void, File> worker = new SwingWorker<Void, File>() {
 						private int percent = 0;
@@ -119,7 +121,8 @@ public class FileTableListener {
 //										if(file.isFile()) {
 //											percent += Math.round(((double)FileUtils.sizeOf(file) / (double)sizeSum) * 100);
 //										}
-										CommandProgressBar.progress(file, sizeSum);
+//										System.out.println(file);
+										Progress.progress(file, sizeSum);
 										return true;
 									}
 								});

@@ -4,7 +4,7 @@ import java.awt.event.KeyEvent;
 import java.awt.event.KeyListener;
 import java.io.File;
 
-import wife.heartcough.Synchronizer;
+import wife.heartcough.common.Synchronizer;
 
 /**
  * 파일 탐색기 상단에 있는 IconTextField의 리스너입니다. 

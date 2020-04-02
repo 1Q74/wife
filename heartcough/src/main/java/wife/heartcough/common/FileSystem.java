@@ -1,4 +1,4 @@
-package wife.heartcough.system;
+package wife.heartcough.common;
 
 import java.io.File;
 

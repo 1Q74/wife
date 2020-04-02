@@ -7,8 +7,8 @@ import java.util.List;
 import javax.swing.JTable;
 import javax.swing.table.TableColumn;
 
-import wife.heartcough.Synchronizer;
-import wife.heartcough.system.FileSystem;
+import wife.heartcough.common.FileSystem;
+import wife.heartcough.common.Synchronizer;
 
 
 /**

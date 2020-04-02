@@ -5,7 +5,7 @@ import java.awt.event.FocusListener;
 import java.awt.event.MouseEvent;
 import java.awt.event.MouseListener;
 
-import wife.heartcough.Synchronizer;
+import wife.heartcough.common.Synchronizer;
 
 
 

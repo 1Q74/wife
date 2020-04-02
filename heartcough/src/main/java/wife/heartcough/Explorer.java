@@ -12,6 +12,7 @@ import javax.swing.UIManager;
 import javax.swing.UnsupportedLookAndFeelException;
 import javax.swing.border.EmptyBorder;
 
+import wife.heartcough.common.Synchronizer;
 import wife.heartcough.path.DirectoryPath;
 import wife.heartcough.table.FileTable;
 import wife.heartcough.tree.FileTree;

@@ -11,7 +11,7 @@ import javax.swing.tree.DefaultMutableTreeNode;
 import javax.swing.tree.DefaultTreeModel;
 import javax.swing.tree.TreePath;
 
-import wife.heartcough.Synchronizer;
+import wife.heartcough.common.Synchronizer;
 
 
 

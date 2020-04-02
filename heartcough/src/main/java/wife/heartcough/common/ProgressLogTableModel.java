@@ -1,4 +1,4 @@
-package wife.heartcough.table;
+package wife.heartcough.common;
 
 import java.io.File;
 
@@ -10,14 +10,14 @@ import wife.heartcough.common.FileSystem;
 
 
 
-public class FileListModel extends AbstractTableModel {
+public class ProgressLogTableModel extends AbstractTableModel {
 
 	private static final long serialVersionUID = 1L;
 
-	private static final String[] COLUMN_NAME = new String[] { "", "Name" };
+	private static final String[] COLUMN_NAME = new String[] { "Progress", "Size", "Name" };
 	private File[] files;
 	
-	public FileListModel(File[] files) {
+	public ProgressLogTableModel(File[] files) {
 		this.files = files;
 	}
 	
@@ -25,8 +25,10 @@ public class FileListModel extends AbstractTableModel {
     public Class<?> getColumnClass(int column) {
 		switch(column) {
 			case 0:
-				return Icon.class;
+				return String.class;
 			case 1:
+				return String.class;
+			case 2:
 				return String.class;
 		}
         

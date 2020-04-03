@@ -190,8 +190,9 @@ public class Progress {
 	
 	public void refreshSizeProgress(long sizeGap) {
 		copiedSize += sizeGap;
-		System.out.println("[copiedSize:" + copiedSize + ", targetSize:" + sizeGap + "]");
 		int percent = getSizePercent(copiedSize, sumSize);
+		
+		System.out.println("[copiedSize:" + copiedSize + ", sumSize:" + sumSize + ", percent:" + percent + "]");
 		
 		bar.setValue(percent);
 		bar.setString(
@@ -255,19 +256,19 @@ public class Progress {
 		while(!ProgressHandler.isStopped()) {
 			if(newFile.exists()) {
 				targetSize = FileUtils.sizeOf(newFile);
-				if(targetSize > previousTargetSize) {
+				if(targetSize < sourceSize && targetSize > previousTargetSize) {
 					sizeGap = targetSize - previousTargetSize;
 					refreshSizeProgress(sizeGap);
 					previousTargetSize = targetSize;
 				}
-			}
-			
-			int percent = getSizePercent(sourceSize, targetSize);
-			logTable.setValueAt(percent, logRowData.getRowIndex(), 0);
-			
-			if(targetSize > 0 && targetSize == sourceSize) {
-				refreshSizeProgress(sizeGap);
-				break;
+				
+				int percent = getSizePercent(targetSize, sourceSize);
+				logTable.setValueAt(percent, logRowData.getRowIndex(), 0);
+				
+				if(targetSize > 0 && targetSize == sourceSize) {
+					refreshSizeProgress(sizeGap);
+					break;
+				}
 			}
 		}
 	}

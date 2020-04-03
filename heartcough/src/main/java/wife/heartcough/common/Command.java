@@ -40,11 +40,6 @@ public class Command implements Runnable {
 					
 					LogRowData logRowData = progress.init(copiedDirectory, source.getAbsolutePath(), file);
 					if(logRowData.getRowIndex() >= 0) {
-//						new Thread(new Runnable() {
-//							public void run() {
-//								progress.process(FileUtils.sizeOf(file), logRowData);
-//							}
-//						}).start();
 						ProgressHandler.getHandler().submit(
 							new Runnable() {
 								public void run() {
@@ -75,13 +70,7 @@ public class Command implements Runnable {
 		
 		if(target.isDirectory()) {
 			if(source.isDirectory()) {
-//				new Thread(
-//					new Runnable() {
-//						public void run() {
-							processCopy(target);
-//						}
-//					}
-//				).start();
+				processCopy(target);
 			}
 		}
 	}

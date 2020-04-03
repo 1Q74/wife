@@ -7,13 +7,8 @@ import java.awt.event.MouseListener;
 import java.io.File;
 import java.io.FileFilter;
 import java.io.IOException;
-import java.util.List;
 
 import javax.swing.JTable;
-import javax.swing.SwingUtilities;
-import javax.swing.SwingWorker;
-import javax.swing.UIManager;
-import javax.swing.UnsupportedLookAndFeelException;
 
 import org.apache.commons.io.FileUtils;
 import org.apache.commons.io.FilenameUtils;
@@ -108,20 +103,22 @@ public class FileTableListener {
 				if(source.isDirectory()) {
 					new Thread(new Runnable() {
 						public void run() {
-							Progress.show();
+							Progress progress  = new Progress();
+							progress.show();
+							progress.setSumSize(FileUtils.sizeOf(source));
 							
 							File copiedDirectory = getCopiedDirectory(targetDirectory);
+							
 			            	try {
 								FileUtils.copyDirectory(source, copiedDirectory, new FileFilter() {
-									private long sizeSum = FileUtils.sizeOfDirectory(source);
-									
 									@Override
 									public boolean accept(File file) {
-										LogRowData logRowData = Progress.init(copiedDirectory, source.getAbsolutePath(), file, sizeSum);
+										LogRowData logRowData = progress.init(copiedDirectory, source.getAbsolutePath(), file);
+										
 										if(logRowData.getRowIndex() >= 0) {
 											new Thread(new Runnable() {
 												public void run() {
-													Progress.process(FileUtils.sizeOf(file), logRowData);
+													progress.process(FileUtils.sizeOf(file), logRowData);
 												}
 											}).start();
 										}
@@ -134,50 +131,6 @@ public class FileTableListener {
 							}
 						}
 					}).start();
-					
-					/*
-					SwingWorker<Void, File> worker = new SwingWorker<Void, File>() {
-			            @Override
-			            public Void doInBackground() {
-			            	File copiedDirectory = getCopiedDirectory(targetDirectory);
-			            	
-			            	try {
-								FileUtils.copyDirectory(source, copiedDirectory, new FileFilter() {
-									private long sizeSum = FileUtils.sizeOfDirectory(source);
-									
-									@Override
-									public boolean accept(File file) {
-										LogRowData logRowData = Progress.init(copiedDirectory, source.getAbsolutePath(), file, sizeSum);
-										if(logRowData.getRowIndex() >= 0) {
-											new Thread(new Runnable() {
-												public void run() {
-													Progress.process(FileUtils.sizeOf(file), logRowData);
-												}
-											}).start();
-										}
-										return true;
-									}
-								});
-							} catch (IOException e) {
-								e.printStackTrace();
-							}
-			                return null;
-			            }
-			            
-			            @Override
-			            protected void process(List<File> chunks) {
-			            	System.out.println(chunks);
-			            }
-
-			            @Override
-			            protected void done() {
-			            	System.out.println("== done ==");
-			            	Synchronizer.reload();
-							Synchronizer.initDirectoryChanged();
-			            }
-			        };
-			        worker.execute();
-			        */
 				}
 			}
 		}

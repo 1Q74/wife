@@ -2,6 +2,7 @@ package wife.heartcough.common;
 
 import java.awt.BorderLayout;
 import java.awt.Component;
+import java.awt.Rectangle;
 import java.io.File;
 
 import javax.swing.BorderFactory;
@@ -12,7 +13,6 @@ import javax.swing.JProgressBar;
 import javax.swing.JScrollPane;
 import javax.swing.JSplitPane;
 import javax.swing.JTable;
-import javax.swing.SwingUtilities;
 import javax.swing.border.Border;
 import javax.swing.border.EmptyBorder;
 import javax.swing.table.DefaultTableModel;
@@ -34,17 +34,19 @@ public class Progress {
 		HEIGHT = 200;
 	}
 	
-	private static JProgressBar bar;
-	private static JTable logTable;
-	private static DefaultTableModel logModel;
+	private JProgressBar bar;
+	private JTable logTable;
+	private DefaultTableModel logModel;
+	private long sumSize = 0;
+	private long copiedSize = 0;
 	
-	private static void initProgressBar() {
+	private void initProgressBar() {
 		bar = new JProgressBar();
-		bar.setValue(0);
+		bar.setString("Calcurating...");
 		bar.setStringPainted(true);
 	}
 	
-	private static TableCellRenderer getLogTableCellRenderer(int alignment, Border border) {
+	private TableCellRenderer getLogTableDefaultCellRenderer(int alignment, Border border) {
 		return
 			new TableCellRenderer() {
 				@Override
@@ -54,16 +56,33 @@ public class Progress {
 																, boolean hasFocus
 																, int row
 																, int column) {
-					JLabel header = new JLabel((String)value);
-					header.setHorizontalAlignment(alignment);
-					header.setBorder(border);
-					
-					return header;
+					JLabel label = new JLabel((String)value);
+					label.setHorizontalAlignment(alignment);
+					label.setBorder(border);
+					return label;
 				}
 			};
 	}
 	
-	private static void initLogTable() {
+	private TableCellRenderer getLogTableProgressBarCellRenderer() {
+		return
+			new TableCellRenderer() {
+				@Override
+				public Component getTableCellRendererComponent(	JTable table
+																, Object value
+																, boolean isSelected
+																, boolean hasFocus
+																, int row
+																, int column) {
+					JProgressBar progressBar = new JProgressBar();
+					progressBar.setValue((Integer)value);
+					progressBar.setStringPainted(true);
+					return progressBar;
+				}
+			};
+	}
+	
+	private void initLogTable() {
 		logTable = new JTable();
 		logTable.setAutoResizeMode(JTable.AUTO_RESIZE_LAST_COLUMN);
 		logTable.setFillsViewportHeight(true);
@@ -75,7 +94,7 @@ public class Progress {
 		
 		JTableHeader header = logTable.getTableHeader();
 		header.setDefaultRenderer(
-			getLogTableCellRenderer(JLabel.CENTER, BorderFactory.createRaisedBevelBorder())
+				getLogTableDefaultCellRenderer(JLabel.CENTER, BorderFactory.createRaisedBevelBorder())
 		);
 		
 		
@@ -87,13 +106,20 @@ public class Progress {
 			column.setWidth(columnSize[i]);
 			column.setResizable(true);
 			column.sizeWidthToFit();
-			
-			Border border = new EmptyBorder(0, 0, 0, 0);
-			column.setCellRenderer(getLogTableCellRenderer(JLabel.RIGHT, border));
+
+			switch(i) {
+				case 0:
+					column.setCellRenderer(getLogTableProgressBarCellRenderer());
+					break;
+				case 1:
+					Border border = new EmptyBorder(0, 0, 0, 0);
+					column.setCellRenderer(getLogTableDefaultCellRenderer(JLabel.RIGHT, border));
+					break;
+			}
 		}
 	}
 
-	private static void ready() {
+	private void ready() {
 		initProgressBar();
 		initLogTable();
 		
@@ -112,7 +138,7 @@ public class Progress {
 		popup.setVisible(true);
 	}
 	
-	public static void show() {
+	public void show() {
 		new Thread(
 			new Runnable() {
 				@Override
@@ -123,7 +149,31 @@ public class Progress {
 		).start();
 	}
 	
-	public static class LogRowData {
+	private int getSizePercent(double source, double total) {
+		return (int)Math.round((source / total) * 100);
+	}
+	
+	public void setSumSize(long sumSize) {
+		this.sumSize = sumSize;
+	}
+	
+	public void refreshSizeProgress(long sizeGap) {
+		copiedSize += sizeGap;
+		System.out.println("[copiedSize:" + copiedSize + ", targetSize:" + sizeGap + "]");
+		int percent = getSizePercent(copiedSize, sumSize);
+		
+		bar.setValue(percent);
+		bar.setString(
+			percent + "%"
+			+ "[ "
+			+ FileUtils.byteCountToDisplaySize(copiedSize)
+			+ " / "
+			+ FileUtils.byteCountToDisplaySize(sumSize)
+			+ " ]"
+		);
+	}
+	
+	public class LogRowData {
 		private int rowIndex;
 		private String filePath;
 
@@ -141,46 +191,58 @@ public class Progress {
 		}
 	}
 	
-	public static LogRowData init(File copiedDirectory, String sourceAbsolutePath, File newFile, long sum) {
+	public LogRowData init(File copiedDirectory, String sourceAbsolutePath, File sourceFile) {
 		int rowIndex = -1;
 		String newFilePath =	copiedDirectory.getAbsolutePath() 
 								+ File.separatorChar
-								+ StringUtils.substring(newFile.getAbsolutePath(), sourceAbsolutePath.length() + 1);
+								+ StringUtils.substring(sourceFile.getAbsolutePath(), sourceAbsolutePath.length() + 1);
 		
-		if(newFile.isFile()) {
-			String[] rowData = new String[] {
-				"0"
-				, FileUtils.byteCountToDisplaySize(FileUtils.sizeOf(newFile))
+		if(sourceFile.isFile()) {
+			Object[] rowData = new Object[] {
+				0
+				, FileUtils.byteCountToDisplaySize(FileUtils.sizeOf(sourceFile))
 				, newFilePath
 			};
 			logModel.addRow(rowData);
 			rowIndex = logModel.getRowCount() - 1;
+			
+			logTable.scrollRectToVisible(new Rectangle(logTable.getCellRect(rowIndex, 0, false)));
 		}
 		
 		return new LogRowData(rowIndex, newFilePath);
 	}
 	
-	public static void process(long sourceSize, LogRowData logRowData) {
+	public void process(long sourceSize, LogRowData logRowData) {
 		if(sourceSize == 0) return;
 
 		File newFile = new File(logRowData.getFilePath());
 		long targetSize = 0;
+		long previousTargetSize = 0;
+		long sizeGap = 0;
 		
 		while(true) {
 			if(newFile.exists()) {
 				targetSize = FileUtils.sizeOf(newFile);
-			} else {
+				if(targetSize > previousTargetSize) {
+					sizeGap = targetSize - previousTargetSize;
+					refreshSizeProgress(sizeGap);
+					previousTargetSize = targetSize;
+				}
+				
 				try {
-					Thread.sleep(200);
+					Thread.sleep(100);
 				} catch (InterruptedException e) {
 					e.printStackTrace();
 				}
 			}
 			
-			int percent = (int)Math.round(((double)targetSize / (double)sourceSize) * 100);
-			logTable.setValueAt(Integer.toString(percent), logRowData.getRowIndex(), 0);
+			int percent = getSizePercent(sourceSize, targetSize);
+			logTable.setValueAt(percent, logRowData.getRowIndex(), 0);
 			
-			if(targetSize > 0 && targetSize == sourceSize) break;
+			if(targetSize > 0 && targetSize == sourceSize) {
+				refreshSizeProgress(sizeGap);
+				break;
+			}
 		}
 	}
 	

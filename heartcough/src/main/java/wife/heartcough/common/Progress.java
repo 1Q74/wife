@@ -3,6 +3,8 @@ package wife.heartcough.common;
 import java.awt.BorderLayout;
 import java.awt.Component;
 import java.awt.Rectangle;
+import java.awt.event.WindowEvent;
+import java.awt.event.WindowListener;
 import java.io.File;
 
 import javax.swing.BorderFactory;
@@ -22,6 +24,7 @@ import javax.swing.table.TableColumn;
 import javax.swing.table.TableColumnModel;
 
 import org.apache.commons.io.FileUtils;
+import org.apache.commons.io.FilenameUtils;
 import org.apache.commons.lang3.StringUtils;
 
 public class Progress {
@@ -30,7 +33,7 @@ public class Progress {
 	private static int HEIGHT;
 	
 	static {
-		WIDTH = 450;
+		WIDTH = 700;
 		HEIGHT = 200;
 	}
 	
@@ -91,6 +94,7 @@ public class Progress {
 		logModel.addColumn("Percent");
 		logModel.addColumn("Size");
 		logModel.addColumn("Name");
+		logModel.addColumn("Path");
 		
 		JTableHeader header = logTable.getTableHeader();
 		header.setDefaultRenderer(
@@ -99,11 +103,11 @@ public class Progress {
 		
 		
 		TableColumnModel columnModel = (TableColumnModel)logTable.getColumnModel();
-		int[] columnSize = new int[] { 100, 120 };
+		int[] columnSize = new int[] { 80, 80, 250 };
 		for(int i = 0; i < columnSize.length; i++) {
 			TableColumn column = columnModel.getColumn(i); 
 			column.setMaxWidth(columnSize[i]);
-			column.setWidth(columnSize[i]);
+			column.setPreferredWidth(columnSize[i]);
 			column.setResizable(true);
 			column.sizeWidthToFit();
 
@@ -112,14 +116,24 @@ public class Progress {
 					column.setCellRenderer(getLogTableProgressBarCellRenderer());
 					break;
 				case 1:
-					Border border = new EmptyBorder(0, 0, 0, 0);
-					column.setCellRenderer(getLogTableDefaultCellRenderer(JLabel.RIGHT, border));
+					column.setCellRenderer(
+						getLogTableDefaultCellRenderer(JLabel.RIGHT, new EmptyBorder(0, 0, 0, 5))
+					);
+					break;
+				case 2:
+					column.setCellRenderer(
+						getLogTableDefaultCellRenderer(JLabel.LEFT, new EmptyBorder(0, 5, 0, 0))
+					);
 					break;
 			}
 		}
+		
+		columnModel.getColumn(3).setCellRenderer(
+			getLogTableDefaultCellRenderer(JLabel.LEFT, new EmptyBorder(0, 5, 0, 0))
+		);
 	}
 
-	private void ready() {
+	public void show() {
 		initProgressBar();
 		initLogTable();
 		
@@ -136,17 +150,34 @@ public class Progress {
 		popup.setSize(WIDTH, HEIGHT);
 		popup.setContentPane(bodyPanel);
 		popup.setVisible(true);
-	}
-	
-	public void show() {
-		new Thread(
-			new Runnable() {
-				@Override
-				public void run() {
-					ready();
-				}
+		popup.addWindowListener(new WindowListener() {
+			@Override
+			public void windowClosing(WindowEvent e) {
+				ProgressHandler.isStopped(true);
+				ProgressHandler.getHandler().shutdownNow();
+				
+				CommandHandler.isStopped(true);
+				CommandHandler.getHandler().shutdownNow();
 			}
-		).start();
+			
+			@Override
+			public void windowOpened(WindowEvent e) {}
+			
+			@Override
+			public void windowIconified(WindowEvent e) {}
+			
+			@Override
+			public void windowDeiconified(WindowEvent e) {}
+			
+			@Override
+			public void windowDeactivated(WindowEvent e) {}
+			
+			@Override
+			public void windowClosed(WindowEvent e) {}
+			
+			@Override
+			public void windowActivated(WindowEvent e) {}
+		});
 	}
 	
 	private int getSizePercent(double source, double total) {
@@ -201,6 +232,7 @@ public class Progress {
 			Object[] rowData = new Object[] {
 				0
 				, FileUtils.byteCountToDisplaySize(FileUtils.sizeOf(sourceFile))
+				, FilenameUtils.getName(newFilePath)
 				, newFilePath
 			};
 			logModel.addRow(rowData);
@@ -214,25 +246,19 @@ public class Progress {
 	
 	public void process(long sourceSize, LogRowData logRowData) {
 		if(sourceSize == 0) return;
-
+	
 		File newFile = new File(logRowData.getFilePath());
 		long targetSize = 0;
 		long previousTargetSize = 0;
 		long sizeGap = 0;
 		
-		while(true) {
+		while(!ProgressHandler.isStopped()) {
 			if(newFile.exists()) {
 				targetSize = FileUtils.sizeOf(newFile);
 				if(targetSize > previousTargetSize) {
 					sizeGap = targetSize - previousTargetSize;
 					refreshSizeProgress(sizeGap);
 					previousTargetSize = targetSize;
-				}
-				
-				try {
-					Thread.sleep(100);
-				} catch (InterruptedException e) {
-					e.printStackTrace();
 				}
 			}
 			

@@ -95,6 +95,7 @@ public class Progress {
 		logModel.addColumn("Size");
 		logModel.addColumn("Name");
 		logModel.addColumn("Path");
+		System.out.println("logModel = " + logModel);
 		
 		JTableHeader header = logTable.getTableHeader();
 		header.setDefaultRenderer(
@@ -192,8 +193,6 @@ public class Progress {
 		copiedSize += sizeGap;
 		int percent = getSizePercent(copiedSize, sumSize);
 		
-		System.out.println("[copiedSize:" + copiedSize + ", sumSize:" + sumSize + ", percent:" + percent + "]");
-		
 		bar.setValue(percent);
 		bar.setString(
 			percent + "%"
@@ -238,11 +237,15 @@ public class Progress {
 			};
 			logModel.addRow(rowData);
 			rowIndex = logModel.getRowCount() - 1;
-			
-			logTable.scrollRectToVisible(new Rectangle(logTable.getCellRect(rowIndex, 0, false)));
+			logTable.scrollRectToVisible(new Rectangle(logTable.getCellRect(rowIndex, 4, true)));
 		}
 		
 		return new LogRowData(rowIndex, newFilePath);
+	}
+	
+	public void process(long sourceSize, long targetSize, LogRowData logRowData) {
+		int percent = getSizePercent(targetSize, sourceSize);
+		logTable.setValueAt(percent, logRowData.getRowIndex(), 0);
 	}
 	
 	public void process(long sourceSize, LogRowData logRowData) {

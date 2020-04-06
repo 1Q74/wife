@@ -8,6 +8,7 @@ import java.nio.channels.ClosedByInterruptException;
 import org.apache.commons.io.FileUtils;
 import org.apache.commons.io.FilenameUtils;
 
+import wife.heartcough.command.Copy;
 import wife.heartcough.common.Progress;
 import wife.heartcough.common.Progress.LogRowData;
 import wife.heartcough.common.Synchronizer;
@@ -26,10 +27,13 @@ public class Command implements Runnable {
 	}
 	
 	private void processCopy(File targetDirectory) {
-		Progress progress  = new Progress();
-		progress.show();
-		progress.setSumSize(FileUtils.sizeOf(source));
+//		Progress progress  = new Progress();
+//		progress.show();
+//		progress.setSumSize(FileUtils.sizeOf(source));
 		
+		Copy copy = new Copy();
+		copy.execute(source, targetDirectory);
+		/*
 		File copiedDirectory = getCopiedDirectory(targetDirectory);
 		
     	try {
@@ -58,6 +62,7 @@ public class Command implements Runnable {
 		} catch(IOException e) {
 			e.printStackTrace();
 		}
+		*/
 	}
 		
 	public void copy() {

@@ -10,7 +10,6 @@ import java.io.OutputStream;
 
 import org.apache.commons.io.FileUtils;
 
-import wife.heartcough.command.Copy;
 import wife.heartcough.common.Synchronizer;
 import wife.heartcough.common.Progress.LogRowData;
 
@@ -68,21 +67,6 @@ public class Command implements Runnable {
 			}
 		}
 	}
-	
-//	public void execute(File source, File target) {
-//		progress.show();
-//		progress.setSumSize(FileUtils.sizeOf(source));
-//		
-//		File newFile = new File(getCopiedFileName(source, target));
-//		newFile.mkdir();
-//		
-//		process(source, newFile);
-//	}
-//	
-//	private void processCopy(File targetDirectory) {
-//		Copy copy = new Copy();
-//		copy.execute(source, targetDirectory);
-//	}
 		
 	public void copy() {
 		source = Synchronizer.getCurrentFile();

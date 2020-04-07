@@ -2,10 +2,10 @@ package wife.heartcough.common;
 
 import java.awt.BorderLayout;
 import java.awt.Component;
-import java.awt.Rectangle;
 import java.awt.event.WindowEvent;
 import java.awt.event.WindowListener;
 import java.io.File;
+import java.lang.reflect.InvocationTargetException;
 
 import javax.swing.BorderFactory;
 import javax.swing.JFrame;
@@ -15,6 +15,7 @@ import javax.swing.JProgressBar;
 import javax.swing.JScrollPane;
 import javax.swing.JSplitPane;
 import javax.swing.JTable;
+import javax.swing.SwingUtilities;
 import javax.swing.border.Border;
 import javax.swing.border.EmptyBorder;
 import javax.swing.table.DefaultTableModel;
@@ -42,6 +43,7 @@ public class Progress {
 	private DefaultTableModel logModel;
 	private long sumSize = 0;
 	private long copiedSize = 0;
+	private JScrollPane logTableScrollPane;
 	
 	private void initProgressBar() {
 		bar = new JProgressBar();
@@ -95,7 +97,6 @@ public class Progress {
 		logModel.addColumn("Size");
 		logModel.addColumn("Name");
 		logModel.addColumn("Path");
-		System.out.println("logModel = " + logModel);
 		
 		JTableHeader header = logTable.getTableHeader();
 		header.setDefaultRenderer(
@@ -138,10 +139,12 @@ public class Progress {
 		initProgressBar();
 		initLogTable();
 		
+		logTableScrollPane = new JScrollPane(logTable);
+		
 		JSplitPane splitter = new JSplitPane(JSplitPane.VERTICAL_SPLIT);
 		splitter.setDividerSize(0);
 		splitter.setTopComponent(bar);
-		splitter.setBottomComponent(new JScrollPane(logTable));
+		splitter.setBottomComponent(logTableScrollPane);
 		
 		JPanel bodyPanel = new JPanel(new BorderLayout());
 		bodyPanel.setBorder(new EmptyBorder(5, 5, 5, 5));
@@ -237,7 +240,18 @@ public class Progress {
 			};
 			logModel.addRow(rowData);
 			rowIndex = logModel.getRowCount() - 1;
-			logTable.scrollRectToVisible(new Rectangle(logTable.getCellRect(rowIndex, 4, true)));
+			
+			
+			try {
+				SwingUtilities.invokeAndWait(new Runnable() {
+					@Override
+					public void run() {
+						logTableScrollPane.getVerticalScrollBar().setValue(logTableScrollPane.getVerticalScrollBar().getMaximum());
+						
+					}
+				});
+			} catch (InvocationTargetException | InterruptedException e) {
+			}
 		}
 		
 		return new LogRowData(rowIndex, newFilePath);

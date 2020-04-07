@@ -1,17 +1,18 @@
 package wife.heartcough.common;
 
 import java.io.File;
-import java.io.FileFilter;
+import java.io.FileInputStream;
+import java.io.FileNotFoundException;
+import java.io.FileOutputStream;
 import java.io.IOException;
-import java.nio.channels.ClosedByInterruptException;
+import java.io.InputStream;
+import java.io.OutputStream;
 
 import org.apache.commons.io.FileUtils;
-import org.apache.commons.io.FilenameUtils;
 
 import wife.heartcough.command.Copy;
-import wife.heartcough.common.Progress;
-import wife.heartcough.common.Progress.LogRowData;
 import wife.heartcough.common.Synchronizer;
+import wife.heartcough.common.Progress.LogRowData;
 
 
 
@@ -21,49 +22,67 @@ public class Command implements Runnable {
 	private File source;
 	private File target;
 	
-	private File getCopiedDirectory(File target) {
-		String sourceName = FilenameUtils.getName(source.getAbsolutePath());
-		return new File(target.getAbsolutePath() + File.separatorChar + sourceName);
+	private Progress progress = new Progress();
+	
+	private String getCopiedFileName(File source, File target) {
+		return target.getAbsolutePath() + File.separatorChar + source.getName();
+	}
+
+	private void process(File source, File target) {
+		File[] files = source.listFiles();
+		
+		for(File file : files) {
+			File newFile = new File(getCopiedFileName(file, target));
+			
+			if(file.isDirectory()) {
+				newFile.mkdir();
+				process(file, newFile);
+			} else {
+				LogRowData logRowData = progress.init(target, source.getAbsolutePath(), file);
+				
+				ProgressHandler.getHandler().submit(new Runnable() {
+					public void run() {
+						try {
+							InputStream in = new FileInputStream(file);
+							OutputStream out = new FileOutputStream(newFile);
+							
+							byte[] buffer = new byte[1024 * 1024];
+							int count = 0;
+							long size = 0;
+							while((count = in.read(buffer, 0, buffer.length)) != -1) {
+								out.write(buffer, 0, count);
+								size += count;
+								progress.process(FileUtils.sizeOf(file), size, logRowData);
+								progress.refreshSizeProgress(count);
+							}
+							System.out.println(file.getAbsolutePath() + " (" + FileUtils.byteCountToDisplaySize( size) + ")");
+							out.close();
+							in.close();
+						} catch (FileNotFoundException e) {
+							e.printStackTrace();
+						} catch (IOException e) {
+							e.printStackTrace();
+						}
+					}
+				});
+			}
+		}
 	}
 	
-	private void processCopy(File targetDirectory) {
-//		Progress progress  = new Progress();
+//	public void execute(File source, File target) {
 //		progress.show();
 //		progress.setSumSize(FileUtils.sizeOf(source));
-		
-		Copy copy = new Copy();
-		copy.execute(source, targetDirectory);
-		/*
-		File copiedDirectory = getCopiedDirectory(targetDirectory);
-		
-    	try {
-			FileUtils.copyDirectory(source, copiedDirectory, new FileFilter() {
-				@Override
-				public boolean accept(File file) {
-					if(CommandHandler.isStopped()) return false;
-					
-					LogRowData logRowData = progress.init(copiedDirectory, source.getAbsolutePath(), file);
-					if(logRowData.getRowIndex() >= 0) {
-						ProgressHandler.getHandler().submit(
-							new Runnable() {
-								public void run() {
-									progress.process(FileUtils.sizeOf(file), logRowData);
-								}
-							}
-						);
-					}
-						
-					return true;
-				}
-			});
-		} catch(ClosedByInterruptException e) {
-			// Progress Window is forcely closed 
-			System.out.println("Progress Window is forcely closed");
-		} catch(IOException e) {
-			e.printStackTrace();
-		}
-		*/
-	}
+//		
+//		File newFile = new File(getCopiedFileName(source, target));
+//		newFile.mkdir();
+//		
+//		process(source, newFile);
+//	}
+//	
+//	private void processCopy(File targetDirectory) {
+//		Copy copy = new Copy();
+//		copy.execute(source, targetDirectory);
+//	}
 		
 	public void copy() {
 		source = Synchronizer.getCurrentFile();
@@ -75,7 +94,13 @@ public class Command implements Runnable {
 		
 		if(target.isDirectory()) {
 			if(source.isDirectory()) {
-				processCopy(target);
+				progress.show();
+				progress.setSumSize(FileUtils.sizeOf(source));
+				
+				File newFile = new File(getCopiedFileName(source, target));
+				newFile.mkdir();
+				
+				process(source, newFile);
 			}
 		}
 	}

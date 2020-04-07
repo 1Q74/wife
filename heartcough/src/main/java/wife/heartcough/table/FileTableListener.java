@@ -4,9 +4,6 @@ import java.awt.event.KeyEvent;
 import java.awt.event.KeyListener;
 import java.awt.event.MouseEvent;
 import java.awt.event.MouseListener;
-import java.util.Calendar;
-import java.util.Timer;
-import java.util.concurrent.TimeUnit;
 
 import javax.swing.JTable;
 
@@ -69,23 +66,8 @@ public class FileTableListener {
 							command.copy();
 							break;
 						case (CTRL + V):
-							Calendar calendar = Calendar.getInstance();
-							System.out.println(
-								"[START] "
-								+ calendar.get(Calendar.HOUR_OF_DAY)
-								+ ":" + calendar.get(Calendar.MINUTE)
-								+ ":" + calendar.get(Calendar.SECOND)
-							);
-							
 							CommandHandler.getHandler().submit(command);
 							Synchronizer.reload();
-							
-							System.out.println(
-								"[END] "
-								+ calendar.get(Calendar.HOUR_OF_DAY)
-								+ ":" + calendar.get(Calendar.MINUTE)
-								+ ":" + calendar.get(Calendar.SECOND)
-							);
 							break;
 					}
 				}

@@ -7,7 +7,6 @@ import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
-import java.util.Calendar;
 
 import org.apache.commons.io.FileUtils;
 
@@ -71,39 +70,6 @@ public class Copy {
 		newFile.mkdir();
 		
 		process(source, newFile);
-	}
-	
-	private void execute() {
-		File source = new File("G:\\backup\\t2");
-		File target = new File("G:\\backup\\출석고사");
-		
-		File newFile = new File(getCopiedFileName(source, target));
-		newFile.mkdir();
-		
-//		String targetPath = target.getAbsolutePath() + File.separatorChar + source.getName();
-		process(source, newFile);
-	}
-	
-	public static void main(String[] args) {
-		Calendar start = Calendar.getInstance();
-		
-		System.out.println(
-			"[START] "
-			+ start.get(Calendar.HOUR_OF_DAY)
-			+ ":" + start.get(Calendar.MINUTE)
-			+ ":" + start.get(Calendar.SECOND)
-		);
-
-		Copy copy = new Copy();
-		copy.execute();
-		
-		Calendar end = Calendar.getInstance();
-		System.out.println(
-			"[END] "
-			+ end.get(Calendar.HOUR_OF_DAY)
-			+ ":" + end.get(Calendar.MINUTE)
-			+ ":" + end.get(Calendar.SECOND)
-		);
 	}
 	
 }

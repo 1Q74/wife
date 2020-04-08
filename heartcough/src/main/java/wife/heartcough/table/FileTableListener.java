@@ -4,6 +4,7 @@ import java.awt.event.KeyEvent;
 import java.awt.event.KeyListener;
 import java.awt.event.MouseEvent;
 import java.awt.event.MouseListener;
+import java.io.File;
 
 import javax.swing.JTable;
 
@@ -21,7 +22,9 @@ public class FileTableListener {
 			new MouseListener() {
 				@Override
 				public void mouseClicked(MouseEvent e) {
-					int rowIndex = ((JTable)e.getSource()).getSelectedRow();
+					JTable table = (JTable)e.getSource();
+					
+					int rowIndex = table.getSelectedRow();
 					if(rowIndex == -1) return;
 					
 					Synchronizer.setCurrentFile(rowIndex);
@@ -59,10 +62,15 @@ public class FileTableListener {
 			
 				@Override
 				public void keyPressed(KeyEvent e) {
+					JTable table = (JTable)e.getSource();
 					int keyCodeSum = e.getModifiers() + e.getKeyCode();
 					
 					switch(keyCodeSum) {
 						case (CTRL + C):
+							int[] rowIndexes = table.getSelectedRows();
+							if(rowIndexes == null || rowIndexes.length == 0) return;
+							
+							Synchronizer.setCurrentFiles(rowIndexes);
 							command.copy();
 							break;
 						case (CTRL + V):

@@ -16,6 +16,7 @@ public class Synchronizer {
 	private static DefaultMutableTreeNode CURRENT_NODE;
 	private static File CURRENT_DIRECTORY;
 	private static File CURRENT_FILE;
+	private static File[] CURRENT_FILES;
 	private static File[] FILE_LIST;
 	private static File[] DIRECTORIES;
 	private static File[] FILES;
@@ -67,6 +68,22 @@ public class Synchronizer {
 	
 	public static File getCurrentFile() {
 		return CURRENT_FILE;
+	}
+	
+	public static void setCurrentFiles(int[] rowIndexes) {
+		System.out.println("<Synchronizer.setCurrentfiles>");
+		CURRENT_FILES = new File[rowIndexes.length];
+		
+		for(int i = 0; i < rowIndexes.length; i++) {
+			CURRENT_FILES[i] = FILE_LIST[rowIndexes[i]];
+			System.out.println(CURRENT_FILES[i]);
+		}
+		
+		CURRENT_FILE = CURRENT_FILES[rowIndexes.length - 1];
+	}
+	
+	public static File[] getCurrentFiles() {
+		return CURRENT_FILES;
 	}
 
 	public static File getCurrentNodeDirectory() {

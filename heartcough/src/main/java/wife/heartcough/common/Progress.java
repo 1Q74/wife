@@ -188,8 +188,10 @@ public class Progress {
 		return (int)Math.round((source / total) * 100);
 	}
 	
-	public void setSumSize(long sumSize) {
-		this.sumSize = sumSize;
+	public void setSumSize(File[] files) {
+		for(File file : files) {
+			this.sumSize += file.isDirectory() ? FileUtils.sizeOfDirectory(file) : FileUtils.sizeOf(file);
+		}
 	}
 	
 	public void refreshSizeProgress(long sizeGap) {
@@ -225,12 +227,9 @@ public class Progress {
 		}
 	}
 	
-	public LogRowData init(File copiedDirectory, String sourceAbsolutePath, File sourceFile) {
+	public LogRowData init(File sourceFile, String newFilePath) {
 		int rowIndex = -1;
-		String newFilePath =	copiedDirectory.getAbsolutePath() 
-								+ File.separatorChar
-								+ StringUtils.substring(sourceFile.getAbsolutePath(), sourceAbsolutePath.length() + 1);
-		
+
 		if(sourceFile.isFile()) {
 			Object[] rowData = new Object[] {
 				0
@@ -259,9 +258,11 @@ public class Progress {
 	
 	public void process(long sourceSize, long targetSize, LogRowData logRowData) {
 		int percent = getSizePercent(targetSize, sourceSize);
+		System.out.println("sourceSize = " + sourceSize + ", percent = " + percent);
 		logTable.setValueAt(percent, logRowData.getRowIndex(), 0);
 	}
 	
+	/*
 	public void process(long sourceSize, LogRowData logRowData) {
 		if(sourceSize == 0) return;
 	
@@ -289,5 +290,6 @@ public class Progress {
 			}
 		}
 	}
+	*/
 	
 }

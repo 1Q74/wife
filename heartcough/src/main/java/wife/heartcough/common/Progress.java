@@ -257,7 +257,6 @@ public class Progress {
 	
 	public void process(long sourceSize, long targetSize, LogRowData logRowData) {
 		int percent = getSizePercent(targetSize, sourceSize);
-		System.out.println("sourceSize = " + sourceSize + ", percent = " + percent);
 		logTable.setValueAt(percent, logRowData.getRowIndex(), 0);
 	}
 	

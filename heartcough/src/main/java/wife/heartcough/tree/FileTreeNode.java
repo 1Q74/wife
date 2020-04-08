@@ -17,10 +17,6 @@ public class FileTreeNode {
 	
 	private File[] nodeElement;
 	
-	public void nodeElement(File[] files) {
-		this.nodeElement = files;
-	}
-	
 	private void setSystemChildNode(DefaultMutableTreeNode nodes, File parent) {
 		for(File child : FileSystem.VIEW.getFiles(parent, false)) {
 			if(child.isDirectory()) {

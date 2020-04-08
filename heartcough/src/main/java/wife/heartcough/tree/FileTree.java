@@ -35,8 +35,6 @@ public class FileTree {
 		    }
 		});
 		tree.addMouseListener(FileTreeListener.getMouseListener());
-		tree.setFocusable(true);
-		tree.addFocusListener(FileTreeListener.getFocusListener());
 		
 		return tree;
 	}

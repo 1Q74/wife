@@ -25,11 +25,6 @@ public class Synchronizer {
 	private static FileTable FILE_TABLE;
 	private static DirectoryPath DIRECTORY_PATH;
 	
-	private static File[] PREVIOUS_DIRECTORIES;
-	private static File[] PREVIOUS_FILES;
-	private static boolean IS_DIRECTORY_CHANGED = false;
-	private static boolean IS_FILE_CHANGED = false;
-	
 	public static void setFileTree(FileTree fileTree) {
 		FILE_TREE = fileTree;
 	}
@@ -71,12 +66,10 @@ public class Synchronizer {
 	}
 	
 	public static void setCurrentFiles(int[] rowIndexes) {
-		System.out.println("<Synchronizer.setCurrentfiles>");
 		CURRENT_FILES = new File[rowIndexes.length];
 		
 		for(int i = 0; i < rowIndexes.length; i++) {
 			CURRENT_FILES[i] = FILE_LIST[rowIndexes[i]];
-			System.out.println(CURRENT_FILES[i]);
 		}
 		
 		CURRENT_FILE = CURRENT_FILES[rowIndexes.length - 1];
@@ -108,8 +101,6 @@ public class Synchronizer {
 	
 	public static void setDirectories(File[] directories) {
 		DIRECTORIES = directories;
-		IS_DIRECTORY_CHANGED = PREVIOUS_DIRECTORIES != null && !DIRECTORIES.equals(PREVIOUS_DIRECTORIES); 
-		PREVIOUS_DIRECTORIES = DIRECTORIES;
 	}
 	
 	public static File[] getDirectories() {
@@ -118,8 +109,6 @@ public class Synchronizer {
 	
 	public static void setFiles(File[] files) {
 		FILES = files;
-		IS_FILE_CHANGED = PREVIOUS_FILES != null && !FILES.equals(PREVIOUS_FILES);
-		PREVIOUS_FILES = FILES;
 	}
 	
 	public static File[] getFiles() {
@@ -128,22 +117,6 @@ public class Synchronizer {
 	
 	public static boolean haveMoreDirecories() {
 		return DIRECTORIES.length > FILES.length;
-	}
-	
-	public static boolean isDirectoryChanged() {
-		return IS_DIRECTORY_CHANGED;
-	}
-	
-	public static boolean isFileChanged() {
-		return IS_FILE_CHANGED;
-	}
-	
-	public static void initDirectoryChanged() {
-		IS_DIRECTORY_CHANGED = false;
-	}
-	
-	public static void initFileChanged() {
-		IS_FILE_CHANGED = false;
 	}
 	
 	public static void reload() {

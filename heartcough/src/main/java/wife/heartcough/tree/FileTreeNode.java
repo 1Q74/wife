@@ -15,8 +15,6 @@ import wife.heartcough.common.Synchronizer;
 
 public class FileTreeNode {
 	
-	private File[] nodeElement;
-	
 	private void setSystemChildNode(DefaultMutableTreeNode nodes, File parent) {
 		for(File child : FileSystem.VIEW.getFiles(parent, false)) {
 			if(child.isDirectory()) {
@@ -34,7 +32,7 @@ public class FileTreeNode {
 	}
 	
 	public void setChildNode() {
-		nodeElement = selectNodeElementSource();
+		File[] nodeElement = selectNodeElementSource();
 		
 		SwingWorker<Void, File> worker = new SwingWorker<Void, File>() {
             @Override

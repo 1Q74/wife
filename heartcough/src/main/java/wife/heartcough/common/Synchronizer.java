@@ -2,6 +2,9 @@ package wife.heartcough.common;
 
 import java.io.File;
 
+import javax.swing.JTable;
+import javax.swing.JTextField;
+import javax.swing.JTree;
 import javax.swing.tree.DefaultMutableTreeNode;
 
 import wife.heartcough.path.DirectoryPath;
@@ -24,6 +27,10 @@ public class Synchronizer {
 	private static FileTree FILE_TREE;
 	private static FileTable FILE_TABLE;
 	private static DirectoryPath DIRECTORY_PATH;
+	
+	private static boolean SELECTED_FROM_FILE_TABLE = false;
+	private static boolean SELECTED_FROM_FILE_TREE = false;
+	private static boolean SELECTED_FROM_FILE_PATH = false;
 	
 	public static void setFileTree(FileTree fileTree) {
 		FILE_TREE = fileTree;
@@ -149,6 +156,28 @@ public class Synchronizer {
 	
 	public static void restorePath() {
 		DIRECTORY_PATH.restorePath();
+	}
+	
+	public static void setSelectedFrom(Object source) {
+		if(source instanceof JTable) {
+			SELECTED_FROM_FILE_TABLE = true;
+		} else if(source instanceof JTree) {
+			SELECTED_FROM_FILE_TREE = true;
+		} else if(source instanceof JTextField) {
+			SELECTED_FROM_FILE_PATH = true;
+		}
+	}
+	
+	public static boolean isSelectedFromFileTable() {
+		return SELECTED_FROM_FILE_TABLE;
+	}
+	
+	public static boolean isSelectedFromFileTree() {
+		return SELECTED_FROM_FILE_TREE;
+	}
+	
+	public static boolean isSelectedFromFilePath() {
+		return SELECTED_FROM_FILE_PATH;
 	}
 	
 }

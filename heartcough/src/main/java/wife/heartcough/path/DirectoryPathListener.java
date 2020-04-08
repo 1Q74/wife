@@ -30,6 +30,7 @@ public class DirectoryPathListener {
 					File file = new File(currentPath);
 
 					if(file.isDirectory()) {
+						Synchronizer.setSelectedFrom(e.getSource());
 						Synchronizer.change(file);
 					}
 				}

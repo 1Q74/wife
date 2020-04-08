@@ -10,9 +10,9 @@ public class FileTreeListener {
 	public static MouseListener getMouseListener() {
 		return 
 			new MouseListener() {
-
 				@Override
 				public void mouseClicked(MouseEvent e) {
+					Synchronizer.setSelectedFrom(e.getSource());
 					Synchronizer.restorePath();
 				}
 	

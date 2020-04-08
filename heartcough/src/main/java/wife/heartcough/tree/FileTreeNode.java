@@ -36,7 +36,6 @@ public class FileTreeNode {
 	public void setChildNode() {
 		nodeElement = selectNodeElementSource();
 		
-//		fileTree.setEnabled(false);
 		SwingWorker<Void, File> worker = new SwingWorker<Void, File>() {
             @Override
             public Void doInBackground() {
@@ -57,9 +56,11 @@ public class FileTreeNode {
 
             @Override
             protected void done() {
-//            	fileTree.setEnabled(true);
-            	Synchronizer.getFileTree().getTree().expandPath(new TreePath(Synchronizer.getCurrentNode().getPath()));
-            	Synchronizer.getFileTree().getTree().repaint();
+            	if(Synchronizer.isSelectedFromFileTable()) {
+	            	Synchronizer.getFileTree().getTree().expandPath(
+	            		new TreePath(Synchronizer.getCurrentNode().getPath())
+	            	);
+            	}
              }
         };
         worker.execute();

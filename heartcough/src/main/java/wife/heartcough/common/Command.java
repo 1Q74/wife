@@ -9,34 +9,16 @@ import java.io.InputStream;
 import java.io.OutputStream;
 
 import org.apache.commons.io.FileUtils;
-import org.apache.commons.lang3.StringUtils;
 
 import wife.heartcough.common.Synchronizer;
 import wife.heartcough.common.Progress.LogRowData;
 
-
-
-
 public class Command implements Runnable {
 
 	private File[] sources;
-//	private File source;
 	private File target;
 	
 	private Progress progress = new Progress();
-	
-	/*
-	private String getCopiedRootPath(File source, File target) {
-		return target.getAbsolutePath() + File.separatorChar + source.getName();
-	}
-	
-	private String getNewFilePath(File file) {
-		int start = this.source.getAbsolutePath().length() + 1;
-		return	target.getAbsolutePath() 
-				+ File.separatorChar
-				+ StringUtils.substring(file.getAbsolutePath(), start);
-	}
-	*/
 	
 	private void copyFile(File src, File newFile) {
 		System.out.println(src + " | " + newFile);
@@ -109,30 +91,21 @@ public class Command implements Runnable {
 	}
 		
 	public void copy() {
-		System.out.println("<Command.copy>");
 		sources = Synchronizer.getCurrentFiles();
 	}
 
 	private void paste() {
-		System.out.println("<Command.paste>");
 		target = Synchronizer.getCurrentDirectory();
-		System.out.println("[target] " + target);
 		if(target.isFile()) return;
 		
 		progress.show();
 		progress.setSumSize(sources);
 		
-		System.out.println("sources.length = " + sources.length);
 		for(File source : sources) {
-//			this.source = source;
-//			progress.setSumSize(FileUtils.sizeOf(source));
-			
 			File newFile = new File(target, source.getName());
-			System.out.println("[newFile] " + newFile);
 			if(source.isDirectory() && !newFile.exists()) {
 				newFile.mkdir();
 			}
-			
 			process(source, newFile);
 		}
 	}

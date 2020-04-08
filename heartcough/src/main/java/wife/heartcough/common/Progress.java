@@ -26,7 +26,6 @@ import javax.swing.table.TableColumnModel;
 
 import org.apache.commons.io.FileUtils;
 import org.apache.commons.io.FilenameUtils;
-import org.apache.commons.lang3.StringUtils;
 
 public class Progress {
 	
@@ -261,35 +260,5 @@ public class Progress {
 		System.out.println("sourceSize = " + sourceSize + ", percent = " + percent);
 		logTable.setValueAt(percent, logRowData.getRowIndex(), 0);
 	}
-	
-	/*
-	public void process(long sourceSize, LogRowData logRowData) {
-		if(sourceSize == 0) return;
-	
-		File newFile = new File(logRowData.getFilePath());
-		long targetSize = 0;
-		long previousTargetSize = 0;
-		long sizeGap = 0;
-		
-		while(!ProgressHandler.isStopped()) {
-			if(newFile.exists()) {
-				targetSize = FileUtils.sizeOf(newFile);
-				if(targetSize < sourceSize && targetSize > previousTargetSize) {
-					sizeGap = targetSize - previousTargetSize;
-					refreshSizeProgress(sizeGap);
-					previousTargetSize = targetSize;
-				}
-				
-				int percent = getSizePercent(targetSize, sourceSize);
-				logTable.setValueAt(percent, logRowData.getRowIndex(), 0);
-				
-				if(targetSize > 0 && targetSize == sourceSize) {
-					refreshSizeProgress(sizeGap);
-					break;
-				}
-			}
-		}
-	}
-	*/
 	
 }

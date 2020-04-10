@@ -139,24 +139,15 @@ public class FileTree {
 		DefaultMutableTreeNode matchedTreeNode = Synchronizer.load(parentNode, true);
 		
 		if(matchedTreeNode != null) {
-//			SwingUtilities.invokeLater(new Runnable() {
-//				@Override
-//				public void run() {
-					if(Synchronizer.isBeforeLastChangedDirectoryPath()) {
-						System.out.println("[expand] " + matchedTreeNode + ", " + Synchronizer.isBeforeLastChangedDirectoryPath());
-						tree.expandPath(new TreePath(matchedTreeNode.getPath()));
-						
-						if(matchedTreeNode.getUserObject().equals(Synchronizer.getLastChangedDirectoryPath())) {
-							Synchronizer.isBeforeLastChangedDirectoryPath(false);
-							tree.setSelectionPath(new TreePath(matchedTreeNode.getPath()));	
-						}
-					} else {
-						System.out.println("[selection] " + matchedTreeNode + ", " + Synchronizer.isBeforeLastChangedDirectoryPath());
-						Synchronizer.isBeforeLastChangedDirectoryPath(false);
-						tree.setSelectionPath(new TreePath(matchedTreeNode.getPath()));						
-					}
-//				}
-//			});
+			System.out.println("[expand] " + matchedTreeNode + ", " + Synchronizer.isBeforeLastChangedDirectoryPath());
+			tree.expandPath(new TreePath(matchedTreeNode.getPath()));
+			
+			if(matchedTreeNode.getUserObject().equals(Synchronizer.getLastChangedDirectoryPath())) {
+				Synchronizer.isBeforeLastChangedDirectoryPath(false);
+				Synchronizer.isDirectoryPathChanged(false);
+				tree.setSelectionPath(new TreePath(matchedTreeNode.getPath()));	
+			}
+
 			searchChildNode(matchedTreeNode);
 		}
 	}
@@ -182,8 +173,6 @@ public class FileTree {
 				Synchronizer.isDirectoryPathChanged(true);
 				
 				if(childNode.isLeaf()) {
-//					TreePath childNodePath = new TreePath(childNode.getPath());
-//					tree.setSelectionPath(childNodePath);
 					searchChildNode(childNode);
 				} else {
 //					searchChildNode(childNode);

@@ -85,10 +85,6 @@ public class Synchronizer {
 	
 	private static boolean DIRECTORY_PATH_CHANGED = false;
 	private static File[] CHANED_DIRECTORY_PATHS;
-	private static TreePath NEXT_CHANGED_DIRECTORY_TREE_PATH;
-	private static boolean HAS_MORE_CHANGED_DIRECTORY_PATH = false;
-	private static boolean NO_MORE_CHANGED_DIRECTORY_PATH = false;
-	
 	private static boolean IS_BEFORE_LAST_CHANGED_DIRECTORY_PATH = false;
 	private static File MATCH_CHANGED_DIRECTORY_PATH;
 	
@@ -215,7 +211,14 @@ public class Synchronizer {
 	 * @param selectedNode FileTree의 현재 선택된 노드
 	 */
 	public static void load(DefaultMutableTreeNode selectedNode) {
-		load(selectedNode, false);
+		setCurrentNode(selectedNode);
+		setCurrentDirectory((File)getCurrentNode().getUserObject());
+		
+		FILE_TABLE.addFileList();
+		FILE_TABLE.load();
+		FILE_TREE.load();
+		DIRECTORY_PATH.setPath(Synchronizer.getCurrentNodeDirectory());
+		
 	}
 	
 	/**
@@ -231,7 +234,6 @@ public class Synchronizer {
 		
 		if(sychronized == false
 				|| (Synchronizer.isDirectoryPathChanged() && Synchronizer.isBeforeLastChangedDirectoryPath())) {
-			System.out.println("[load] " + selectedNode + "|" + Synchronizer.isBeforeLastChangedDirectoryPath());
 			FILE_TABLE.load();
 			DefaultMutableTreeNode matchedTreeNode = FILE_TREE.load(sychronized, getMatchChangedDirectoryPath());
 			DIRECTORY_PATH.setPath(Synchronizer.getCurrentNodeDirectory());
@@ -334,15 +336,12 @@ public class Synchronizer {
 			File path = CHANED_DIRECTORY_PATHS[i];
 			
 			if(path.equals(search)) {
-				System.out.println("[" + i + "][path] " + path);
 				MATCH_CHANGED_DIRECTORY_PATH = path;
+				
 				if(CHANED_DIRECTORY_PATHS.length == 1 || i <= CHANED_DIRECTORY_PATHS.length - 2) {
-					System.out.println("[isBeforeLastChangedDirectoryPath] " + path);
 					isBeforeLastChangedDirectoryPath(true);
-				} else {
-					System.out.println("### LAST");
-//					isBeforeLastChangedDirectoryPath(false);
 				}
+				
 				return true;
 			}
 		}
@@ -364,60 +363,6 @@ public class Synchronizer {
 	
 	public static File getLastChangedDirectoryPath() {
 		return CHANED_DIRECTORY_PATHS[CHANED_DIRECTORY_PATHS.length - 1];
-	}
-	
-	
-	
-	
-	
-	public static void setNextChangedDirectoryTreePath(DefaultMutableTreeNode childNode) {
-		for(int i = 0; i < CHANED_DIRECTORY_PATHS.length; i++) {
-			File path = CHANED_DIRECTORY_PATHS[i];
-			
-			if(path.equals((File)childNode.getUserObject())) {
-				NEXT_CHANGED_DIRECTORY_TREE_PATH = new TreePath(childNode.getPath());
-				hasMoreChanedDirectoryPaths(true);
-				noMoreChanedDirectoryPaths(false);
-				
-				if(i == CHANED_DIRECTORY_PATHS.length - 1) {
-					noMoreChanedDirectoryPaths(true);
-				}
-				
-				break;
-			}
-		}
-	}
-	
-	public static TreePath getNextChangedDirectoryTreePath() {
-		return NEXT_CHANGED_DIRECTORY_TREE_PATH;
-	}
-	
-	public static void hasMoreChanedDirectoryPaths(boolean isExists) {
-		HAS_MORE_CHANGED_DIRECTORY_PATH = isExists;
-	}
-	
-	public static boolean hasMoreChanedDirectoryPaths() {
-		return HAS_MORE_CHANGED_DIRECTORY_PATH;
-	}
-	
-	public static void noMoreChanedDirectoryPaths(boolean isExists) {
-		NO_MORE_CHANGED_DIRECTORY_PATH = isExists;
-	}
-	
-	public static boolean noMoreChanedDirectoryPaths() {
-		return NO_MORE_CHANGED_DIRECTORY_PATH;
-	}
-	
-	public static boolean isNextChangedDirectoryTreeNode(DefaultMutableTreeNode childNode) {
-		for(int i = 0; i < CHANED_DIRECTORY_PATHS.length; i++) {
-			File path = CHANED_DIRECTORY_PATHS[i];
-			
-			if(path.equals((File)childNode.getUserObject())) {
-				return true;
-			}
-		}
-		
-		return false;
 	}
 	
 }

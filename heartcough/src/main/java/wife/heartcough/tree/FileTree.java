@@ -11,14 +11,8 @@ import javax.swing.tree.DefaultMutableTreeNode;
 import javax.swing.tree.DefaultTreeModel;
 import javax.swing.tree.TreePath;
 
-import org.apache.commons.lang3.StringUtils;
-
 import wife.heartcough.common.FileSystem;
 import wife.heartcough.common.Synchronizer;
-import wife.heartcough.path.DirectoryPath;
-
-
-
 
 public class FileTree {
 	
@@ -45,28 +39,43 @@ public class FileTree {
 	}
 	
 	/**
-	 * FileTree를 로드한다.
+	 * 노드를 선택할 수 있는 상태인지 확인한다.
+	 * 
+	 * @return 현재 선택되어 있는 노드가 아니고 leaf상태이면 true
+	 */
+	private boolean isEnableNodeSelection() {
+		return Synchronizer.getCurrentNode() != null && Synchronizer.getCurrentNode().isLeaf();
+	}
+	
+	/**
+	 * 상단의 디렉토리 경로가 수동으로 변경되어, 디렉토리를 검색하는 중인지를 확인한다. 
+	 * @return 현재 선택되어 있는 노드가 아니고 leaf상태이면서,
+	 *         상단의 디렉토리 경로가 수동으로 변경되었다면 true
+	 */
+	private boolean isEnableNodeSelectionWithDirectoryPathChanged() {
+		return isEnableNodeSelection() && Synchronizer.isDirectoryPathChanged();
+	}
+	
+	/**
+	 * FileTree노드의 사용자 선택에 따라 FileTree를 로드한다.
 	 * 
 	 * Synchronizer.getCurrentNode() != null && Synchronizer.getCurrentNode().isLeaf() : 마우스 클릭(사용자 선택)
 	 * Synchronizer.isDirectoryPathChanged() : 파일 경로의 변경
 	 */
 	public void load() {
-		if(Synchronizer.getCurrentNode() != null && Synchronizer.getCurrentNode().isLeaf()) {
-			fileTreeNode.setChildNode();
-		}
+		if(!isEnableNodeSelection()) return;
+		fileTreeNode.setChildNode();
 	}
 
 	/**
-	 * FileTree를 로드한다.
+	 * 상단의 디렉토리 경로가 수동으로 변경된 경우, 변경된 경로까지 FileTree를 로드한다.
 	 * 
-	 * Synchronizer.getCurrentNode() != null && Synchronizer.getCurrentNode().isLeaf() : 마우스 클릭(사용자 선택)
-	 * Synchronizer.isDirectoryPathChanged() : 파일 경로의 변경
+	 * Synchronizer.isDirectoryPathChanged() : 파일 경로의 사용자 변경여부
 	 */
-	public DefaultMutableTreeNode load(boolean sychronized, File matchedDirectory) {
+	public DefaultMutableTreeNode load(File matchedDirectory) {
 		DefaultMutableTreeNode matchedTreeNode = null;
 		
-		if((Synchronizer.getCurrentNode() != null && Synchronizer.getCurrentNode().isLeaf())
-			|| Synchronizer.isDirectoryPathChanged()) {
+		if(isEnableNodeSelectionWithDirectoryPathChanged()) {
 			matchedTreeNode = fileTreeNode.setSynchronizedChildNode(matchedDirectory);
 		}
 		
@@ -136,7 +145,7 @@ public class FileTree {
 	*/
 	
 	public void searchChildNode(DefaultMutableTreeNode parentNode) {
-		DefaultMutableTreeNode matchedTreeNode = Synchronizer.load(parentNode, true);
+		DefaultMutableTreeNode matchedTreeNode = Synchronizer.synchronizedLoad(parentNode);
 		
 		if(matchedTreeNode != null) {
 			System.out.println("[expand] " + matchedTreeNode + ", " + Synchronizer.isBeforeLastChangedDirectoryPath());

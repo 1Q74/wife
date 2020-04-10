@@ -202,7 +202,7 @@ public class Synchronizer {
 	 */
 	public static void reload() {
 		FILE_TREE.removeCurrentNodeChildren();
-		load(getCurrentNode(), false);
+		load(getCurrentNode());
 	}
 	
 	/**
@@ -226,16 +226,15 @@ public class Synchronizer {
 	 * 
 	 * @param selectedNode FileTree의 현재 선택된 노드
 	 */
-	public static DefaultMutableTreeNode load(DefaultMutableTreeNode selectedNode, boolean sychronized) {
+	public static DefaultMutableTreeNode synchronizedLoad(DefaultMutableTreeNode selectedNode) {
 		setCurrentNode(selectedNode);
 		setCurrentDirectory((File)getCurrentNode().getUserObject());
 		
 		FILE_TABLE.addFileList();
 		
-		if(sychronized == false
-				|| (Synchronizer.isDirectoryPathChanged() && Synchronizer.isBeforeLastChangedDirectoryPath())) {
+		if(Synchronizer.isDirectoryPathChanged() && Synchronizer.isBeforeLastChangedDirectoryPath()) {
 			FILE_TABLE.load();
-			DefaultMutableTreeNode matchedTreeNode = FILE_TREE.load(sychronized, getMatchChangedDirectoryPath());
+			DefaultMutableTreeNode matchedTreeNode = FILE_TREE.load(getMatchChangedDirectoryPath());
 			DIRECTORY_PATH.setPath(Synchronizer.getCurrentNodeDirectory());
 		
 			return matchedTreeNode;

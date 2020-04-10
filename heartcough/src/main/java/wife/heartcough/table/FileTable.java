@@ -69,6 +69,7 @@ public class FileTable {
 		if(FileSystem.isWindowsSpecialFolder(Synchronizer.getCurrentNodeDirectoryName())) {
 			files = Synchronizer.getCurrentNodeDirectory().listFiles();
 			Synchronizer.setDirectories(files);
+			Synchronizer.setFileList(Synchronizer.getDirectories());
 		} else {
 			int end = filenames.length;
 			files = new File[end];
@@ -110,7 +111,7 @@ public class FileTable {
 	 * @return JTable객체
 	 */
 	public JTable load() {
-		addFileList();
+//		addFileList();
 		
 		table.setModel(new FileListModel(Synchronizer.getFileList()));
 		setFileIconColumn();

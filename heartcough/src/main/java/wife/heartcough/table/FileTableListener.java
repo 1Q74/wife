@@ -32,7 +32,7 @@ public class FileTableListener {
 						}
 					}
 					
-					Synchronizer.restorePath();
+					Synchronizer.pathChanged();
 				}
 	
 				@Override

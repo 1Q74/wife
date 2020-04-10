@@ -1,8 +1,11 @@
 package wife.heartcough.tree;
 
 import java.io.File;
+import java.lang.reflect.InvocationTargetException;
 import java.util.List;
 
+import javax.swing.JTree;
+import javax.swing.SwingUtilities;
 import javax.swing.SwingWorker;
 import javax.swing.tree.DefaultMutableTreeNode;
 import javax.swing.tree.TreePath;
@@ -37,6 +40,8 @@ public class FileTreeNode {
 		SwingWorker<Void, File> worker = new SwingWorker<Void, File>() {
             @Override
             public Void doInBackground() {
+            	Synchronizer.getFileTree().getTree().setEnabled(false);
+            	
             	for(File file : nodeElement) {
         			if(file.isDirectory()) {
         				publish(file);
@@ -48,20 +53,85 @@ public class FileTreeNode {
             @Override
             protected void process(List<File> chunks) {
                 for(File child : chunks) {
-                	Synchronizer.getCurrentNode().add(new DefaultMutableTreeNode(child));
+                	DefaultMutableTreeNode childNode = new DefaultMutableTreeNode(child);
+                	Synchronizer.getCurrentNode().add(childNode);
+
+                	if(Synchronizer.isDirectoryPathChanged()) {
+                		Synchronizer.setNextChangedDirectoryTreePath(childNode);
+                	}
                 }
             }
 
             @Override
             protected void done() {
-            	if(Synchronizer.isSelectedFromFileTable()) {
-	            	Synchronizer.getFileTree().getTree().expandPath(
-	            		new TreePath(Synchronizer.getCurrentNode().getPath())
-	            	);
+            	System.out.println("== done ==");
+            	Synchronizer.getFileTree().getTree().setEnabled(true);
+            	
+            	JTree tree = Synchronizer.getFileTree().getTree();
+            	TreePath currentNodeTreePath = new TreePath(Synchronizer.getCurrentNode().getPath());
+            	
+            	if(!Synchronizer.isBeforeLastChangedDirectoryPath()) {
+            		System.out.println("expandPath");
+            		tree.expandPath(currentNodeTreePath);
             	}
+            	
+//            	if(Synchronizer.isSelectedFromFileTable() || Synchronizer.isDirectoryPathChanged()) {
+//	            	Synchronizer.getFileTree().getTree().expandPath(
+//	            		new TreePath(Synchronizer.getCurrentNode().getPath())
+//	            	);
+//	            	
+//	            	if(Synchronizer.isDirectoryPathChanged() && Synchronizer.hasMoreChanedDirectoryPaths()) {
+//						Synchronizer.getFileTree().getTree().setSelectionPath(Synchronizer.getNextChangedDirectoryTreePath());
+//						
+//						if(Synchronizer.noMoreChanedDirectoryPaths()) {
+//							
+//						}
+//	            	} 
+//            	}
              }
         };
         worker.execute();
+        
+        
+        if(worker.isDone()) {
+        	System.out.println("[isDone] " + Synchronizer.getCurrentNode());
+//        	if(Synchronizer.isDirectoryPathChanged() && Synchronizer.noMoreChanedDirectoryPaths()) {
+//    			Synchronizer.isDirectoryPathChanged(false);
+//        	}        	
+        }
+	}
+	
+	public DefaultMutableTreeNode setSynchronizedChildNode(File matchedDirectory) {
+		System.out.println("== setSynchronizedChildNode ==");
+		Synchronizer.getFileTree().getTree().setEnabled(false);
+		
+		File[] nodeElement = selectNodeElementSource();
+		DefaultMutableTreeNode matchedTreeNode = null;
+		
+		for(File child : nodeElement) {
+           	DefaultMutableTreeNode childNode = new DefaultMutableTreeNode(child);
+           	Synchronizer.getCurrentNode().add(childNode);
+           	
+           	if(childNode.getUserObject().equals(matchedDirectory)) {
+           		matchedTreeNode = childNode;
+           	}
+           	
+//           	if(Synchronizer.isInChangedDirectoryPath((File)childNode.getUserObject())) {
+//           		matchedTreeNode = childNode;
+//           	}
+        }
+
+		Synchronizer.getFileTree().getTree().setEnabled(true);
+		
+		JTree tree = Synchronizer.getFileTree().getTree();
+    	TreePath currentNodeTreePath = new TreePath(Synchronizer.getCurrentNode().getPath());
+    	
+    	if(!Synchronizer.isBeforeLastChangedDirectoryPath()) {
+    		System.out.println("expandPath");
+    		tree.expandPath(currentNodeTreePath);
+    	}
+		
+		return matchedTreeNode;
 	}
 	
 	public DefaultMutableTreeNode getDesktopFolderNodes() {

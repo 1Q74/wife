@@ -26,10 +26,10 @@ public class DirectoryPathListener {
 			@Override
 			public void keyPressed(KeyEvent e) {
 				if(e.getKeyCode() == KeyEvent.VK_ENTER) {
-					String currentPath = ((IconTextField)e.getSource()).getText();
-					File file = new File(currentPath);
+					String path = ((IconTextField)e.getSource()).getText();
+					File file = new File(path);
 
-					if(file.isDirectory()) {
+					if(!file.equals(DirectoryPath.getCurrentPath()) && file.isDirectory()) {
 						Synchronizer.setSelectedFrom(e.getSource());
 						Synchronizer.change(file);
 					}

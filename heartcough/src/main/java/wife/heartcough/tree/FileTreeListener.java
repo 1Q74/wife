@@ -13,7 +13,7 @@ public class FileTreeListener {
 				@Override
 				public void mouseClicked(MouseEvent e) {
 					Synchronizer.setSelectedFrom(e.getSource());
-					Synchronizer.restorePath();
+					Synchronizer.pathChanged();
 				}
 	
 				@Override

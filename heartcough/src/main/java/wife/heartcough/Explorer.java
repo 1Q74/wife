@@ -35,6 +35,8 @@ public class Explorer {
 	private JSplitPane getSplitter() {
 		JSplitPane body = new JSplitPane(JSplitPane.HORIZONTAL_SPLIT);
 		body.setLeftComponent(new JScrollPane(fileTree.getRoot()));
+		
+		fileTable.addFileList();
 		body.setRightComponent(new JScrollPane(fileTable.load()));
 		
 		JPanel bodyPanel = new JPanel(new BorderLayout());

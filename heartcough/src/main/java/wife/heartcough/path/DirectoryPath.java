@@ -13,12 +13,14 @@ import wife.heartcough.common.Synchronizer;
 public class DirectoryPath {
 	
 	private IconTextField path = new IconTextField();
+	private static File CURRENT_PATH;
 
 	public DirectoryPath() {
 		this.path.addKeyListener(DirectoryPathListener.getKeyListener());
 	}
 	
 	public void setPath(File directory) {
+		CURRENT_PATH = directory;
 		path.setIcon(FileSystem.VIEW.getSystemIcon(directory));
 		
 		if(FileSystem.isWindowsSpecialFolder(directory.getName())) {
@@ -28,11 +30,15 @@ public class DirectoryPath {
 		}
 	}
 	
+	public static File getCurrentPath() {
+		return CURRENT_PATH;
+	}
+	
 	public IconTextField getPath() {
 		return this.path;
 	}
 	
-	public void restorePath() {
+	public void pathChanged() {
 		setPath(Synchronizer.getCurrentNodeDirectory());
 	}
 	

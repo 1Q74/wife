@@ -21,8 +21,6 @@ public class Command implements Runnable {
 	private Progress progress = new Progress();
 	
 	private void copyFile(File src, File newFile) {
-		System.out.println(src + " | " + newFile);
-		
 		LogRowData logRowData = progress.init(src, newFile.getAbsolutePath());
 		
 		new Thread(new Runnable() {

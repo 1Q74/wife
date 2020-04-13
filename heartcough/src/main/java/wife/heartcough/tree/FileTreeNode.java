@@ -1,11 +1,9 @@
 package wife.heartcough.tree;
 
 import java.io.File;
-import java.lang.reflect.InvocationTargetException;
 import java.util.List;
 
 import javax.swing.JTree;
-import javax.swing.SwingUtilities;
 import javax.swing.SwingWorker;
 import javax.swing.tree.DefaultMutableTreeNode;
 import javax.swing.tree.TreePath;
@@ -41,6 +39,7 @@ public class FileTreeNode {
             @Override
             public Void doInBackground() {
             	Synchronizer.getFileTree().getTree().setEnabled(false);
+            	Synchronizer.checkHasMoreChanedDirectoryPaths();
             	
             	for(File file : nodeElement) {
         			if(file.isDirectory()) {
@@ -64,64 +63,20 @@ public class FileTreeNode {
 
             @Override
             protected void done() {
-            	System.out.println("== done ==");
             	Synchronizer.getFileTree().getTree().setEnabled(true);
             	
-            	JTree tree = Synchronizer.getFileTree().getTree();
-            	TreePath currentNodeTreePath = new TreePath(Synchronizer.getCurrentNode().getPath());
-            	
             	if(Synchronizer.isSelectedFromFileTable() || Synchronizer.isDirectoryPathChanged()) {
-	            	Synchronizer.getFileTree().getTree().expandPath(
-	            		new TreePath(Synchronizer.getCurrentNode().getPath())
-	            	);
+                	JTree tree = Synchronizer.getFileTree().getTree();
+            		tree.expandPath(new TreePath(Synchronizer.getCurrentNode().getPath()));
 	            	
 	            	if(Synchronizer.isDirectoryPathChanged() && Synchronizer.hasMoreChanedDirectoryPaths()) {
-						Synchronizer.getFileTree().getTree().setSelectionPath(Synchronizer.getNextChangedDirectoryTreePath());
-						
-						if(Synchronizer.noMoreChanedDirectoryPaths()) {
-							
-						}
+	            		tree.setSelectionPath(Synchronizer.getNextChangedDirectoryTreePath());
 	            	} 
             	}
              }
         };
         worker.execute();
 	}
-	
-	/*
-	public DefaultMutableTreeNode setSynchronizedChildNode(File matchedDirectory) {
-		System.out.println("== setSynchronizedChildNode ==");
-		Synchronizer.getFileTree().getTree().setEnabled(false);
-		
-		File[] nodeElement = selectNodeElementSource();
-		DefaultMutableTreeNode matchedTreeNode = null;
-		
-		for(File child : nodeElement) {
-           	DefaultMutableTreeNode childNode = new DefaultMutableTreeNode(child);
-           	Synchronizer.getCurrentNode().add(childNode);
-           	
-           	if(childNode.getUserObject().equals(matchedDirectory)) {
-           		matchedTreeNode = childNode;
-           	}
-           	
-//           	if(Synchronizer.isInChangedDirectoryPath((File)childNode.getUserObject())) {
-//           		matchedTreeNode = childNode;
-//           	}
-        }
-
-		Synchronizer.getFileTree().getTree().setEnabled(true);
-		
-		JTree tree = Synchronizer.getFileTree().getTree();
-    	TreePath currentNodeTreePath = new TreePath(Synchronizer.getCurrentNode().getPath());
-    	
-    	if(!Synchronizer.isBeforeLastChangedDirectoryPath()) {
-    		System.out.println("expandPath");
-    		tree.expandPath(currentNodeTreePath);
-    	}
-		
-		return matchedTreeNode;
-	}
-	*/
 	
 	public DefaultMutableTreeNode getDesktopFolderNodes() {
 		DefaultMutableTreeNode desktopNode = null;

@@ -90,6 +90,7 @@ public class Progress {
 		logTable = new JTable();
 		logTable.setAutoResizeMode(JTable.AUTO_RESIZE_LAST_COLUMN);
 		logTable.setFillsViewportHeight(true);
+		logTable.setEnabled(false);
 		
 		logModel = (DefaultTableModel)logTable.getModel();
 		logModel.addColumn("Percent");

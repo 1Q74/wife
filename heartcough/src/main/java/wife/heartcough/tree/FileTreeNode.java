@@ -4,8 +4,10 @@ import java.io.File;
 import java.util.List;
 
 import javax.swing.JTree;
+import javax.swing.SwingUtilities;
 import javax.swing.SwingWorker;
 import javax.swing.tree.DefaultMutableTreeNode;
+import javax.swing.tree.DefaultTreeModel;
 import javax.swing.tree.TreePath;
 
 import wife.heartcough.common.FileSystem;
@@ -58,17 +60,24 @@ public class FileTreeNode {
 
             @Override
             protected void done() {
-            	Synchronizer.getFileTree().getTree().setEnabled(true);
-            	
             	JTree tree = Synchronizer.getFileTree().getTree();
             	TreePath currentNodeTreePath = new TreePath(Synchronizer.getCurrentNode().getPath());
             	
+            	tree.expandPath(currentNodeTreePath);
+            	
             	if(!Synchronizer.isBeforeLastChangedDirectoryPath()) {
-            		tree.expandPath(currentNodeTreePath);
+            		System.out.println("////////////////////////////////////////////////////////");
+            		System.out.println("[done] " + Synchronizer.getCurrentNode() + ", currentNodeTreePath = " + currentNodeTreePath);
+            		System.out.println(Synchronizer.getCurrentNode().getLastChild());
+            		System.out.println("////////////////////////////////////////////////////////");
             		
+           			tree.expandPath(currentNodeTreePath);
+            			
             		Synchronizer.isBeforeLastChangedDirectoryPath(true);
             		Synchronizer.isDirectoryPathChanged(false);
             	}
+            	
+            	Synchronizer.getFileTree().getTree().setEnabled(true);
             	
 //            	if(Synchronizer.isSelectedFromFileTable() || Synchronizer.isDirectoryPathChanged()) {
 //	            	Synchronizer.getFileTree().getTree().expandPath(
@@ -89,18 +98,22 @@ public class FileTreeNode {
 	}
 	
 	public DefaultMutableTreeNode setSynchronizedChildNode(File matchedDirectory) {
+//		System.out.println("== setSynchronizedChildNode ==");
 		Synchronizer.getFileTree().getTree().setEnabled(false);
 		
 		File[] nodeElement = selectNodeElementSource();
 		DefaultMutableTreeNode matchedTreeNode = null;
 		
 		for(File child : nodeElement) {
-           	DefaultMutableTreeNode childNode = new DefaultMutableTreeNode(child);
-           	Synchronizer.getCurrentNode().add(childNode);
-           	
-           	if(childNode.getUserObject().equals(matchedDirectory)) {
-           		matchedTreeNode = childNode;
-           	}
+			if(child.isDirectory()) {
+	//			System.out.println("[child] " + child + ", [matchedDirectory] " + matchedDirectory);
+	           	DefaultMutableTreeNode childNode = new DefaultMutableTreeNode(child);
+	           	Synchronizer.getCurrentNode().add(childNode);
+	           	
+	           	if(childNode.getUserObject().equals(matchedDirectory)) {
+	           		matchedTreeNode = childNode;
+	           	}
+			}
         }
 
 		Synchronizer.getFileTree().getTree().setEnabled(true);

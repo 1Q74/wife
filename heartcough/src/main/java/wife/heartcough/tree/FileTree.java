@@ -25,12 +25,23 @@ public class FileTree {
 		tree.addTreeSelectionListener(new TreeSelectionListener() {
 			@Override
 			public void valueChanged(TreeSelectionEvent e) {
+				DefaultMutableTreeNode node = (DefaultMutableTreeNode)e.getPath().getLastPathComponent();
+				System.out.println("[valueChanged] " + node);
+				if(node.getUserObject().equals(new File("C:\\"))) {
+					System.out.println("C Drive Found!!!");
+					return;
+				}
+				Synchronizer.load(node);
+				/*
 				SwingUtilities.invokeLater(new Runnable() {
 					public void run() {
-						System.out.println("[valueChanged] " + (DefaultMutableTreeNode)e.getPath().getLastPathComponent());
-						Synchronizer.load((DefaultMutableTreeNode)e.getPath().getLastPathComponent());
+						DefaultMutableTreeNode node = (DefaultMutableTreeNode)e.getPath().getLastPathComponent();
+						System.out.println("[valueChanged] " + node);
+						if(node.getUserObject().equals(new File("C:\\"))) return;
+						Synchronizer.load(node);
 					}
 				});
+				*/
 		    }
 		});
 		tree.addMouseListener(FileTreeListener.getMouseListener());
@@ -49,11 +60,11 @@ public class FileTree {
 	
 	/**
 	 * 상단의 디렉토리 경로가 수동으로 변경되어, 디렉토리를 검색하는 중인지를 확인한다. 
-	 * @return 현재 선택되어 있는 노드가 아니고 leaf상태이면서,
+	 * @return 현재 선택되어 있는 노드가 아니고,
 	 *         상단의 디렉토리 경로가 수동으로 변경되었다면 true
 	 */
 	private boolean isEnableNodeSelectionWithDirectoryPathChanged() {
-		return isEnableNodeSelection() && Synchronizer.isDirectoryPathChanged();
+		return Synchronizer.getCurrentNode() != null && Synchronizer.isDirectoryPathChanged();
 	}
 	
 	/**
@@ -148,16 +159,43 @@ public class FileTree {
 		DefaultMutableTreeNode matchedTreeNode = Synchronizer.synchronizedLoad(parentNode);
 		
 		if(matchedTreeNode != null) {
-			System.out.println("[expand] " + matchedTreeNode + ", " + Synchronizer.isBeforeLastChangedDirectoryPath());
 			tree.expandPath(new TreePath(matchedTreeNode.getPath()));
 			
 			if(matchedTreeNode.getUserObject().equals(Synchronizer.getLastChangedDirectoryPath())) {
 				Synchronizer.isBeforeLastChangedDirectoryPath(false);
 				Synchronizer.isDirectoryPathChanged(false);
-				tree.setSelectionPath(new TreePath(matchedTreeNode.getPath()));	
+				tree.setSelectionPath(new TreePath(matchedTreeNode.getPath()));		
 			}
 
-			searchChildNode(matchedTreeNode);
+			if(matchedTreeNode.isLeaf()) {
+				searchChildNode(matchedTreeNode);
+			} else {
+				searchChildNodeByChildren(matchedTreeNode);
+			}
+		}
+	}
+	
+	public void searchChildNodeByChildren(DefaultMutableTreeNode parentNode) {
+		System.out.println("////////////////////////////// searchChildNodeByChildren ///////////////////////////");
+		DefaultMutableTreeNode matchedTreeNode = Synchronizer.synchronizedLoad(parentNode);
+		
+		if(matchedTreeNode != null) {
+			Enumeration<?> children = parentNode.children();
+			
+			while(children.hasMoreElements()) {
+				DefaultMutableTreeNode childNode = (DefaultMutableTreeNode)children.nextElement();
+				
+				System.out.println("[isLeaf] " + childNode.isLeaf() + ", [isExpanded]" + childNode);
+				
+				if(childNode.equals(matchedTreeNode)) {
+					System.out.println("[MATCH====>] " + matchedTreeNode);
+					if(matchedTreeNode.isLeaf()) {
+						searchChildNode(matchedTreeNode);
+					} else {
+						searchChildNodeByChildren(matchedTreeNode);
+					}
+				}
+			}
 		}
 	}
 	
@@ -182,9 +220,13 @@ public class FileTree {
 				Synchronizer.isDirectoryPathChanged(true);
 				
 				if(childNode.isLeaf()) {
-					searchChildNode(childNode);
-				} else {
+					System.out.println("[isLeaf] " + childNode.isLeaf() + ", " + childNode);
 //					searchChildNode(childNode);
+					tree.setSelectionPath(new TreePath(childNode.getPath()));
+				} else {
+					System.out.println("[is-NOT-Leaf] " + childNode.isLeaf() + ", " + childNode);
+					tree.expandPath(new TreePath(childNode.getPath()));
+//					searchChildNodeByChildren(childNode);
 				}
 			}
 		}

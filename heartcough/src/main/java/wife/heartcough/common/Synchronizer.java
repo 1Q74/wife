@@ -23,10 +23,6 @@ import wife.heartcough.tree.FileTree;
  */
 public class Synchronizer {
 	
-	public Synchronizer() {
-		super();
-	}
-
 	/**
 	 * FileTree의 현재 선택된 노드의 인스턴스를 저장합니다.
 	 */
@@ -211,7 +207,12 @@ public class Synchronizer {
 		FILE_TABLE.addFileList();
 		FILE_TABLE.load();
 		FILE_TREE.load();
-		DIRECTORY_PATH.setPath(Synchronizer.getCurrentNodeDirectory());
+		
+		// 자식 노드를 찾아가는 동안의 디렉토리 경로가 변경되는 것이 보이므로
+		// 디렉토리를 수동으로 변경한 경우는 DirectoryPath를 동기화하지 않는다.
+		if(!isDirectoryPathChanged()) {
+			DIRECTORY_PATH.setPath(Synchronizer.getCurrentNodeDirectory());
+		}
 	}
 	
 	/**
@@ -326,7 +327,10 @@ public class Synchronizer {
 	}
 	
 	public static void checkHasMoreChanedDirectoryPaths() {
-		if(getCurrentNode().getUserObject().equals(CHANED_DIRECTORY_PATHS[CHANED_DIRECTORY_PATHS.length - 1])) {
+		if(getChangedDirectoryPaths() == null) return;
+		
+		if(getCurrentNode().getUserObject().equals(
+			getChangedDirectoryPaths()[getChangedDirectoryPaths().length - 1])) {
 			hasMoreChanedDirectoryPaths(false);
 		}
 	}

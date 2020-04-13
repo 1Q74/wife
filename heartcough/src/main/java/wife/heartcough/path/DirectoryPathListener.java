@@ -4,6 +4,8 @@ import java.awt.event.KeyEvent;
 import java.awt.event.KeyListener;
 import java.io.File;
 
+import javax.swing.JTree;
+
 import wife.heartcough.common.Synchronizer;
 
 /**
@@ -30,6 +32,7 @@ public class DirectoryPathListener {
 					File file = new File(path);
 
 					if(!file.equals(DirectoryPath.getCurrentPath()) && file.isDirectory()) {
+						Synchronizer.getFileTree().getTree().clearSelection();
 						Synchronizer.setSelectedFrom(e.getSource());
 						Synchronizer.change(file);
 					}

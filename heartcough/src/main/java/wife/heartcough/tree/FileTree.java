@@ -25,23 +25,13 @@ public class FileTree {
 		tree.addTreeSelectionListener(new TreeSelectionListener() {
 			@Override
 			public void valueChanged(TreeSelectionEvent e) {
-				DefaultMutableTreeNode node = (DefaultMutableTreeNode)e.getPath().getLastPathComponent();
-				System.out.println("[valueChanged] " + node);
-				if(node.getUserObject().equals(new File("C:\\"))) {
-					System.out.println("C Drive Found!!!");
-					return;
-				}
-				Synchronizer.load(node);
-				/*
 				SwingUtilities.invokeLater(new Runnable() {
 					public void run() {
 						DefaultMutableTreeNode node = (DefaultMutableTreeNode)e.getPath().getLastPathComponent();
 						System.out.println("[valueChanged] " + node);
-						if(node.getUserObject().equals(new File("C:\\"))) return;
 						Synchronizer.load(node);
 					}
 				});
-				*/
 		    }
 		});
 		tree.addMouseListener(FileTreeListener.getMouseListener());
@@ -136,7 +126,6 @@ public class FileTree {
 		return isFound;
 	}
 	
-	/*
 	public void searchChildNode(DefaultMutableTreeNode parentNode) {
 		Enumeration<?> children = parentNode.children();
 		
@@ -153,83 +142,10 @@ public class FileTree {
        		}
 		}
 	}
-	*/
-	
-	public void searchChildNode(DefaultMutableTreeNode parentNode) {
-		DefaultMutableTreeNode matchedTreeNode = Synchronizer.synchronizedLoad(parentNode);
-		
-		if(matchedTreeNode != null) {
-			tree.expandPath(new TreePath(matchedTreeNode.getPath()));
-			
-			if(matchedTreeNode.getUserObject().equals(Synchronizer.getLastChangedDirectoryPath())) {
-				Synchronizer.isBeforeLastChangedDirectoryPath(false);
-				Synchronizer.isDirectoryPathChanged(false);
-				tree.setSelectionPath(new TreePath(matchedTreeNode.getPath()));		
-			}
-
-			if(matchedTreeNode.isLeaf()) {
-				searchChildNode(matchedTreeNode);
-			} else {
-				searchChildNodeByChildren(matchedTreeNode);
-			}
-		}
-	}
-	
-	public void searchChildNodeByChildren(DefaultMutableTreeNode parentNode) {
-		System.out.println("////////////////////////////// searchChildNodeByChildren ///////////////////////////");
-		DefaultMutableTreeNode matchedTreeNode = Synchronizer.synchronizedLoad(parentNode);
-		
-		if(matchedTreeNode != null) {
-			Enumeration<?> children = parentNode.children();
-			
-			while(children.hasMoreElements()) {
-				DefaultMutableTreeNode childNode = (DefaultMutableTreeNode)children.nextElement();
-				
-				System.out.println("[isLeaf] " + childNode.isLeaf() + ", [isExpanded]" + childNode);
-				
-				if(childNode.equals(matchedTreeNode)) {
-					System.out.println("[MATCH====>] " + matchedTreeNode);
-					if(matchedTreeNode.isLeaf()) {
-						searchChildNode(matchedTreeNode);
-					} else {
-						searchChildNodeByChildren(matchedTreeNode);
-					}
-				}
-			}
-		}
-	}
 	
 	public void change() {
-//		DefaultMutableTreeNode root = (DefaultMutableTreeNode)tree.getModel().getRoot();
-//		search(root);
-		
-		// 변경된 경로를 디렉토리 구분자로 나눈다.
-		Synchronizer.setChangedDirectoryPaths();
-		
-		// 윈도우 : 모든 경로의 시작은 드라이브로 시작될 것이므로 먼저 [내 PC]노드를 찾는다.
-		File windowsMyPC = new File(FileSystem.WINDOWS_MY_PC_NAME);
-		
 		DefaultMutableTreeNode root = (DefaultMutableTreeNode)tree.getModel().getRoot();
-		Enumeration<?> children = root.children();
-		
-		while(children.hasMoreElements()) {
-			DefaultMutableTreeNode childNode = (DefaultMutableTreeNode)children.nextElement();
-			File userObject = (File)childNode.getUserObject();
-			
-			if(userObject.equals(windowsMyPC)) {
-				Synchronizer.isDirectoryPathChanged(true);
-				
-				if(childNode.isLeaf()) {
-					System.out.println("[isLeaf] " + childNode.isLeaf() + ", " + childNode);
-//					searchChildNode(childNode);
-					tree.setSelectionPath(new TreePath(childNode.getPath()));
-				} else {
-					System.out.println("[is-NOT-Leaf] " + childNode.isLeaf() + ", " + childNode);
-					tree.expandPath(new TreePath(childNode.getPath()));
-//					searchChildNodeByChildren(childNode);
-				}
-			}
-		}
+		search(root);
 	}
 	
 	public void synchronize() {

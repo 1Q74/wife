@@ -70,37 +70,25 @@ public class FileTreeNode {
             	JTree tree = Synchronizer.getFileTree().getTree();
             	TreePath currentNodeTreePath = new TreePath(Synchronizer.getCurrentNode().getPath());
             	
-            	if(!Synchronizer.isBeforeLastChangedDirectoryPath()) {
-            		System.out.println("expandPath");
-            		tree.expandPath(currentNodeTreePath);
+            	if(Synchronizer.isSelectedFromFileTable() || Synchronizer.isDirectoryPathChanged()) {
+	            	Synchronizer.getFileTree().getTree().expandPath(
+	            		new TreePath(Synchronizer.getCurrentNode().getPath())
+	            	);
+	            	
+	            	if(Synchronizer.isDirectoryPathChanged() && Synchronizer.hasMoreChanedDirectoryPaths()) {
+						Synchronizer.getFileTree().getTree().setSelectionPath(Synchronizer.getNextChangedDirectoryTreePath());
+						
+						if(Synchronizer.noMoreChanedDirectoryPaths()) {
+							
+						}
+	            	} 
             	}
-            	
-//            	if(Synchronizer.isSelectedFromFileTable() || Synchronizer.isDirectoryPathChanged()) {
-//	            	Synchronizer.getFileTree().getTree().expandPath(
-//	            		new TreePath(Synchronizer.getCurrentNode().getPath())
-//	            	);
-//	            	
-//	            	if(Synchronizer.isDirectoryPathChanged() && Synchronizer.hasMoreChanedDirectoryPaths()) {
-//						Synchronizer.getFileTree().getTree().setSelectionPath(Synchronizer.getNextChangedDirectoryTreePath());
-//						
-//						if(Synchronizer.noMoreChanedDirectoryPaths()) {
-//							
-//						}
-//	            	} 
-//            	}
              }
         };
         worker.execute();
-        
-        
-        if(worker.isDone()) {
-        	System.out.println("[isDone] " + Synchronizer.getCurrentNode());
-//        	if(Synchronizer.isDirectoryPathChanged() && Synchronizer.noMoreChanedDirectoryPaths()) {
-//    			Synchronizer.isDirectoryPathChanged(false);
-//        	}        	
-        }
 	}
 	
+	/*
 	public DefaultMutableTreeNode setSynchronizedChildNode(File matchedDirectory) {
 		System.out.println("== setSynchronizedChildNode ==");
 		Synchronizer.getFileTree().getTree().setEnabled(false);
@@ -133,6 +121,7 @@ public class FileTreeNode {
 		
 		return matchedTreeNode;
 	}
+	*/
 	
 	public DefaultMutableTreeNode getDesktopFolderNodes() {
 		DefaultMutableTreeNode desktopNode = null;

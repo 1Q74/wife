@@ -168,12 +168,6 @@ public class Synchronizer {
 	
 	public static void setDirectories(File[] directories) {
 		DIRECTORIES = directories;
-		
-		if(Synchronizer.isDirectoryPathChanged()) {
-			for(File dir : DIRECTORIES) {
-				isInChangedDirectoryPath(dir);
-			}
-		}
 	}
 	
 	public static File[] getDirectories() {
@@ -206,7 +200,8 @@ public class Synchronizer {
 	 */
 	public static void reload() {
 		FILE_TREE.removeCurrentNodeChildren();
-		load(getCurrentNode(), false);
+//		load(getCurrentNode(), false);
+		load(getCurrentNode());
 	}
 	
 	/**
@@ -215,7 +210,13 @@ public class Synchronizer {
 	 * @param selectedNode FileTree의 현재 선택된 노드
 	 */
 	public static void load(DefaultMutableTreeNode selectedNode) {
-		load(selectedNode, false);
+		setCurrentNode(selectedNode);
+		setCurrentDirectory((File)getCurrentNode().getUserObject());
+		
+		FILE_TABLE.addFileList();
+		FILE_TABLE.load();
+		FILE_TREE.load();
+		DIRECTORY_PATH.setPath(Synchronizer.getCurrentNodeDirectory());
 	}
 	
 	/**
@@ -223,6 +224,7 @@ public class Synchronizer {
 	 * 
 	 * @param selectedNode FileTree의 현재 선택된 노드
 	 */
+	/*
 	public static DefaultMutableTreeNode load(DefaultMutableTreeNode selectedNode, boolean sychronized) {
 		setCurrentNode(selectedNode);
 		setCurrentDirectory((File)getCurrentNode().getUserObject());
@@ -241,6 +243,7 @@ public class Synchronizer {
 		
 		return null;
 	}
+	*/
 	
 	/**
 	 * FileTable에서 디렉토리를 마우스 더블클릭해서 선택했을 경우,
@@ -329,6 +332,7 @@ public class Synchronizer {
 		return CHANED_DIRECTORY_PATHS;
 	}
 	
+	/*
 	public static boolean isInChangedDirectoryPath(File search) {
 		for(int i = 0; i < CHANED_DIRECTORY_PATHS.length; i++) {
 			File path = CHANED_DIRECTORY_PATHS[i];
@@ -365,6 +369,7 @@ public class Synchronizer {
 	public static File getLastChangedDirectoryPath() {
 		return CHANED_DIRECTORY_PATHS[CHANED_DIRECTORY_PATHS.length - 1];
 	}
+	*/
 	
 	
 	

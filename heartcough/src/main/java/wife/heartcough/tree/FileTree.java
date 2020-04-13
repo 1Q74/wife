@@ -62,6 +62,7 @@ public class FileTree {
 	 * Synchronizer.getCurrentNode() != null && Synchronizer.getCurrentNode().isLeaf() : 마우스 클릭(사용자 선택)
 	 * Synchronizer.isDirectoryPathChanged() : 파일 경로의 변경
 	 */
+	/*
 	public DefaultMutableTreeNode load(boolean sychronized, File matchedDirectory) {
 		DefaultMutableTreeNode matchedTreeNode = null;
 		
@@ -72,6 +73,7 @@ public class FileTree {
 		
 		return matchedTreeNode;
 	}
+	*/
 	
 	public void refresh() {
 		DefaultMutableTreeNode currentTreeNode = Synchronizer.getCurrentNode();
@@ -116,7 +118,6 @@ public class FileTree {
 		return isFound;
 	}
 	
-	/*
 	public void searchChildNode(DefaultMutableTreeNode parentNode) {
 		Enumeration<?> children = parentNode.children();
 		
@@ -133,8 +134,8 @@ public class FileTree {
        		}
 		}
 	}
-	*/
 	
+	/*
 	public void searchChildNode(DefaultMutableTreeNode parentNode) {
 		DefaultMutableTreeNode matchedTreeNode = Synchronizer.load(parentNode, true);
 		
@@ -160,8 +161,10 @@ public class FileTree {
 			searchChildNode(matchedTreeNode);
 		}
 	}
+	*/
 	
 	public void change() {
+		System.out.println("///////////////////////// [FileTree.change] //////////////////////////////");
 //		DefaultMutableTreeNode root = (DefaultMutableTreeNode)tree.getModel().getRoot();
 //		search(root);
 		
@@ -182,14 +185,15 @@ public class FileTree {
 				Synchronizer.isDirectoryPathChanged(true);
 				
 				if(childNode.isLeaf()) {
-//					TreePath childNodePath = new TreePath(childNode.getPath());
-//					tree.setSelectionPath(childNodePath);
-					searchChildNode(childNode);
-				} else {
+					TreePath childNodePath = new TreePath(childNode.getPath());
+					tree.setSelectionPath(childNodePath);
 //					searchChildNode(childNode);
+				} else {
+					searchChildNode(childNode);
 				}
 			}
 		}
+		System.out.println("///////////////////////// [//FileTree.change] //////////////////////////////");
 	}
 	
 	public void synchronize() {

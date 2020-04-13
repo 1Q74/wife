@@ -258,6 +258,10 @@ public class Synchronizer {
 		return SELECTED_FROM_FILE_TABLE;
 	}
 	
+	public static void isSelectedFromFileTable(boolean isSelected) {
+		SELECTED_FROM_FILE_TABLE = isSelected;
+	}
+	
 	public static boolean isSelectedFromFileTree() {
 		return SELECTED_FROM_FILE_TREE;
 	}
@@ -274,7 +278,14 @@ public class Synchronizer {
 		return DIRECTORY_PATH_CHANGED;
 	}
 	
-	// 변경된 경로를 디렉토리 구분자로 나눈다.
+	/**
+	 * 변경된 경로를 디렉토리 구분자로 나눈다.
+	 * 
+	 * ex) C:\Windows\System32
+	 *     => [0] : C:\ 
+	 *        [1] : C:\Windows
+	 *        [2] : C:\Windows\System32
+	 */
 	public static void setChangedDirectoryPaths() {
 		String[] pathTokens = StringUtils.split(
 			Synchronizer.getCurrentDirectory().getAbsolutePath(), File.separatorChar
@@ -326,6 +337,11 @@ public class Synchronizer {
 		return HAS_MORE_CHANGED_DIRECTORY_PATH;
 	}
 	
+	/**
+	 * 탐색해야 할 변경된 디렉토리 경로가 더 존재하는지 확인하기 위해,
+	 * 현재 선택된 트리 노드의 UserObject가 변경된 경로정보를 가지고 있는 배열의
+	 * 가장 마지막 요소와 일치하는지 확인한다.
+	 */
 	public static void checkHasMoreChanedDirectoryPaths() {
 		if(getChangedDirectoryPaths() == null) return;
 		

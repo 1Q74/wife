@@ -68,6 +68,10 @@ public class FileTreeNode {
             	if(Synchronizer.isSelectedFromFileTable() || Synchronizer.isDirectoryPathChanged()) {
                 	JTree tree = Synchronizer.getFileTree().getTree();
             		tree.expandPath(new TreePath(Synchronizer.getCurrentNode().getPath()));
+            		
+            		if(Synchronizer.isSelectedFromFileTable()) {
+            			Synchronizer.isSelectedFromFileTable(false);
+            		}
 	            	
 	            	if(Synchronizer.isDirectoryPathChanged() && Synchronizer.hasMoreChanedDirectoryPaths()) {
 	            		tree.setSelectionPath(Synchronizer.getNextChangedDirectoryTreePath());

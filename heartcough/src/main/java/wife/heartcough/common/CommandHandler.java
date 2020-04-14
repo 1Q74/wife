@@ -5,7 +5,7 @@ import java.util.concurrent.Executors;
 
 public class CommandHandler {
 	
-	public static ExecutorService handler = Executors.newSingleThreadExecutor();
+	public static ExecutorService handler = Executors.newCachedThreadPool();
 
 	private static boolean stopState = false;
 	

@@ -27,8 +27,6 @@ import javax.swing.table.TableColumnModel;
 import org.apache.commons.io.FileUtils;
 import org.apache.commons.io.FilenameUtils;
 
-import wife.heartcough.common.Progress.LogRowData;
-
 public class Progress {
 	
 	private static int WIDTH;
@@ -234,28 +232,26 @@ public class Progress {
 		int rowIndex = -1;
 
 		// 크기가 0인 디렉토리도 LogTable에 출력한다.
-//		if(sourceFile.isFile() || (sourceFile.isDirectory() && sourceFile.length() == 0)) {
-			Object[] rowData = new Object[] {
-				sourceFile.length() == 0 ? 100 : 0
-				, FileUtils.byteCountToDisplaySize(FileUtils.sizeOf(sourceFile))
-				, FilenameUtils.getName(newFilePath)
-				, newFilePath
-			};
-			logModel.addRow(rowData);
-			rowIndex = logModel.getRowCount() - 1;
-			
-			
-			try {
-				SwingUtilities.invokeAndWait(new Runnable() {
-					@Override
-					public void run() {
-						logTableScrollPane.getVerticalScrollBar().setValue(logTableScrollPane.getVerticalScrollBar().getMaximum());
-						
-					}
-				});
-			} catch (InvocationTargetException | InterruptedException e) {
-			}
-//		}
+		Object[] rowData = new Object[] {
+			sourceFile.length() == 0 ? 100 : 0
+			, FileUtils.byteCountToDisplaySize(FileUtils.sizeOf(sourceFile))
+			, FilenameUtils.getName(newFilePath)
+			, newFilePath
+		};
+		logModel.addRow(rowData);
+		rowIndex = logModel.getRowCount() - 1;
+		
+		
+		try {
+			SwingUtilities.invokeAndWait(new Runnable() {
+				@Override
+				public void run() {
+					logTableScrollPane.getVerticalScrollBar().setValue(logTableScrollPane.getVerticalScrollBar().getMaximum());
+					
+				}
+			});
+		} catch (InvocationTargetException | InterruptedException e) {
+		}
 		
 		return new LogRowData(rowIndex, newFilePath);
 	}

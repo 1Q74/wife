@@ -232,7 +232,7 @@ public class Progress {
 		int rowIndex = -1;
 
 		// 크기가 0인 디렉토리도 LogTable에 출력한다.
-		if(sourceFile.isFile() || (sourceFile.isDirectory() && sourceFile.length() == 0)) {
+//		if(sourceFile.isFile() || (sourceFile.isDirectory() && sourceFile.length() == 0)) {
 			Object[] rowData = new Object[] {
 				sourceFile.length() == 0 ? 100 : 0
 				, FileUtils.byteCountToDisplaySize(FileUtils.sizeOf(sourceFile))
@@ -253,7 +253,7 @@ public class Progress {
 				});
 			} catch (InvocationTargetException | InterruptedException e) {
 			}
-		}
+//		}
 		
 		return new LogRowData(rowIndex, newFilePath);
 	}

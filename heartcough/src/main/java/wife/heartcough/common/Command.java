@@ -20,11 +20,40 @@ public class Command implements Runnable {
 	
 	private Progress progress = new Progress();
 	
-	private void displayProgress(long sourceSize, long copiedSize, LogRowData logRowData, long sum) {
-		progress.process(sourceSize, copiedSize, logRowData);
+	/**
+	 * 디렉토리의 크리가 0인 것도 LogTable에 출력되도록 한다.
+	 * 
+	 * @param src 원본 디렉토리
+	 * @param newDir 원본(src)의 이름으로 새롭게 생성된 디렉토리
+	 */
+	private void displayZeroByteDirectory(File src, File newDir) {
+		new Thread(new Runnable() {
+			public void run() {
+				LogRowData logRowData = progress.init(src, newDir.getAbsolutePath());
+				displayProgress(0, 0, logRowData, 0);
+			}
+		}).start();
+	}
+	
+	/**
+	 * LogTable에 작업(복사, 이동, 삭제 등)상태를 표시한다.
+	 * 
+	 * @param sourceSize 원본 파일의 크기
+	 * @param targetSize 작업대상 파일의 크기
+	 * @param logRowData LogTable의 구성하기 위한 행(row) 객체
+	 * @param sum 작업대상 파일의 총합
+	 */
+	private void displayProgress(long sourceSize, long targetSize, LogRowData logRowData, long sum) {
+		progress.process(sourceSize, targetSize, logRowData);
 		progress.refreshSizeProgress(sum);
 	}
 	
+	/**
+	 * 복사를 진행한다.
+	 * 
+	 * @param src 원본 파일
+	 * @param newFile 대상 파일
+	 */
 	private void copyFile(File src, File newFile) {
 		LogRowData logRowData = progress.init(src, newFile.getAbsolutePath());
 		
@@ -42,10 +71,8 @@ public class Command implements Runnable {
 					long size = 0;
 					
 					while((count = in.read(buffer, 0, buffer.length)) != -1 && !ProgressHandler.isStopped()) {
-//						out.write(buffer, 0, count);
+						out.write(buffer, 0, count);
 						size += count;
-//						progress.process(FileUtils.sizeOf(src), size, logRowData);
-//						progress.refreshSizeProgress(count);
 						displayProgress(FileUtils.sizeOf(src), size, logRowData, count);
 					}
 					
@@ -79,8 +106,14 @@ public class Command implements Runnable {
 	private void process(File src, File tgt) {
 		if(src.isDirectory()) {
 			File newDir = new File(tgt, src.getName());
+			
 			if(!newDir.exists()) {
 				newDir.mkdir();
+
+				// 서브 디렉토리나 파일이 없을 경우 크기가 0인 디렉토리로 LogTable에 출력한다.
+				if(src.list().length == 0) {
+					displayZeroByteDirectory(src, newDir);
+				}
 			}
 			
 			File[] files = src.listFiles();
@@ -108,11 +141,6 @@ public class Command implements Runnable {
 		progress.setSumSize(sources);
 		
 		for(File source : sources) {
-//			File newFile = new File(target, source.getName());
-//			if(source.isDirectory() && !newFile.exists()) {
-//				newFile.mkdir();
-//			}
-//			process(source, newFile);
 			process(source, target);
 		}
 	}

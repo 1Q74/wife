@@ -185,6 +185,7 @@ public class Progress {
 	}
 	
 	private int getSizePercent(double source, double total) {
+		if(source == 0) return 100;
 		return (int)Math.round((source / total) * 100);
 	}
 	
@@ -230,9 +231,10 @@ public class Progress {
 	public LogRowData init(File sourceFile, String newFilePath) {
 		int rowIndex = -1;
 
-		if(sourceFile.isFile()) {
+		// 크기가 0인 디렉토리도 LogTable에 출력한다.
+		if(sourceFile.isFile() || (sourceFile.isDirectory() && sourceFile.length() == 0)) {
 			Object[] rowData = new Object[] {
-				0
+				sourceFile.length() == 0 ? 100 : 0
 				, FileUtils.byteCountToDisplaySize(FileUtils.sizeOf(sourceFile))
 				, FilenameUtils.getName(newFilePath)
 				, newFilePath

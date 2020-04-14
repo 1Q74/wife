@@ -20,6 +20,11 @@ public class Command implements Runnable {
 	
 	private Progress progress = new Progress();
 	
+	private void displayProgress(long sourceSize, long copiedSize, LogRowData logRowData, long sum) {
+		progress.process(sourceSize, copiedSize, logRowData);
+		progress.refreshSizeProgress(sum);
+	}
+	
 	private void copyFile(File src, File newFile) {
 		LogRowData logRowData = progress.init(src, newFile.getAbsolutePath());
 		
@@ -35,11 +40,13 @@ public class Command implements Runnable {
 					byte[] buffer = new byte[1024 * 1024];
 					int count = 0;
 					long size = 0;
+					
 					while((count = in.read(buffer, 0, buffer.length)) != -1 && !ProgressHandler.isStopped()) {
-						out.write(buffer, 0, count);
+//						out.write(buffer, 0, count);
 						size += count;
-						progress.process(FileUtils.sizeOf(src), size, logRowData);
-						progress.refreshSizeProgress(count);
+//						progress.process(FileUtils.sizeOf(src), size, logRowData);
+//						progress.refreshSizeProgress(count);
+						displayProgress(FileUtils.sizeOf(src), size, logRowData, count);
 					}
 					
 					out.close();
@@ -70,21 +77,22 @@ public class Command implements Runnable {
 	}
 
 	private void process(File src, File tgt) {
-		File[] files = src.listFiles();
-		
-		if(files == null) {
-			copyFile(src, tgt);
-		} else {
+		if(src.isDirectory()) {
+			File newDir = new File(tgt, src.getName());
+			if(!newDir.exists()) {
+				newDir.mkdir();
+			}
+			
+			File[] files = src.listFiles();
 			for(File file : files) {
-				File newFile = new File(tgt, file.getName());
-				
 				if(file.isDirectory()) {
-					newFile.mkdir();
-					process(file, newFile);
+					process(file, newDir);
 				} else {
-					copyFile(file, newFile);
+					copyFile(file, new File(newDir, file.getName()));
 				}
 			}
+		} else {
+			copyFile(src, new File(tgt, src.getName()));
 		}
 	}
 		
@@ -100,11 +108,12 @@ public class Command implements Runnable {
 		progress.setSumSize(sources);
 		
 		for(File source : sources) {
-			File newFile = new File(target, source.getName());
-			if(source.isDirectory() && !newFile.exists()) {
-				newFile.mkdir();
-			}
-			process(source, newFile);
+//			File newFile = new File(target, source.getName());
+//			if(source.isDirectory() && !newFile.exists()) {
+//				newFile.mkdir();
+//			}
+//			process(source, newFile);
+			process(source, target);
 		}
 	}
 

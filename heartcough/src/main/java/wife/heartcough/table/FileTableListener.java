@@ -9,6 +9,7 @@ import javax.swing.JTable;
 
 import wife.heartcough.common.Command;
 import wife.heartcough.common.CommandHandler;
+import wife.heartcough.common.ProgressHandler;
 import wife.heartcough.common.Synchronizer;
 
 public class FileTableListener {
@@ -71,6 +72,11 @@ public class FileTableListener {
 							command.copy();
 							break;
 						case (CTRL + V):
+							// 한번 복사한 파일을 여러 번 붙여넣기 할 경우가 있을 수 있기 때문에
+							// 붙여넣기 할 때에 isStopped(false)를 실행한다.
+							// 그렇지 않으면 최초에 붙여넣는 파일 리스트만 진행상태가 제대로 출력되고
+							// 두 번째 부터는 진행바에 0에 멈추어 있게 된다.
+							ProgressHandler.isStopped(false);
 							CommandHandler.getHandler().submit(command);
 							Synchronizer.reload();
 							break;

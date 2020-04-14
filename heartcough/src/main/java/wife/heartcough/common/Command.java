@@ -8,6 +8,8 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
 
+import javax.swing.JOptionPane;
+
 import org.apache.commons.io.FileUtils;
 
 import wife.heartcough.common.Synchronizer;
@@ -74,18 +76,41 @@ public class Command implements Runnable {
 			}
 		}).start();
 	}
-
+	
+	private File getUniqueDirectory(File newDir) {
+		File uniqueDirectory = null;
+		
+		for(int i = 1; ; i++) {
+			uniqueDirectory = new File(newDir.getAbsolutePath() + " (" + i + ")");
+			if(uniqueDirectory.exists()) {
+				continue;
+			} else {
+				break;
+			}
+		}
+		
+		return uniqueDirectory;
+	}
+	
+//	JOptionPane.showConfirmDialog(
+//	Synchronizer.getWindow()
+//	, "Same directory name exists"
+//	, "Confirm"
+//	, JOptionPane.YES_NO_OPTION
+//);
+	
 	private void process(File src, File tgt) {
 		if(src.isDirectory()) {
 			File newDir = new File(tgt, src.getName());
 			
-			if(!newDir.exists()) {
-				newDir.mkdir();
+			if(newDir.exists()) {
+				newDir = getUniqueDirectory(newDir);
+			} 
+			newDir.mkdir();
 
-				// 서브 디렉토리나 파일이 없을 경우 크기가 0인 디렉토리로 LogTable에 출력한다.
-				if(src.list().length == 0) {
-					progress.displayZeroByteDirectory(src, newDir);
-				}
+			// 서브 디렉토리나 파일이 없을 경우 크기가 0인 디렉토리로 LogTable에 출력한다.
+			if(src.list().length == 0) {
+				progress.displayZeroByteDirectory(src, newDir);
 			}
 			
 			File[] files = src.listFiles();

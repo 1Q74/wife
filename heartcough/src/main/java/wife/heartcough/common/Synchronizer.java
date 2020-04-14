@@ -2,6 +2,7 @@ package wife.heartcough.common;
 
 import java.io.File;
 
+import javax.swing.JFrame;
 import javax.swing.JTable;
 import javax.swing.JTextField;
 import javax.swing.JTree;
@@ -75,6 +76,11 @@ public class Synchronizer {
 	 */
 	private static DirectoryPath DIRECTORY_PATH;
 	
+	/**
+	 * 메인 Window를 저장합니다.
+	 */
+	private static JFrame WINDOW;
+	
 	private static boolean SELECTED_FROM_FILE_TABLE = false;
 	private static boolean SELECTED_FROM_FILE_TREE = false;
 	private static boolean SELECTED_FROM_FILE_PATH = false;
@@ -98,6 +104,14 @@ public class Synchronizer {
 	
 	public static void setDirectoryPath(DirectoryPath directoryPath) {
 		DIRECTORY_PATH = directoryPath;
+	}
+	
+	public static void setWindow(JFrame window) {
+		WINDOW = window;
+	}
+	
+	public static JFrame getWindow() {
+		return WINDOW;
 	}
 
 	public static void setCurrentNode(DefaultMutableTreeNode currentNode) {

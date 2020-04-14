@@ -71,7 +71,7 @@ public class FileTableListener {
 							command.copy();
 							break;
 						case (CTRL + V):
-							CommandHandler.getHandler().execute(command);
+							CommandHandler.getHandler().submit(command);
 							Synchronizer.reload();
 							break;
 					}

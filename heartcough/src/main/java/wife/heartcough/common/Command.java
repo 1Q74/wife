@@ -26,6 +26,7 @@ public class Command implements Runnable {
 	 * @param src 원본 디렉토리
 	 * @param newDir 원본(src)의 이름으로 새롭게 생성된 디렉토리
 	 */
+	/*
 	private void displayZeroByteDirectory(File src, File newDir) {
 		new Thread(new Runnable() {
 			public void run() {
@@ -34,6 +35,7 @@ public class Command implements Runnable {
 			}
 		}).start();
 	}
+	*/
 	
 	/**
 	 * LogTable에 작업(복사, 이동, 삭제 등)상태를 표시한다.
@@ -43,10 +45,12 @@ public class Command implements Runnable {
 	 * @param logRowData LogTable의 구성하기 위한 행(row) 객체
 	 * @param sum 작업대상 파일의 총합
 	 */
+	/*
 	private void displayProgress(long sourceSize, long targetSize, LogRowData logRowData, long sum) {
 		progress.process(sourceSize, targetSize, logRowData);
 		progress.refreshSizeProgress(sum);
 	}
+	*/
 	
 	/**
 	 * 복사를 진행한다.
@@ -71,9 +75,9 @@ public class Command implements Runnable {
 					long size = 0;
 					
 					while((count = in.read(buffer, 0, buffer.length)) != -1 && !ProgressHandler.isStopped()) {
-						out.write(buffer, 0, count);
+//						out.write(buffer, 0, count);
 						size += count;
-						displayProgress(FileUtils.sizeOf(src), size, logRowData, count);
+						progress.progress(FileUtils.sizeOf(src), size, logRowData, count);
 					}
 					
 					out.close();
@@ -112,7 +116,7 @@ public class Command implements Runnable {
 
 				// 서브 디렉토리나 파일이 없을 경우 크기가 0인 디렉토리로 LogTable에 출력한다.
 				if(src.list().length == 0) {
-					displayZeroByteDirectory(src, newDir);
+					progress.displayZeroByteDirectory(src, newDir);
 				}
 			}
 			

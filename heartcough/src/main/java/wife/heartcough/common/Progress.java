@@ -27,6 +27,8 @@ import javax.swing.table.TableColumnModel;
 import org.apache.commons.io.FileUtils;
 import org.apache.commons.io.FilenameUtils;
 
+import wife.heartcough.common.Progress.LogRowData;
+
 public class Progress {
 	
 	private static int WIDTH;
@@ -262,5 +264,34 @@ public class Progress {
 		int percent = getSizePercent(targetSize, sourceSize);
 		logTable.setValueAt(percent, logRowData.getRowIndex(), 0);
 	}
+	
+	/**
+	 * 디렉토리의 크리가 0인 것도 LogTable에 출력되도록 한다.
+	 * 
+	 * @param src 원본 디렉토리
+	 * @param newDir 원본(src)의 이름으로 새롭게 생성된 디렉토리
+	 */
+	public void displayZeroByteDirectory(File src, File newDir) {
+		new Thread(new Runnable() {
+			public void run() {
+				LogRowData logRowData = init(src, newDir.getAbsolutePath());
+				progress(0, 0, logRowData, 0);
+			}
+		}).start();
+	}
+	
+	/**
+	 * LogTable에 작업(복사, 이동, 삭제 등)상태를 표시한다.
+	 * 
+	 * @param sourceSize 원본 파일의 크기
+	 * @param targetSize 작업대상 파일의 크기
+	 * @param logRowData LogTable의 구성하기 위한 행(row) 객체
+	 * @param sum 작업대상 파일의 총합
+	 */
+	public void progress(long sourceSize, long targetSize, LogRowData logRowData, long sum) {
+		process(sourceSize, targetSize, logRowData);
+		refreshSizeProgress(sum);
+	}
+	
 	
 }

@@ -11,6 +11,7 @@ import java.io.OutputStream;
 import javax.swing.JOptionPane;
 
 import org.apache.commons.io.FileUtils;
+import org.apache.commons.io.FilenameUtils;
 
 import wife.heartcough.common.Synchronizer;
 import wife.heartcough.common.Progress.LogRowData;
@@ -33,7 +34,7 @@ public class Command implements Runnable {
 	 * @param newFile 대상 파일
 	 */
 	private void copyFile(File src, File newFile) {
-		LogRowData logRowData = progress.init(src, newFile.getAbsolutePath());
+ 		LogRowData logRowData = progress.init(src, newFile.getAbsolutePath());
 		
 		new Thread(new Runnable() {
 			public void run() {
@@ -85,7 +86,7 @@ public class Command implements Runnable {
 		File uniqueDirectory = null;
 		
 		for(int i = 1; ; i++) {
-			uniqueDirectory = new File(newDir.getAbsolutePath() + " (" + i + ")");
+			uniqueDirectory = new File(newDir.getAbsolutePath() + "(" + i + ")");
 			if(uniqueDirectory.exists()) {
 				continue;
 			} else {
@@ -94,6 +95,27 @@ public class Command implements Runnable {
 		}
 		
 		return uniqueDirectory;
+	}
+	
+	private File getUniqueFile(File newFile) {
+		File uniqueFile = null;
+		
+		for(int i = 1; ; i++) {
+			uniqueFile = new File(
+				FilenameUtils.getFullPath(newFile.getAbsolutePath())
+				+ FilenameUtils.getBaseName(newFile.getAbsolutePath())
+				+ "(" + i + ")"
+				+ "." + FilenameUtils.getExtension(newFile.getName())
+				
+			);
+			if(uniqueFile.exists()) {
+				continue;
+			} else {
+				break;
+			}
+		}
+		
+		return uniqueFile;
 	}
 	
 	private int checkFileExistence(File newFile) {
@@ -113,18 +135,24 @@ public class Command implements Runnable {
 		return result;
 	}
 	
-	private void doCopyFile(File src, File newFile) {
-		// 덮어쓰기
-		if(checkFileExistence(newFile) == JOptionPane.YES_OPTION) {
+	private void doCopyFile(File src, File newFile, int depth) {
+		if(newFile.exists()) {
+			if(depth == 0) {
+				newFile = getUniqueFile(newFile);
+				copyFile(src, newFile);
+			} else if(checkFileExistence(newFile) == JOptionPane.YES_OPTION) {
+				copyFile(src, newFile);
+			}
+		} else {
 			copyFile(src, newFile);
 		}
 	}
 	
-	private void process(File src, File tgt) {
+	private void process(File src, File tgt, int depth) {
 		if(src.isDirectory()) {
 			File newDir = new File(tgt, src.getName());
 			
-			if(newDir.exists()) {
+			if(newDir.exists() && depth == 0) {
 				newDir = getUniqueDirectory(newDir);
 			} 
 			newDir.mkdir();
@@ -137,13 +165,13 @@ public class Command implements Runnable {
 			File[] files = src.listFiles();
 			for(File file : files) {
 				if(file.isDirectory()) {
-					process(file, newDir);
+					process(file, newDir, depth);
 				} else {
-					doCopyFile(file, new File(newDir, file.getName()));
+					doCopyFile(file, new File(newDir, file.getName()), depth);
 				}
 			}
 		} else {
-			doCopyFile(src, new File(tgt, src.getName()));
+			doCopyFile(src, new File(tgt, src.getName()), depth);
 		}
 	}
 		
@@ -152,15 +180,15 @@ public class Command implements Runnable {
 	}
 
 	private void paste() {
-		target = Synchronizer.getCurrentDirectory();
-		System.out.println(target);
+		target = Synchronizer.getDirectoryPath().getCurrentPath();
 		if(target.isFile()) return;
 		
 		progress.show();
 		progress.setSumSize(sources);
 		
+		int depth = 0;
 		for(File source : sources) {
-			process(source, target);
+			process(source, target, depth);
 		}
 		
 		Synchronizer.reload();

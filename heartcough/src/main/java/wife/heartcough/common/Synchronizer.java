@@ -111,6 +111,10 @@ public class Synchronizer {
 		DIRECTORY_PATH = directoryPath;
 	}
 	
+	public static DirectoryPath getDirectoryPath() {
+		return DIRECTORY_PATH;
+	}
+	
 	public static void setWindow(JFrame window) {
 		WINDOW = window;
 	}

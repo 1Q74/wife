@@ -27,7 +27,8 @@ public class DirectoryPathListener {
 					String path = ((IconTextField)e.getSource()).getText();
 					File file = new File(path);
 
-					if(!file.equals(DirectoryPath.getCurrentPath()) && file.isDirectory()) {
+					if(!file.equals(Synchronizer.getDirectoryPath().getCurrentPath())
+						&& file.isDirectory()) {
 						Synchronizer.setSelectedFrom(e.getSource());
 						Synchronizer.change(file);
 					}

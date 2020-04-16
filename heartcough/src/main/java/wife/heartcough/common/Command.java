@@ -9,6 +9,7 @@ import java.io.InputStream;
 import java.io.OutputStream;
 
 import javax.swing.JOptionPane;
+import javax.swing.SwingUtilities;
 
 import org.apache.commons.io.FileUtils;
 
@@ -21,6 +22,10 @@ public class Command implements Runnable {
 	private File target;
 	
 	private Progress progress = new Progress();
+	
+	public Command() {
+		Synchronizer.setProgress(this.progress);
+	}
 	
 	/**
 	 * 복사를 진행한다.
@@ -45,7 +50,7 @@ public class Command implements Runnable {
 					long size = 0;
 					
 					while((count = in.read(buffer, 0, buffer.length)) != -1 && !ProgressHandler.isStopped()) {
-//						out.write(buffer, 0, count);
+						out.write(buffer, 0, count);
 						size += count;
 						progress.progress(FileUtils.sizeOf(src), size, logRowData, count);
 					}
@@ -92,12 +97,39 @@ public class Command implements Runnable {
 		return uniqueDirectory;
 	}
 	
-//	JOptionPane.showConfirmDialog(
-//	Synchronizer.getWindow()
-//	, "Same directory name exists"
-//	, "Confirm"
-//	, JOptionPane.YES_NO_OPTION
-//);
+	private int viewMessageBox(String fileName) {
+		System.out.println("== viewMessageBox ==");
+		return 
+//		SwingUtilities.invokeLater(new Runnable() {
+//			public void run() {
+				JOptionPane.showOptionDialog(
+						Synchronizer.getProgress().getLogTable()
+						, "[" + fileName + "]\nSame file name exists"
+						, "Confirm"
+						, JOptionPane.YES_NO_OPTION
+						, JOptionPane.WARNING_MESSAGE
+						, null
+						, new String[] { "Overwrite", "Skip" }
+						, null
+					);	
+//			}
+//		});
+	}
+	
+	private int checkFileExistence(File newFile) {
+		int result = JOptionPane.YES_OPTION;
+		if(newFile.exists()) {
+			result = viewMessageBox(newFile.getName());
+		}
+		return result;
+	}
+	
+	private void doCopyFile(File src, File newFile) {
+		// 덮어쓰기
+		if(checkFileExistence(newFile) == JOptionPane.YES_OPTION) {
+			copyFile(src, newFile);
+		}
+	}
 	
 	private void process(File src, File tgt) {
 		if(src.isDirectory()) {
@@ -118,11 +150,11 @@ public class Command implements Runnable {
 				if(file.isDirectory()) {
 					process(file, newDir);
 				} else {
-					copyFile(file, new File(newDir, file.getName()));
+					doCopyFile(file, new File(newDir, file.getName()));
 				}
 			}
 		} else {
-			copyFile(src, new File(tgt, src.getName()));
+			doCopyFile(src, new File(tgt, src.getName()));
 		}
 	}
 		
@@ -140,6 +172,8 @@ public class Command implements Runnable {
 		for(File source : sources) {
 			process(source, target);
 		}
+		
+		Synchronizer.reload();
 	}
 
 	@Override

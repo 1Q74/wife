@@ -78,7 +78,6 @@ public class FileTableListener {
 							// 두 번째 부터는 진행바에 0에 멈추어 있게 된다.
 							ProgressHandler.isStopped(false);
 							CommandHandler.getHandler().submit(command);
-							Synchronizer.reload();
 							break;
 					}
 				}

@@ -77,9 +77,14 @@ public class Synchronizer {
 	private static DirectoryPath DIRECTORY_PATH;
 	
 	/**
-	 * 메인 Window를 저장합니다.
+	 * 메인 Window의 인스턴스를 저장합니다.
 	 */
 	private static JFrame WINDOW;
+	
+	/**
+	 * 파일 복사 등의 진행화면(Progress)의 인스턴스를 저장합니다.
+	 */
+	private static Progress PROGRESS;
 	
 	private static boolean SELECTED_FROM_FILE_TABLE = false;
 	private static boolean SELECTED_FROM_FILE_TREE = false;
@@ -112,6 +117,14 @@ public class Synchronizer {
 	
 	public static JFrame getWindow() {
 		return WINDOW;
+	}
+	
+	public static void setProgress(Progress progress) {
+		PROGRESS = progress;
+	}
+	
+	public static Progress getProgress() {
+		return PROGRESS;
 	}
 
 	public static void setCurrentNode(DefaultMutableTreeNode currentNode) {

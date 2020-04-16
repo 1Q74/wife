@@ -45,6 +45,9 @@ public class Progress {
 	private JScrollPane logTableScrollPane;
 	
 	private void initProgressBar() {
+		sumSize = 0;
+		copiedSize = 0;
+		
 		bar = new JProgressBar();
 		bar.setString("Calcurating...");
 		bar.setStringPainted(true);
@@ -191,7 +194,7 @@ public class Progress {
 	
 	public void setSumSize(File[] files) {
 		for(File file : files) {
-			this.sumSize += file.isDirectory() ? FileUtils.sizeOfDirectory(file) : FileUtils.sizeOf(file);
+			sumSize += file.isDirectory() ? FileUtils.sizeOfDirectory(file) : FileUtils.sizeOf(file);
 		}
 	}
 	
@@ -257,7 +260,6 @@ public class Progress {
 	}
 	
 	public void process(long sourceSize, long targetSize, LogRowData logRowData) {
-		System.out.println("sourceSize = " + sourceSize + ", targetSize = " + targetSize);
 		int percent = getSizePercent(targetSize, sourceSize);
 		logTable.setValueAt(percent, logRowData.getRowIndex(), 0);
 	}
@@ -290,5 +292,13 @@ public class Progress {
 		refreshSizeProgress(sum);
 	}
 	
+	/**
+	 * 파일 복사 등을 실행할 경우 사용자에게 보여지는 메시지 팝업의 부모 객체로 사용한다.
+	 * 
+	 * @return 파일리스트를 출력하는 LogTable 객체
+	 */
+	public JTable getLogTable() {
+		return logTable;
+	}
 	
 }

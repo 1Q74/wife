@@ -9,7 +9,6 @@ import java.io.InputStream;
 import java.io.OutputStream;
 
 import javax.swing.JOptionPane;
-import javax.swing.SwingUtilities;
 
 import org.apache.commons.io.FileUtils;
 
@@ -97,29 +96,19 @@ public class Command implements Runnable {
 		return uniqueDirectory;
 	}
 	
-	private int viewMessageBox(String fileName) {
-		System.out.println("== viewMessageBox ==");
-		return 
-//		SwingUtilities.invokeLater(new Runnable() {
-//			public void run() {
-				JOptionPane.showOptionDialog(
-						Synchronizer.getProgress().getLogTable()
-						, "[" + fileName + "]\nSame file name exists"
-						, "Confirm"
-						, JOptionPane.YES_NO_OPTION
-						, JOptionPane.WARNING_MESSAGE
-						, null
-						, new String[] { "Overwrite", "Skip" }
-						, null
-					);	
-//			}
-//		});
-	}
-	
 	private int checkFileExistence(File newFile) {
 		int result = JOptionPane.YES_OPTION;
 		if(newFile.exists()) {
-			result = viewMessageBox(newFile.getName());
+			result = JOptionPane.showOptionDialog(
+				Synchronizer.getProgress().getLogTable()
+				, newFile.getName() + "\nSame file name exists"
+				, "Confirm"
+				, JOptionPane.YES_NO_OPTION
+				, JOptionPane.WARNING_MESSAGE
+				, null
+				, new String[] { "Overwrite", "Skip" }
+				, null
+			);
 		}
 		return result;
 	}
@@ -164,6 +153,7 @@ public class Command implements Runnable {
 
 	private void paste() {
 		target = Synchronizer.getCurrentDirectory();
+		System.out.println(target);
 		if(target.isFile()) return;
 		
 		progress.show();

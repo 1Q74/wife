@@ -1,5 +1,7 @@
 package wife.heartcough.table;
 
+import java.awt.event.FocusEvent;
+import java.awt.event.FocusListener;
 import java.awt.event.KeyEvent;
 import java.awt.event.KeyListener;
 import java.awt.event.MouseEvent;
@@ -87,6 +89,20 @@ public class FileTableListener {
 
 				@Override
 				public void keyReleased(KeyEvent e) {}
+			};
+	}
+	
+	public static FocusListener getFocusListener() {
+		return 
+			new FocusListener() {
+				
+				@Override
+				public void focusLost(FocusEvent e) {}
+				
+				@Override
+				public void focusGained(FocusEvent e) {
+					Synchronizer.reload();
+				}
 			};
 	}
 	

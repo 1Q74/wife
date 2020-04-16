@@ -7,9 +7,6 @@ import javax.swing.table.AbstractTableModel;
 
 import wife.heartcough.common.FileSystem;
 
-
-
-
 public class FileListModel extends AbstractTableModel {
 
 	private static final long serialVersionUID = 1L;

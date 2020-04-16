@@ -98,7 +98,7 @@ public class FileTree {
 		while(children.hasMoreElements()) {
 			DefaultMutableTreeNode childNode = (DefaultMutableTreeNode)children.nextElement();
 
-			if(Synchronizer.isNextChangedDirectoryTreeNode(childNode)) {
+			if(Synchronizer.isNextChangedDirectoryTreeNode(childNode, false)) {
        			if(childNode.isLeaf()) {
        				tree.setSelectionPath(new TreePath(childNode.getPath()));
        			} 

@@ -7,8 +7,10 @@ import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
+import java.lang.reflect.InvocationTargetException;
 
 import javax.swing.JOptionPane;
+import javax.swing.SwingUtilities;
 
 import org.apache.commons.io.FileUtils;
 import org.apache.commons.io.FilenameUtils;
@@ -82,32 +84,26 @@ public class Command implements Runnable {
 		}).start();
 	}
 	
-	private File getUniqueDirectory(File newDir) {
-		File uniqueDirectory = null;
+	private String getUniqueFileName(File newFile, int index) {
+		String fileName = "";
 		
-		for(int i = 1; ; i++) {
-			uniqueDirectory = new File(newDir.getAbsolutePath() + "(" + i + ")");
-			if(uniqueDirectory.exists()) {
-				continue;
-			} else {
-				break;
-			}
+		if(newFile.isDirectory()) {
+			fileName = newFile.getAbsolutePath() + "(" + index + ")";
+		} else {
+			fileName =	FilenameUtils.getFullPath(newFile.getAbsolutePath())
+						+ FilenameUtils.getBaseName(newFile.getAbsolutePath())
+						+ "(" + index + ")"
+						+ "." + FilenameUtils.getExtension(newFile.getName());
 		}
 		
-		return uniqueDirectory;
+		return fileName;
 	}
 	
 	private File getUniqueFile(File newFile) {
 		File uniqueFile = null;
 		
 		for(int i = 1; ; i++) {
-			uniqueFile = new File(
-				FilenameUtils.getFullPath(newFile.getAbsolutePath())
-				+ FilenameUtils.getBaseName(newFile.getAbsolutePath())
-				+ "(" + i + ")"
-				+ "." + FilenameUtils.getExtension(newFile.getName())
-				
-			);
+			uniqueFile = new File(getUniqueFileName(newFile, i));
 			if(uniqueFile.exists()) {
 				continue;
 			} else {
@@ -116,6 +112,10 @@ public class Command implements Runnable {
 		}
 		
 		return uniqueFile;
+	}
+	
+	private File getUniqueDirectory(File newDir) {
+		return getUniqueFile(newDir);
 	}
 	
 	private int checkFileExistence(File newFile) {
@@ -165,7 +165,7 @@ public class Command implements Runnable {
 			File[] files = src.listFiles();
 			for(File file : files) {
 				if(file.isDirectory()) {
-					process(file, newDir, depth);
+					process(file, newDir, ++depth);
 				} else {
 					doCopyFile(file, new File(newDir, file.getName()), depth);
 				}
@@ -185,12 +185,12 @@ public class Command implements Runnable {
 		
 		progress.show();
 		progress.setSumSize(sources);
-		
-		int depth = 0;
+
 		for(File source : sources) {
+			int depth = 0;
 			process(source, target, depth);
 		}
-		
+
 		Synchronizer.reload();
 	}
 

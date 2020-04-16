@@ -345,6 +345,7 @@ public class Synchronizer {
 	}
 	
 	public static void setNextChangedDirectoryTreePath(DefaultMutableTreeNode childNode) {
+		/*
 		for(int i = 0; i < CHANED_DIRECTORY_PATHS.length; i++) {
 			File path = CHANED_DIRECTORY_PATHS[i];
 			
@@ -354,6 +355,8 @@ public class Synchronizer {
 				break;
 			}
 		}
+		*/
+		isNextChangedDirectoryTreeNode(childNode, true);
 	}
 	
 	public static TreePath getNextChangedDirectoryTreePath() {
@@ -382,11 +385,15 @@ public class Synchronizer {
 		}
 	}
 
-	public static boolean isNextChangedDirectoryTreeNode(DefaultMutableTreeNode childNode) {
+	public static boolean isNextChangedDirectoryTreeNode(DefaultMutableTreeNode childNode, boolean setNextNode) {
 		for(int i = 0; i < CHANED_DIRECTORY_PATHS.length; i++) {
 			File path = CHANED_DIRECTORY_PATHS[i];
 			
 			if(path.equals((File)childNode.getUserObject())) {
+				if(setNextNode) {
+					NEXT_CHANGED_DIRECTORY_TREE_PATH = new TreePath(childNode.getPath());
+					hasMoreChanedDirectoryPaths(true);
+				}
 				return true;
 			}
 		}

@@ -26,6 +26,7 @@ public class FileTable {
 	public FileTable() {
 		table.addMouseListener(FileTableListener.getMouseListener());
 		table.addKeyListener(FileTableListener.getKeyListener());
+		table.addFocusListener(FileTableListener.getFocusListener());
 	}
 	
 	/**

@@ -345,17 +345,6 @@ public class Synchronizer {
 	}
 	
 	public static void setNextChangedDirectoryTreePath(DefaultMutableTreeNode childNode) {
-		/*
-		for(int i = 0; i < CHANED_DIRECTORY_PATHS.length; i++) {
-			File path = CHANED_DIRECTORY_PATHS[i];
-			
-			if(path.equals((File)childNode.getUserObject())) {
-				NEXT_CHANGED_DIRECTORY_TREE_PATH = new TreePath(childNode.getPath());
-				hasMoreChanedDirectoryPaths(true);
-				break;
-			}
-		}
-		*/
 		isNextChangedDirectoryTreeNode(childNode, true);
 	}
 	

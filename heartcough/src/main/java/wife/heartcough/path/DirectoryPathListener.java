@@ -16,12 +16,10 @@ public class DirectoryPathListener {
 	public static KeyListener getKeyListener() {
 		return new KeyListener() {
 			@Override
-			public void keyTyped(KeyEvent e) {
-			}
+			public void keyTyped(KeyEvent e) {}
 			
 			@Override
-			public void keyReleased(KeyEvent e) {
-			}
+			public void keyReleased(KeyEvent e) {}
 			
 			@Override
 			public void keyPressed(KeyEvent e) {
@@ -29,7 +27,8 @@ public class DirectoryPathListener {
 					String path = ((IconTextField)e.getSource()).getText();
 					File file = new File(path);
 
-					if(!file.equals(DirectoryPath.getCurrentPath()) && file.isDirectory()) {
+					if(!file.equals(Synchronizer.getDirectoryPath().getCurrentPath())
+						&& file.isDirectory()) {
 						Synchronizer.setSelectedFrom(e.getSource());
 						Synchronizer.change(file);
 					}

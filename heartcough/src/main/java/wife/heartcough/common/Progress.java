@@ -45,6 +45,9 @@ public class Progress {
 	private JScrollPane logTableScrollPane;
 	
 	private void initProgressBar() {
+		sumSize = 0;
+		copiedSize = 0;
+		
 		bar = new JProgressBar();
 		bar.setString("Calcurating...");
 		bar.setStringPainted(true);
@@ -185,12 +188,13 @@ public class Progress {
 	}
 	
 	private int getSizePercent(double source, double total) {
+		if(source == 0) return 100;
 		return (int)Math.round((source / total) * 100);
 	}
 	
 	public void setSumSize(File[] files) {
 		for(File file : files) {
-			this.sumSize += file.isDirectory() ? FileUtils.sizeOfDirectory(file) : FileUtils.sizeOf(file);
+			sumSize += file.isDirectory() ? FileUtils.sizeOfDirectory(file) : FileUtils.sizeOf(file);
 		}
 	}
 	
@@ -230,27 +234,26 @@ public class Progress {
 	public LogRowData init(File sourceFile, String newFilePath) {
 		int rowIndex = -1;
 
-		if(sourceFile.isFile()) {
-			Object[] rowData = new Object[] {
-				0
-				, FileUtils.byteCountToDisplaySize(FileUtils.sizeOf(sourceFile))
-				, FilenameUtils.getName(newFilePath)
-				, newFilePath
-			};
-			logModel.addRow(rowData);
-			rowIndex = logModel.getRowCount() - 1;
-			
-			
-			try {
-				SwingUtilities.invokeAndWait(new Runnable() {
-					@Override
-					public void run() {
-						logTableScrollPane.getVerticalScrollBar().setValue(logTableScrollPane.getVerticalScrollBar().getMaximum());
-						
-					}
-				});
-			} catch (InvocationTargetException | InterruptedException e) {
-			}
+		// 크기가 0인 디렉토리도 LogTable에 출력한다.
+		Object[] rowData = new Object[] {
+			sourceFile.length() == 0 ? 100 : 0
+			, FileUtils.byteCountToDisplaySize(FileUtils.sizeOf(sourceFile))
+			, FilenameUtils.getName(newFilePath)
+			, newFilePath
+		};
+		logModel.addRow(rowData);
+		rowIndex = logModel.getRowCount() - 1;
+		
+		
+		try {
+			SwingUtilities.invokeAndWait(new Runnable() {
+				@Override
+				public void run() {
+					logTableScrollPane.getVerticalScrollBar().setValue(logTableScrollPane.getVerticalScrollBar().getMaximum());
+					
+				}
+			});
+		} catch (InvocationTargetException | InterruptedException e) {
 		}
 		
 		return new LogRowData(rowIndex, newFilePath);
@@ -259,6 +262,43 @@ public class Progress {
 	public void process(long sourceSize, long targetSize, LogRowData logRowData) {
 		int percent = getSizePercent(targetSize, sourceSize);
 		logTable.setValueAt(percent, logRowData.getRowIndex(), 0);
+	}
+	
+	/**
+	 * 디렉토리의 크리가 0인 것도 LogTable에 출력되도록 한다.
+	 * 
+	 * @param src 원본 디렉토리
+	 * @param newDir 원본(src)의 이름으로 새롭게 생성된 디렉토리
+	 */
+	public void displayZeroByteDirectory(File src, File newDir) {
+		new Thread(new Runnable() {
+			public void run() {
+				LogRowData logRowData = init(src, newDir.getAbsolutePath());
+				progress(0, 0, logRowData, 0);
+			}
+		}).start();
+	}
+	
+	/**
+	 * LogTable에 작업(복사, 이동, 삭제 등)상태를 표시한다.
+	 * 
+	 * @param sourceSize 원본 파일의 크기
+	 * @param targetSize 작업대상 파일의 크기
+	 * @param logRowData LogTable의 구성하기 위한 행(row) 객체
+	 * @param sum 작업대상 파일의 총합
+	 */
+	public void progress(long sourceSize, long targetSize, LogRowData logRowData, long sum) {
+		process(sourceSize, targetSize, logRowData);
+		refreshSizeProgress(sum);
+	}
+	
+	/**
+	 * 파일 복사 등을 실행할 경우 사용자에게 보여지는 메시지 팝업의 부모 객체로 사용한다.
+	 * 
+	 * @return 파일리스트를 출력하는 LogTable 객체
+	 */
+	public JTable getLogTable() {
+		return logTable;
 	}
 	
 }

@@ -2,6 +2,7 @@ package wife.heartcough.tree;
 
 import java.io.File;
 import java.util.Enumeration;
+import java.util.regex.Pattern;
 
 import javax.swing.JTree;
 import javax.swing.SwingUtilities;
@@ -41,7 +42,6 @@ public class FileTree {
 	 * FileTree를 로드한다.
 	 * 
 	 * Synchronizer.getCurrentNode() != null && Synchronizer.getCurrentNode().isLeaf() : 마우스 클릭(사용자 선택)
-	 * Synchronizer.isDirectoryPathChanged() : 파일 경로의 변경
 	 */
 	public void load() {
 		if(Synchronizer.getCurrentNode() != null && Synchronizer.getCurrentNode().isLeaf()) {
@@ -92,17 +92,36 @@ public class FileTree {
 		return isFound;
 	}
 	
-	public void searchChildNode(DefaultMutableTreeNode parentNode) {
+	private boolean isDrive(String path) {
+		return Pattern.matches("^[A-Z]:\\\\$", path);
+	}
+	
+	public void searchChildNode(DefaultMutableTreeNode parentNode, int depth) {
 		Enumeration<?> children = parentNode.children();
 		
 		while(children.hasMoreElements()) {
 			DefaultMutableTreeNode childNode = (DefaultMutableTreeNode)children.nextElement();
-
-			if(Synchronizer.isNextChangedDirectoryTreeNode(childNode)) {
-       			if(childNode.isLeaf()) {
+			
+			// [내 PC]의 자식노드 중에서 드라이브가 아닌 것은 검색에서 제외한다.
+			// * DirectoryPath의 변경시 무조건 드라이브 노드부터 검색하도록 한다.
+			if(depth == 2 && !isDrive(((File)childNode.getUserObject()).getAbsolutePath())) {
+				continue;
+			}
+			
+			if(Synchronizer.isNextChangedDirectoryTreeNode(childNode, false)) {
+				// 한번 읽어들인 자식노드는 isLeaf() == false이기 때문에
+				// 변경된 가장 마지막 디렉토리일 경우 setSelectPath가 실행되도록 한다.
+				//---------------------------------------------------------------------------
+				// * 같은 depth의 자식노드를 읽어들어온 상태라면 마지막 디렉토리가 선택되지 않는 오류가 발생하기 때문에
+				//    setSelectionPath가 실행되도록 한다.
+				//---------------------------------------------------------------------------
+				Synchronizer.checkHasMoreChanedDirectoryPaths((File)childNode.getUserObject());
+				
+       			if(childNode.isLeaf() || !Synchronizer.hasMoreChanedDirectoryPaths()) {
        				tree.setSelectionPath(new TreePath(childNode.getPath()));
-       			} 
-       			searchChildNode(childNode);
+       			} else {
+       				searchChildNode(childNode, ++depth);
+       			}
        		}
 		}
 	}
@@ -128,7 +147,8 @@ public class FileTree {
 					TreePath childNodePath = new TreePath(childNode.getPath());
 					tree.setSelectionPath(childNodePath);
 				} else {
-					searchChildNode(childNode);
+					// 바탕화면(depth:0) > 내 PC(depth:1) > NODE(depth:2);
+					searchChildNode(childNode, 2);
 				}
 			}
 		}

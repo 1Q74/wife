@@ -2,6 +2,7 @@ package wife.heartcough.common;
 
 import java.io.File;
 
+import javax.swing.JFrame;
 import javax.swing.JTable;
 import javax.swing.JTextField;
 import javax.swing.JTree;
@@ -75,14 +76,44 @@ public class Synchronizer {
 	 */
 	private static DirectoryPath DIRECTORY_PATH;
 	
+	/**
+	 * 메인 Window의 인스턴스를 저장합니다.
+	 */
+	private static JFrame WINDOW;
+	
+	/**
+	 * 파일 복사 등의 진행화면(Progress)의 인스턴스를 저장합니다.
+	 */
+	private static Progress PROGRESS;
+	
 	private static boolean SELECTED_FROM_FILE_TABLE = false;
 	private static boolean SELECTED_FROM_FILE_TREE = false;
 	private static boolean SELECTED_FROM_FILE_PATH = false;
 	
+	/**
+	 * DirectoryPath가 변경되었는지의 여부
+	 */
 	private static boolean DIRECTORY_PATH_CHANGED = false;
+	
+	/**
+	 * DirectoryPath에서 변경된 디렉토리의 계층 경로
+	 */
 	private static File[] CHANED_DIRECTORY_PATHS;
+	
+	/**
+	 * DirectoryPath에서 변경된 디렉토리의 계층의 다음 경로
+	 */
 	private static TreePath NEXT_CHANGED_DIRECTORY_TREE_PATH;
+	
+	/**
+	 * DirectoryPath에서 변경된 디렉토리의 계층의 다음 경로의 존재 여부
+	 */
 	private static boolean HAS_MORE_CHANGED_DIRECTORY_PATH = true;
+	
+	/**
+	 * 디렉토리, 파일 등을 붙여넣기 했는지 여부
+	 */
+	private static boolean IS_PASTE_COMMAND_EXECUTED = false;
 	
 	public static void setFileTree(FileTree fileTree) {
 		FILE_TREE = fileTree;
@@ -98,6 +129,26 @@ public class Synchronizer {
 	
 	public static void setDirectoryPath(DirectoryPath directoryPath) {
 		DIRECTORY_PATH = directoryPath;
+	}
+	
+	public static DirectoryPath getDirectoryPath() {
+		return DIRECTORY_PATH;
+	}
+	
+	public static void setWindow(JFrame window) {
+		WINDOW = window;
+	}
+	
+	public static JFrame getWindow() {
+		return WINDOW;
+	}
+	
+	public static void setProgress(Progress progress) {
+		PROGRESS = progress;
+	}
+	
+	public static Progress getProgress() {
+		return PROGRESS;
 	}
 
 	public static void setCurrentNode(DefaultMutableTreeNode currentNode) {
@@ -233,6 +284,8 @@ public class Synchronizer {
 	
 	public static void change(File changedDirectory) {
 		setCurrentDirectory(changedDirectory);
+		// DirectoryPath 변경에 의해서 false로 되어 있다면 true로 초기화한다.
+		hasMoreChanedDirectoryPaths(true);
 		FILE_TREE.change();
 	}
 
@@ -314,15 +367,7 @@ public class Synchronizer {
 	}
 	
 	public static void setNextChangedDirectoryTreePath(DefaultMutableTreeNode childNode) {
-		for(int i = 0; i < CHANED_DIRECTORY_PATHS.length; i++) {
-			File path = CHANED_DIRECTORY_PATHS[i];
-			
-			if(path.equals((File)childNode.getUserObject())) {
-				NEXT_CHANGED_DIRECTORY_TREE_PATH = new TreePath(childNode.getPath());
-				hasMoreChanedDirectoryPaths(true);
-				break;
-			}
-		}
+		isNextChangedDirectoryTreeNode(childNode, true);
 	}
 	
 	public static TreePath getNextChangedDirectoryTreePath() {
@@ -343,24 +388,66 @@ public class Synchronizer {
 	 * 가장 마지막 요소와 일치하는지 확인한다.
 	 */
 	public static void checkHasMoreChanedDirectoryPaths() {
+		checkHasMoreChanedDirectoryPaths((File)getCurrentNode().getUserObject());
+	}
+	
+	/**
+	 * 탐색해야 할 변경된 디렉토리 경로가 더 존재하는지 확인하기 위해,
+	 * 현재 선택된 트리 노드의 UserObject가 변경된 경로정보를 가지고 있는 배열의
+	 * 가장 마지막 요소와 일치하는지 확인한다.
+	 */
+	public static void checkHasMoreChanedDirectoryPaths(File userObject) {
 		if(getChangedDirectoryPaths() == null) return;
 		
-		if(getCurrentNode().getUserObject().equals(
-			getChangedDirectoryPaths()[getChangedDirectoryPaths().length - 1])) {
+		File lastPath = getChangedDirectoryPaths()[getChangedDirectoryPaths().length - 1];
+		if(userObject.equals(lastPath)) {
 			hasMoreChanedDirectoryPaths(false);
 		}
 	}
 
-	public static boolean isNextChangedDirectoryTreeNode(DefaultMutableTreeNode childNode) {
+	/**
+	 * 변경된 디렉토리 계층에 FileTree의 자식노드가 존재하는지 비교한다.
+	 * setNextNode가 true이면 CHANED_DIRECTORY_PATHS에서 자동선택되어야 할
+	 * 다음 디렉토리 경로를 넘겨준다.
+	 * 
+	 * @param childNode 변경된 디렉토리 경로의 계층과 비교하기 위한 FileTree의 자식노드
+	 * @param setNextNode selectionPath를 이용하여 다음 경로를 자동으로 선택하기 위한
+	 *        변경된 디렉토리의 다음 경로 
+	 * @return childNode가 변경된 디렉토리 계층의 값과 동일하다면 true, 그렇지 않으면 false
+	 */
+	public static boolean isNextChangedDirectoryTreeNode(DefaultMutableTreeNode childNode, boolean setNextNode) {
 		for(int i = 0; i < CHANED_DIRECTORY_PATHS.length; i++) {
 			File path = CHANED_DIRECTORY_PATHS[i];
 			
 			if(path.equals((File)childNode.getUserObject())) {
+				if(setNextNode) {
+					NEXT_CHANGED_DIRECTORY_TREE_PATH = new TreePath(childNode.getPath());
+					hasMoreChanedDirectoryPaths(true);
+				}
 				return true;
 			}
 		}
 		
 		return false;
+	}
+
+	/**
+	 * 붙여넣기 실행여부를 설정한다.
+	 * 복사(CTRL+C)할 때에 false로 초기화한다.
+	 * 
+	 * @param isExecuted 복사시에는 false, 붙여넣기를 하였다면 true 
+	 */
+	public static void isPasteCommandExecuted(boolean isExecuted) {
+		IS_PASTE_COMMAND_EXECUTED = isExecuted;
+	}
+	
+	/**
+	 * 붙여넣기 실행여부를 리턴한다.
+	 * 
+	 * @return 붙여넣기를 하였다면 true, 복사만 하였을 경우에는 false
+	 */
+	public static boolean isPasteCommandExecuted() {
+		return IS_PASTE_COMMAND_EXECUTED;
 	}
 	
 }

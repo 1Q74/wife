@@ -25,11 +25,13 @@ public class Explorer {
 	private FileTree fileTree = new FileTree();
 	private FileTable fileTable = new FileTable();
 	private DirectoryPath directoryPath = new DirectoryPath();
+	private JFrame window = new JFrame();
 	
 	public Explorer() {
 		Synchronizer.setFileTree(fileTree);
 		Synchronizer.setFileTable(fileTable);
 		Synchronizer.setDirectoryPath(directoryPath);
+		Synchronizer.setWindow(window);
 	}
 	
 	private JSplitPane getSplitter() {
@@ -66,7 +68,6 @@ public class Explorer {
 			e.printStackTrace();
 		}
 		
-		JFrame window = new JFrame();
 		window.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
 		window.setContentPane(getSplitter());
 		window.setSize(1024, 768);

@@ -26,7 +26,7 @@ public class FileTable {
 	public FileTable() {
 		table.addMouseListener(FileTableListener.getMouseListener());
 		table.addKeyListener(FileTableListener.getKeyListener());
-		table.addFocusListener(FileTableListener.getFocusListener());
+//		table.addFocusListener(FileTableListener.getFocusListener());
 	}
 	
 	/**
@@ -53,7 +53,7 @@ public class FileTable {
 		Synchronizer.setDirectories(tmpDirectories);
 		Synchronizer.setFiles(tmpFiles);
 		
-		System.arraycopy(Synchronizer.getDirectories(), 0, files, 0, directoryCount);
+		System.arraycopy(tmpDirectories, 0, files, 0, directoryCount);
 		System.arraycopy(Synchronizer.getFiles(), 0, files, directoryCount, fileCount);
 		
 		Synchronizer.setFileList(files);
@@ -70,7 +70,7 @@ public class FileTable {
 		if(FileSystem.isWindowsSpecialFolder(Synchronizer.getCurrentNodeDirectoryName())) {
 			files = Synchronizer.getCurrentNodeDirectory().listFiles();
 			Synchronizer.setDirectories(files);
-			Synchronizer.setFileList(Synchronizer.getDirectories());
+			Synchronizer.setFileList(files);
 		} else {
 			int end = filenames.length;
 			files = new File[end];
@@ -82,7 +82,7 @@ public class FileTable {
 				String filePath = 	Synchronizer.getCurrentNodeDirectoryPath()
 									+ File.separatorChar
 									+ filenames[i];
-				
+
 				File file = new File(filePath);
 				if(file.isDirectory()) {
 					directoryList.add(file);

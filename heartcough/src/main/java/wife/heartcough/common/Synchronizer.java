@@ -374,6 +374,16 @@ public class Synchronizer {
 		}
 	}
 
+	/**
+	 * 변경된 디렉토리 계층에 FileTree의 자식노드가 존재하는지 비교한다.
+	 * setNextNode가 true이면 CHANED_DIRECTORY_PATHS에서 자동선택되어야 할
+	 * 다음 디렉토리 경로를 넘겨준다.
+	 * 
+	 * @param childNode 변경된 디렉토리 경로의 계층과 비교하기 위한 FileTree의 자식노드
+	 * @param setNextNode selectionPath를 이용하여 다음 경로를 자동으로 선택하기 위한
+	 *        변경된 디렉토리의 다음 경로 
+	 * @return childNode가 변경된 디렉토리 계층의 값과 동일하다면 true, 그렇지 않으면 false
+	 */
 	public static boolean isNextChangedDirectoryTreeNode(DefaultMutableTreeNode childNode, boolean setNextNode) {
 		for(int i = 0; i < CHANED_DIRECTORY_PATHS.length; i++) {
 			File path = CHANED_DIRECTORY_PATHS[i];

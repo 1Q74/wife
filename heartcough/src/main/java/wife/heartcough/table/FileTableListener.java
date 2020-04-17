@@ -30,8 +30,7 @@ public class FileTableListener {
 					
 					if(e.getClickCount() == 2) {
 						if(Synchronizer.getCurrentFile().isDirectory()) {
-							Synchronizer.setSelectedFrom(e.getSource());
-							Synchronizer.synchronize(Synchronizer.getCurrentFile());
+							Synchronizer.change(Synchronizer.getCurrentFile());
 						}
 					}
 					

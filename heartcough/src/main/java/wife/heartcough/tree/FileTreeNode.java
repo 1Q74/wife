@@ -36,9 +36,11 @@ public class FileTreeNode {
 		File[] nodeElement = selectNodeElementSource();
 		
 		SwingWorker<Void, File> worker = new SwingWorker<Void, File>() {
+			private JTree tree = Synchronizer.getFileTree().getTree();
+			
             @Override
             public Void doInBackground() {
-            	Synchronizer.getFileTree().getTree().setEnabled(false);
+            	tree.setEnabled(false);
             	Synchronizer.checkHasMoreChanedDirectoryPaths();
             	
             	for(File file : nodeElement) {
@@ -55,27 +57,32 @@ public class FileTreeNode {
                 	DefaultMutableTreeNode childNode = new DefaultMutableTreeNode(child);
                 	Synchronizer.getCurrentNode().add(childNode);
 
+                	// DirectoryPath가 사용자에 의해 변경되었다면
+                	// 자동선택되어야 할 다음 디렉토리 경로를 찾는다.
                 	if(Synchronizer.isDirectoryPathChanged()) {
                 		Synchronizer.setNextChangedDirectoryTreePath(childNode);
                 	}
                 }
             }
+            
+            private void expandPath() {
+        		tree.expandPath(new TreePath(Synchronizer.getCurrentNode().getPath()));            	
+            }
 
             @Override
             protected void done() {
-            	Synchronizer.getFileTree().getTree().setEnabled(true);
+            	tree.setEnabled(true);
             	
             	if(Synchronizer.isSelectedFromFileTable() || Synchronizer.isDirectoryPathChanged()) {
-                	JTree tree = Synchronizer.getFileTree().getTree();
-            		tree.expandPath(new TreePath(Synchronizer.getCurrentNode().getPath()));
-            		
-            		if(Synchronizer.isSelectedFromFileTable()) {
-            			Synchronizer.isSelectedFromFileTable(false);
-            		}
-	            	
-	            	if(Synchronizer.isDirectoryPathChanged() && Synchronizer.hasMoreChanedDirectoryPaths()) {
-	            		tree.setSelectionPath(Synchronizer.getNextChangedDirectoryTreePath());
-	            	} 
+            		expandPath();	
+            	}
+            	
+            	if(Synchronizer.isSelectedFromFileTable()) {
+           			Synchronizer.isSelectedFromFileTable(false);
+           		// DirectoryPath변경에 의해 자동선택되어야 할 디렉토리가 있다면
+           		// 해당 디렉토리를 선택한다.
+        		} else if(Synchronizer.isDirectoryPathChanged() && Synchronizer.hasMoreChanedDirectoryPaths()) {
+            		tree.setSelectionPath(Synchronizer.getNextChangedDirectoryTreePath());
             	}
              }
         };

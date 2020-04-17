@@ -2,6 +2,7 @@ package wife.heartcough.tree;
 
 import java.io.File;
 import java.util.Enumeration;
+import java.util.regex.Pattern;
 
 import javax.swing.JTree;
 import javax.swing.SwingUtilities;
@@ -92,17 +93,28 @@ public class FileTree {
 		return isFound;
 	}
 	
-	public void searchChildNode(DefaultMutableTreeNode parentNode) {
+	private boolean isDrive(String path) {
+		return Pattern.matches("^[A-Z]:\\\\$", path);
+	}
+	
+	public void searchChildNode(DefaultMutableTreeNode parentNode, int depth) {
 		Enumeration<?> children = parentNode.children();
 		
 		while(children.hasMoreElements()) {
 			DefaultMutableTreeNode childNode = (DefaultMutableTreeNode)children.nextElement();
+			
+			// [내 PC]의 자식노드 중에서 드라이브가 아닌 것은 검색에서 제외한다.
+			// * DirectoryPath의 변경시 무조건 드라이브 노드부터 검색하도록 한다.
+			if(depth == 2 && !isDrive(((File)childNode.getUserObject()).getAbsolutePath())) {
+				continue;
+			}
 
 			if(Synchronizer.isNextChangedDirectoryTreeNode(childNode, false)) {
        			if(childNode.isLeaf()) {
        				tree.setSelectionPath(new TreePath(childNode.getPath()));
-       			} 
-       			searchChildNode(childNode);
+       			} else {
+       				searchChildNode(childNode, ++depth);
+       			}
        		}
 		}
 	}
@@ -128,7 +140,8 @@ public class FileTree {
 					TreePath childNodePath = new TreePath(childNode.getPath());
 					tree.setSelectionPath(childNodePath);
 				} else {
-					searchChildNode(childNode);
+					// 바탕화면(depth:0) > 내 PC(depth:1) > NODE(depth:2);
+					searchChildNode(childNode, 2);
 				}
 			}
 		}

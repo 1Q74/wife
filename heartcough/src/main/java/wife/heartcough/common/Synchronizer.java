@@ -264,6 +264,8 @@ public class Synchronizer {
 	
 	public static void change(File changedDirectory) {
 		setCurrentDirectory(changedDirectory);
+		// DirectoryPath 변경에 의해서 false로 되어 있다면 true로 초기화한다.
+		hasMoreChanedDirectoryPaths(true);
 		FILE_TREE.change();
 	}
 
@@ -366,10 +368,19 @@ public class Synchronizer {
 	 * 가장 마지막 요소와 일치하는지 확인한다.
 	 */
 	public static void checkHasMoreChanedDirectoryPaths() {
+		checkHasMoreChanedDirectoryPaths((File)getCurrentNode().getUserObject());
+	}
+	
+	/**
+	 * 탐색해야 할 변경된 디렉토리 경로가 더 존재하는지 확인하기 위해,
+	 * 현재 선택된 트리 노드의 UserObject가 변경된 경로정보를 가지고 있는 배열의
+	 * 가장 마지막 요소와 일치하는지 확인한다.
+	 */
+	public static void checkHasMoreChanedDirectoryPaths(File userObject) {
 		if(getChangedDirectoryPaths() == null) return;
 		
-		if(getCurrentNode().getUserObject().equals(
-			getChangedDirectoryPaths()[getChangedDirectoryPaths().length - 1])) {
+		File lastPath = getChangedDirectoryPaths()[getChangedDirectoryPaths().length - 1];
+		if(userObject.equals(lastPath)) {
 			hasMoreChanedDirectoryPaths(false);
 		}
 	}

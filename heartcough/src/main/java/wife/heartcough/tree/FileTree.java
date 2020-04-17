@@ -108,9 +108,17 @@ public class FileTree {
 			if(depth == 2 && !isDrive(((File)childNode.getUserObject()).getAbsolutePath())) {
 				continue;
 			}
-
+			
 			if(Synchronizer.isNextChangedDirectoryTreeNode(childNode, false)) {
-       			if(childNode.isLeaf()) {
+				// 한번 읽어들인 자식노드는 isLeaf() == false이기 때문에
+				// 변경된 가장 마지막 디렉토리일 경우 setSelectPath가 실행되도록 한다.
+				//---------------------------------------------------------------------------
+				// * 같은 depth의 자식노드를 읽어들어온 상태라면 마지막 디렉토리가 선택되지 않는 오류가 발생하기 때문에
+				//    setSelectionPath가 실행되도록 한다.
+				//---------------------------------------------------------------------------
+				Synchronizer.checkHasMoreChanedDirectoryPaths((File)childNode.getUserObject());
+				
+       			if(childNode.isLeaf() || !Synchronizer.hasMoreChanedDirectoryPaths()) {
        				tree.setSelectionPath(new TreePath(childNode.getPath()));
        			} else {
        				searchChildNode(childNode, ++depth);
@@ -120,6 +128,7 @@ public class FileTree {
 	}
 	
 	public void change() {
+		System.out.println("[change]");
 		// 변경된 경로를 디렉토리 구분자로 나눈다.
 		Synchronizer.setChangedDirectoryPaths();
 		

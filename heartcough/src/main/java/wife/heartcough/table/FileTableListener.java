@@ -1,5 +1,7 @@
 package wife.heartcough.table;
 
+import java.awt.event.FocusEvent;
+import java.awt.event.FocusListener;
 import java.awt.event.KeyEvent;
 import java.awt.event.KeyListener;
 import java.awt.event.MouseEvent;
@@ -9,6 +11,7 @@ import javax.swing.JTable;
 
 import wife.heartcough.common.Command;
 import wife.heartcough.common.CommandHandler;
+import wife.heartcough.common.ProgressHandler;
 import wife.heartcough.common.Synchronizer;
 
 public class FileTableListener {
@@ -27,7 +30,6 @@ public class FileTableListener {
 					
 					if(e.getClickCount() == 2) {
 						if(Synchronizer.getCurrentFile().isDirectory()) {
-							Synchronizer.setSelectedFrom(e.getSource());
 							Synchronizer.synchronize(Synchronizer.getCurrentFile());
 						}
 					}
@@ -67,12 +69,18 @@ public class FileTableListener {
 							int[] rowIndexes = table.getSelectedRows();
 							if(rowIndexes == null || rowIndexes.length == 0) return;
 							
+							Synchronizer.isPasteCommandExecuted(false);
 							Synchronizer.setCurrentFiles(rowIndexes);
 							command.copy();
 							break;
 						case (CTRL + V):
+							Synchronizer.isPasteCommandExecuted(true);
+							// 한번 복사한 파일을 여러 번 붙여넣기 할 경우가 있을 수 있기 때문에
+							// 붙여넣기 할 때에 isStopped(false)를 실행한다.
+							// 그렇지 않으면 최초에 붙여넣는 파일 리스트만 진행상태가 제대로 출력되고
+							// 두 번째 부터는 진행바에 0에 멈추어 있게 된다.
+							ProgressHandler.isStopped(false);
 							CommandHandler.getHandler().submit(command);
-							Synchronizer.reload();
 							break;
 					}
 				}
@@ -82,6 +90,20 @@ public class FileTableListener {
 
 				@Override
 				public void keyReleased(KeyEvent e) {}
+			};
+	}
+	
+	public static FocusListener getFocusListener() {
+		return 
+			new FocusListener() {
+				
+				@Override
+				public void focusLost(FocusEvent e) {}
+				
+				@Override
+				public void focusGained(FocusEvent e) {
+					Synchronizer.reload();
+				}
 			};
 	}
 	

@@ -73,7 +73,9 @@ public class FileTreeNode {
             protected void done() {
             	tree.setEnabled(true);
             	
-            	if(Synchronizer.isSelectedFromFileTable() || Synchronizer.isDirectoryPathChanged()) {
+            	if(Synchronizer.isSelectedFromFileTable()
+            		|| Synchronizer.isDirectoryPathChanged()
+            		|| Synchronizer.isPasteCommandExecuted()) {
             		expandPath();	
             	}
             	

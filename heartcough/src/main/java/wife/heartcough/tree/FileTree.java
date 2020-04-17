@@ -42,7 +42,6 @@ public class FileTree {
 	 * FileTree를 로드한다.
 	 * 
 	 * Synchronizer.getCurrentNode() != null && Synchronizer.getCurrentNode().isLeaf() : 마우스 클릭(사용자 선택)
-	 * Synchronizer.isDirectoryPathChanged() : 파일 경로의 변경
 	 */
 	public void load() {
 		if(Synchronizer.getCurrentNode() != null && Synchronizer.getCurrentNode().isLeaf()) {
@@ -128,7 +127,6 @@ public class FileTree {
 	}
 	
 	public void change() {
-		System.out.println("[change]");
 		// 변경된 경로를 디렉토리 구분자로 나눈다.
 		Synchronizer.setChangedDirectoryPaths();
 		

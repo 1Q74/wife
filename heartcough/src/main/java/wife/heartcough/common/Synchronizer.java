@@ -90,10 +90,30 @@ public class Synchronizer {
 	private static boolean SELECTED_FROM_FILE_TREE = false;
 	private static boolean SELECTED_FROM_FILE_PATH = false;
 	
+	/**
+	 * DirectoryPath가 변경되었는지의 여부
+	 */
 	private static boolean DIRECTORY_PATH_CHANGED = false;
+	
+	/**
+	 * DirectoryPath에서 변경된 디렉토리의 계층 경로
+	 */
 	private static File[] CHANED_DIRECTORY_PATHS;
+	
+	/**
+	 * DirectoryPath에서 변경된 디렉토리의 계층의 다음 경로
+	 */
 	private static TreePath NEXT_CHANGED_DIRECTORY_TREE_PATH;
+	
+	/**
+	 * DirectoryPath에서 변경된 디렉토리의 계층의 다음 경로의 존재 여부
+	 */
 	private static boolean HAS_MORE_CHANGED_DIRECTORY_PATH = true;
+	
+	/**
+	 * 디렉토리, 파일 등을 붙여넣기 했는지 여부
+	 */
+	private static boolean IS_PASTE_COMMAND_EXECUTED = false;
 	
 	public static void setFileTree(FileTree fileTree) {
 		FILE_TREE = fileTree;
@@ -409,6 +429,25 @@ public class Synchronizer {
 		}
 		
 		return false;
+	}
+
+	/**
+	 * 붙여넣기 실행여부를 설정한다.
+	 * 복사(CTRL+C)할 때에 false로 초기화한다.
+	 * 
+	 * @param isExecuted 복사시에는 false, 붙여넣기를 하였다면 true 
+	 */
+	public static void isPasteCommandExecuted(boolean isExecuted) {
+		IS_PASTE_COMMAND_EXECUTED = isExecuted;
+	}
+	
+	/**
+	 * 붙여넣기 실행여부를 리턴한다.
+	 * 
+	 * @return 붙여넣기를 하였다면 true, 복사만 하였을 경우에는 false
+	 */
+	public static boolean isPasteCommandExecuted() {
+		return IS_PASTE_COMMAND_EXECUTED;
 	}
 	
 }

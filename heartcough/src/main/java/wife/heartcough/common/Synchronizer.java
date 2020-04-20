@@ -395,10 +395,22 @@ public class Synchronizer {
 		return false;
 	}
 
+	/**
+	 * FileTable에서 디렉토리를 선택하거나 DirectoryPath에서 디렉토리의 경로를
+	 * 변경했을 경우, FileTree의 자식노드를 확장된(expanded) 상태로 보여줄 지 결정한다.
+	 * 
+	 * @param isExpanding FileTree의 자식노드를 확장시킨 상태로 보여주려면 true,
+	 *        그렇지 않으면 flase
+	 */
 	public static void isExpandingPath(boolean isExpanding) {
 		IS_EXPANDING_PATH = isExpanding;
 	}
 	
+	/**
+	 * FileTree의 자식노드를 확장해서 보여줄 지를 선택하는 옵션
+	 * 
+	 * @return FileTree의 자식노드를 확장해서 보여준다면 treu, 그렇지 않으면 false
+	 */
 	public static boolean isExpandingPath() {
 		return IS_EXPANDING_PATH;
 	}

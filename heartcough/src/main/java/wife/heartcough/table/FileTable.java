@@ -24,9 +24,11 @@ public class FileTable {
 	 * 이벤트 리스러를 등록한다.
 	 */
 	public FileTable() {
-		table.addMouseListener(FileTableListener.getMouseListener());
-		table.addKeyListener(FileTableListener.getKeyListener());
-//		table.addFocusListener(FileTableListener.getFocusListener());
+		FileTableListener listener = new FileTableListener();
+		
+		table.addMouseListener(listener.getMouseListener());
+		table.addKeyListener(listener.getKeyListener());
+		table.addFocusListener(listener.getFocusListener());
 	}
 	
 	/**

@@ -402,5 +402,15 @@ public class Synchronizer {
 	public static boolean isExpandingPath() {
 		return IS_EXPANDING_PATH;
 	}
+
+	/**
+	 * Component가 마우스 포커스를 얻었을 때에 Component의 갱신여부를 결정한다.
+	 * 
+	 * @return 현재 디렉토리의 파일 개수가 변했다면 true, 그렇지 않으면 false
+	 */
+	public static boolean isDirectoryFileCountChanged() {
+		return
+			getFileList().length != DIRECTORY_PATH.getCurrentPath().list().length;
+	}
 	
 }

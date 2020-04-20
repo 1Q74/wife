@@ -1,53 +1,22 @@
-package wife.heartcough.table;
+package wife.heartcough.common;
 
-import java.awt.event.MouseEvent;
+import java.awt.event.FocusEvent;
+import java.awt.event.FocusListener;
+import java.awt.event.KeyEvent;
+import java.awt.event.KeyListener;
 import java.awt.event.MouseListener;
 
 import javax.swing.JTable;
 
-import wife.heartcough.common.FileEventListener;
+import wife.heartcough.common.Command;
+import wife.heartcough.common.CommandHandler;
+import wife.heartcough.common.ProgressHandler;
 import wife.heartcough.common.Synchronizer;
 
-public class FileTableListener extends FileEventListener {
+public abstract class FileEventListener {
 	
-	@Override
-	public MouseListener getMouseListener() {
-		return 
-			new MouseListener() {
-				@Override
-				public void mouseClicked(MouseEvent e) {
-					JTable table = (JTable)e.getSource();
-					
-					int rowIndex = table.getSelectedRow();
-					if(rowIndex == -1) return;
-					
-					Synchronizer.setCurrentFile(rowIndex);
-					
-					if(e.getClickCount() == 2) {
-						if(Synchronizer.getCurrentFile().isDirectory()) {
-							Synchronizer.isExpandingPath(true);
-							Synchronizer.synchronize(Synchronizer.getCurrentFile());
-						}
-					}
-					
-					Synchronizer.pathChanged();
-				}
+	public abstract MouseListener getMouseListener();
 	
-				@Override
-				public void mousePressed(MouseEvent e) {}
-	
-				@Override
-				public void mouseReleased(MouseEvent e) {}
-	
-				@Override
-				public void mouseEntered(MouseEvent e) {}
-	
-				@Override
-				public void mouseExited(MouseEvent e) {}
-			};
-	}
-	
-	/*
 	public KeyListener getKeyListener() {
 		return
 			new KeyListener() {
@@ -98,6 +67,7 @@ public class FileTableListener extends FileEventListener {
 				
 				@Override
 				public void focusGained(FocusEvent e) {
+					System.out.println("== focusGained ==");
 					if(Synchronizer.isDirectoryFileCountChanged()) {
 						Synchronizer.isExpandingPath(true);
 						Synchronizer.reload();
@@ -105,6 +75,5 @@ public class FileTableListener extends FileEventListener {
 				}
 			};
 	}
-	*/
 	
 }

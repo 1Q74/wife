@@ -187,8 +187,8 @@ public class Command implements Runnable {
 		for(File source : sources) {
 			int depth = 0;
 			process(source, target, depth);
-			Synchronizer.reload();
 		}
+		Synchronizer.reload();
 	}
 
 	@Override

@@ -12,12 +12,14 @@ public class FileTreeListener {
 			new MouseListener() {
 				@Override
 				public void mouseClicked(MouseEvent e) {
-					Synchronizer.setSelectedFrom(e.getSource());
+//					Synchronizer.setSelectedFrom(e.getSource());
 					Synchronizer.pathChanged();
 				}
 	
 				@Override
-				public void mousePressed(MouseEvent e) {}
+				public void mousePressed(MouseEvent e) {
+					Synchronizer.isExpandingPath(false);
+				}
 	
 				@Override
 				public void mouseReleased(MouseEvent e) {}

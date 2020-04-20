@@ -29,7 +29,8 @@ public class DirectoryPathListener {
 
 					if(!file.equals(Synchronizer.getDirectoryPath().getCurrentPath())
 						&& file.isDirectory()) {
-						Synchronizer.setSelectedFrom(e.getSource());
+//						Synchronizer.setSelectedFrom(e.getSource());
+						Synchronizer.isExpandingPath(true);
 						Synchronizer.change(file);
 					}
 				}

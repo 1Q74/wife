@@ -69,29 +69,21 @@ public class FileTreeNode {
         		tree.expandPath(new TreePath(Synchronizer.getCurrentNode().getPath()));            	
             }
             
-            private void initEachFlag() {
-            	if(Synchronizer.isSelectedFromFileTable()) Synchronizer.isSelectedFromFileTable(false);
-            	if(Synchronizer.isPasteCommandExecuted()) Synchronizer.isPasteCommandExecuted(false);
-            }
-
             @Override
             protected void done() {
             	System.out.println("[done]");
+            	System.out.println("isExpandingPath = " + Synchronizer.isExpandingPath());
             	tree.setEnabled(true);
 
-            	if(Synchronizer.isSelectedFromFileTable()
-            		|| Synchronizer.isDirectoryPathChanged()
-            		|| Synchronizer.isPasteCommandExecuted()) {
-            		expandPath();	
-            	}
-            	
+    			if(Synchronizer.isExpandingPath()) {
+            		expandPath();
+            	}            			
+
            		// DirectoryPath변경에 의해 자동선택되어야 할 디렉토리가 있다면
            		// 해당 디렉토리를 선택한다.
         		if(Synchronizer.isDirectoryPathChanged() && Synchronizer.hasMoreChanedDirectoryPaths()) {
             		tree.setSelectionPath(Synchronizer.getNextChangedDirectoryTreePath());
             	}
-        		
-        		initEachFlag();
              }
         };
         worker.execute();

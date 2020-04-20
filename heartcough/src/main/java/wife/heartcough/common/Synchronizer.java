@@ -3,9 +3,6 @@ package wife.heartcough.common;
 import java.io.File;
 
 import javax.swing.JFrame;
-import javax.swing.JTable;
-import javax.swing.JTextField;
-import javax.swing.JTree;
 import javax.swing.tree.DefaultMutableTreeNode;
 import javax.swing.tree.TreePath;
 
@@ -86,10 +83,6 @@ public class Synchronizer {
 	 */
 	private static Progress PROGRESS;
 	
-	private static boolean SELECTED_FROM_FILE_TABLE = false;
-	private static boolean SELECTED_FROM_FILE_TREE = false;
-	private static boolean SELECTED_FROM_FILE_PATH = false;
-	
 	/**
 	 * DirectoryPath가 변경되었는지의 여부
 	 */
@@ -110,10 +103,7 @@ public class Synchronizer {
 	 */
 	private static boolean HAS_MORE_CHANGED_DIRECTORY_PATH = true;
 	
-	/**
-	 * 디렉토리, 파일 등을 붙여넣기 했는지 여부
-	 */
-	private static boolean IS_PASTE_COMMAND_EXECUTED = false;
+	private static boolean IS_EXPANDING_PATH = false;
 	
 	public static void setFileTree(FileTree fileTree) {
 		FILE_TREE = fileTree;
@@ -297,32 +287,6 @@ public class Synchronizer {
 		DIRECTORY_PATH.pathChanged();
 	}
 	
-	public static void setSelectedFrom(Object source) {
-		if(source instanceof JTable) {
-			SELECTED_FROM_FILE_TABLE = true;
-		} else if(source instanceof JTree) {
-			SELECTED_FROM_FILE_TREE = true;
-		} else if(source instanceof JTextField) {
-			SELECTED_FROM_FILE_PATH = true;
-		}
-	}
-	
-	public static boolean isSelectedFromFileTable() {
-		return SELECTED_FROM_FILE_TABLE;
-	}
-	
-	public static void isSelectedFromFileTable(boolean isSelected) {
-		SELECTED_FROM_FILE_TABLE = isSelected;
-	}
-	
-	public static boolean isSelectedFromFileTree() {
-		return SELECTED_FROM_FILE_TREE;
-	}
-	
-	public static boolean isSelectedFromFilePath() {
-		return SELECTED_FROM_FILE_PATH;
-	}
-	
 	public static void isDirectoryPathChanged(boolean changed) {
 		DIRECTORY_PATH_CHANGED = changed;
 	}
@@ -431,23 +395,12 @@ public class Synchronizer {
 		return false;
 	}
 
-	/**
-	 * 붙여넣기 실행여부를 설정한다.
-	 * 복사(CTRL+C)할 때에 false로 초기화한다.
-	 * 
-	 * @param isExecuted 복사시에는 false, 붙여넣기를 하였다면 true 
-	 */
-	public static void isPasteCommandExecuted(boolean isExecuted) {
-		IS_PASTE_COMMAND_EXECUTED = isExecuted;
+	public static void isExpandingPath(boolean isExpanding) {
+		IS_EXPANDING_PATH = isExpanding;
 	}
 	
-	/**
-	 * 붙여넣기 실행여부를 리턴한다.
-	 * 
-	 * @return 붙여넣기를 하였다면 true, 복사만 하였을 경우에는 false
-	 */
-	public static boolean isPasteCommandExecuted() {
-		return IS_PASTE_COMMAND_EXECUTED;
+	public static boolean isExpandingPath() {
+		return IS_EXPANDING_PATH;
 	}
 	
 }

@@ -410,7 +410,8 @@ public class Synchronizer {
 	 */
 	public static boolean isDirectoryFileCountChanged() {
 		return
-			getFileList().length != DIRECTORY_PATH.getCurrentPath().list().length;
+			!FileSystem.isWindowsSpecialFolder(DIRECTORY_PATH.getCurrentPath().getName())
+			&& getFileList().length != DIRECTORY_PATH.getCurrentPath().list().length;
 	}
 	
 }

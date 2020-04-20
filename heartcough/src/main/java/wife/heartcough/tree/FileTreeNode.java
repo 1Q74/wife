@@ -71,8 +71,6 @@ public class FileTreeNode {
             
             @Override
             protected void done() {
-            	System.out.println("[done]");
-            	System.out.println("isExpandingPath = " + Synchronizer.isExpandingPath());
             	tree.setEnabled(true);
 
     			if(Synchronizer.isExpandingPath()) {

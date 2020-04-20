@@ -12,12 +12,18 @@ public class FileTreeListener {
 			new MouseListener() {
 				@Override
 				public void mouseClicked(MouseEvent e) {
-//					Synchronizer.setSelectedFrom(e.getSource());
 					Synchronizer.pathChanged();
+					
+					// 마우스 더블 클릭 시에는 노드를 확장한다.
+					if(e.getClickCount() == 2) {
+						Synchronizer.isExpandingPath(true);
+					}
 				}
 	
 				@Override
 				public void mousePressed(MouseEvent e) {
+					// FileTable, DirectoryPath에서 true로 설정되었다면
+					// 마우스 클릭 시에는 false로 설정한다.
 					Synchronizer.isExpandingPath(false);
 				}
 	

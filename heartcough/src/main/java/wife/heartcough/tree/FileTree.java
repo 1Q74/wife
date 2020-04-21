@@ -186,7 +186,6 @@ public class FileTree {
 	}
 	
 	public void reload(List<File> newDirectories) {
-		System.out.println("FileTree.reload()");
 		for(File dir : newDirectories) {
 			getRootNode().add(new DefaultMutableTreeNode(dir));
 		}

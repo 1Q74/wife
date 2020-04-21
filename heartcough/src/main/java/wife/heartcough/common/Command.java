@@ -11,9 +11,6 @@ import java.util.ArrayList;
 import java.util.List;
 
 import javax.swing.JOptionPane;
-import javax.swing.table.DefaultTableModel;
-import javax.swing.tree.DefaultMutableTreeNode;
-import javax.swing.tree.DefaultTreeModel;
 
 import org.apache.commons.io.FileUtils;
 import org.apache.commons.io.FilenameUtils;
@@ -154,21 +151,16 @@ public class Command implements Runnable {
 	}
 	
 	public void initNewDirectories() {
-		System.out.println("initNewDirectories()");
 		this.newDirectories = new ArrayList<File>();
 	}
 	
 	private void addNewDirectory(File newDir, int depth) {
-		System.out.println("addNewDirectory()");
 		if(depth == 0 && Synchronizer.isCopiedFromFileTree()) {
-			System.out.println("[newDir]" + newDir);
-			System.out.println("[this.newDirectories]" + this.newDirectories);
 			this.newDirectories.add(newDir);	
 		}
 	}
 	
 	private void process(File src, File tgt, int depth) {
-		System.out.println("process()");
 		if(src.isDirectory()) {
 			File newDir = new File(tgt, src.getName());
 			
@@ -177,7 +169,6 @@ public class Command implements Runnable {
 			} 
 			newDir.mkdir();
 			addNewDirectory(newDir, depth);
-			System.out.println("====> after[addNewDirectory]");
 			
 			// 서브 디렉토리나 파일이 없을 경우 크기가 0인 디렉토리로 LogTable에 출력한다.
 			if(src.list().length == 0) {
@@ -203,7 +194,6 @@ public class Command implements Runnable {
 	}
 	
 	private File getTarget() {
-		System.out.println("getTarget()");
 		// FileTree에서는 복사되는 소스와 복사되어질 대상이 같다. 
 		boolean isEqualSourceAndTarget = StringUtils.equals(
 			sources[0].getAbsolutePath()
@@ -220,13 +210,11 @@ public class Command implements Runnable {
 		} else {
 			target = Synchronizer.getDirectoryPath().getCurrentPath();
 		}
-		System.out.println("[target] " + target);
 		
 		return target; 
 	}
 	
 	private void reload() {
-		System.out.println("reload()");
 		if(Synchronizer.isDirectoryFileCountChanged()
 			&& Synchronizer.isCopiedFromFileTree()
 			&& Synchronizer.getCurrentNode().equals(Synchronizer.getFileTree().getRootNode())) {
@@ -237,7 +225,6 @@ public class Command implements Runnable {
 	}
 
 	private void paste() {
-		System.out.println("paste()");
 //		target = Synchronizer.getDirectoryPath().getCurrentPath();
 		target = getTarget();
 		if(target.isFile()) return;

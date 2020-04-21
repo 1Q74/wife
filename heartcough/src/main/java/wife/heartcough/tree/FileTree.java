@@ -21,6 +21,11 @@ public class FileTree {
 	private FileTreeNode fileTreeNode = new FileTreeNode();
 	private JTree tree;
 
+	/**
+	 * 윈도우의 경우 Desktop경로를 root노드로 하는 트리를 구성한다. 
+	 * 
+	 * @return FileTree를 구성하는 JTree객체
+	 */
 	public JTree getRoot() {
 		tree = 	new JTree(fileTreeNode.getDesktopFolderNodes());
 		tree.setCellRenderer(new FileTreeNodeCellRenender());
@@ -96,6 +101,12 @@ public class FileTree {
 		return isFound;
 	}
 	
+	/**
+	 * 노드가 드라이브인지의 여부를 확인한다.
+	 * 
+	 * @param path 노드에 저장된 파일의 절대경로
+	 * @return 파일의 경대경로가 드라이브 문자이면 true, 그렇지 않으면 false
+	 */
 	private boolean isDrive(String path) {
 		return Pattern.matches("^[A-Z]:\\\\$", path);
 	}
@@ -173,18 +184,39 @@ public class FileTree {
 		}
 	}
 	
+	/**
+	 * FileTree의 JTree객체를 리턴한다.
+	 * 
+	 * @return FileTree클래스의 JTree객체
+	 */
 	public JTree getTree() {
 		return tree;
 	}
 	
+	/**
+	 * JTree의 모델을 리턴한다.
+	 * 
+	 * @return JTree의 모델
+	 */
 	public DefaultTreeModel getModel() {
 		return (DefaultTreeModel)getTree().getModel();
 	}
 	
+	/**
+	 * JTree 모델의 root노드를 리턴한다.
+	 * 
+	 * @return JTree 모델의 root노드
+	 */
 	public DefaultMutableTreeNode getRootNode() {
 		return (DefaultMutableTreeNode)getModel().getRoot();
 	}
 	
+	/**
+	 * FileTree에서 파일을 복사해서 root노드의 바탕화면에 붙여넣기를 실행했을 경우에만
+	 * 새롭게 추가된 디렉토리 정보를 root노드에 추가한다. 
+	 * 
+	 * @param newDirectories 복사 시 새롭게 추가된 디렉토리들
+	 */
 	public void reload(List<File> newDirectories) {
 		for(File dir : newDirectories) {
 			getRootNode().add(new DefaultMutableTreeNode(dir));

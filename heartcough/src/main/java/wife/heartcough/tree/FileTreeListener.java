@@ -3,11 +3,13 @@ package wife.heartcough.tree;
 import java.awt.event.MouseEvent;
 import java.awt.event.MouseListener;
 
+import wife.heartcough.common.FileEventListener;
 import wife.heartcough.common.Synchronizer;
 
-public class FileTreeListener {
+public class FileTreeListener extends FileEventListener {
 	
-	public static MouseListener getMouseListener() {
+	@Override
+	public MouseListener getMouseListener() {
 		return 
 			new MouseListener() {
 				@Override
@@ -25,6 +27,8 @@ public class FileTreeListener {
 					// FileTable, DirectoryPath에서 true로 설정되었다면
 					// 마우스 클릭 시에는 false로 설정한다.
 					Synchronizer.isExpandingPath(false);
+					
+					Synchronizer.setSourceComponent(e.getSource());
 				}
 	
 				@Override

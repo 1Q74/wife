@@ -2,6 +2,7 @@ package wife.heartcough.tree;
 
 import java.io.File;
 import java.util.Enumeration;
+import java.util.List;
 import java.util.regex.Pattern;
 
 import javax.swing.JTree;
@@ -33,7 +34,10 @@ public class FileTree {
 				});
 		    }
 		});
-		tree.addMouseListener(FileTreeListener.getMouseListener());
+		
+		FileTreeListener listener = new FileTreeListener();
+		tree.addMouseListener(listener.getMouseListener());
+		tree.addKeyListener(listener.getKeyListener());
 		
 		return tree;
 	}
@@ -171,6 +175,22 @@ public class FileTree {
 	
 	public JTree getTree() {
 		return tree;
+	}
+	
+	public DefaultTreeModel getModel() {
+		return (DefaultTreeModel)getTree().getModel();
+	}
+	
+	public DefaultMutableTreeNode getRootNode() {
+		return (DefaultMutableTreeNode)getModel().getRoot();
+	}
+	
+	public void reload(List<File> newDirectories) {
+		System.out.println("FileTree.reload()");
+		for(File dir : newDirectories) {
+			getRootNode().add(new DefaultMutableTreeNode(dir));
+		}
+		getModel().reload();
 	}
 
 }

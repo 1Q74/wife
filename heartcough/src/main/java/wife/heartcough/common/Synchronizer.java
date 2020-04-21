@@ -3,6 +3,8 @@ package wife.heartcough.common;
 import java.io.File;
 
 import javax.swing.JFrame;
+import javax.swing.JTable;
+import javax.swing.JTree;
 import javax.swing.tree.DefaultMutableTreeNode;
 import javax.swing.tree.TreePath;
 
@@ -103,7 +105,14 @@ public class Synchronizer {
 	 */
 	private static boolean HAS_MORE_CHANGED_DIRECTORY_PATH = true;
 	
+	/**
+	 * FileTree의 노드를 확장시켜서 보여줄 지를 설정
+	 */
 	private static boolean IS_EXPANDING_PATH = false;
+	
+	private static Object SOURCE_COMPONENT;
+	private static boolean IS_COPIED_FROM_FILE_TABLE = false;
+	private static boolean IS_COPIED_FROM_FILE_TREE = false;
 	
 	public static void setFileTree(FileTree fileTree) {
 		FILE_TREE = fileTree;
@@ -165,7 +174,8 @@ public class Synchronizer {
 		return CURRENT_FILE;
 	}
 	
-	public static void setCurrentFiles(int[] rowIndexes) {
+	public static void setCurrentFilesForTable(int[] rowIndexes) {
+		System.out.println("setCurrentFilesForTable()");
 		CURRENT_FILES = new File[rowIndexes.length];
 		
 		for(int i = 0; i < rowIndexes.length; i++) {
@@ -173,6 +183,13 @@ public class Synchronizer {
 		}
 		
 		CURRENT_FILE = CURRENT_FILES[rowIndexes.length - 1];
+	}
+	
+	public static void setCurrentFileForTree(File userObject) {
+		System.out.println("setCurrentFileForTree()");
+		CURRENT_FILES = new File[1];
+		CURRENT_FILES[0] = userObject;
+		CURRENT_FILE = CURRENT_FILES[0];
 	}
 	
 	public static File[] getCurrentFiles() {
@@ -424,6 +441,30 @@ public class Synchronizer {
 		return
 			!FileSystem.isWindowsSpecialFolder(DIRECTORY_PATH.getCurrentPath().getName())
 			&& getFileList().length != DIRECTORY_PATH.getCurrentPath().list().length;
+	}
+	
+	public static void setSourceComponent(Object sourceComponent) {
+		SOURCE_COMPONENT = sourceComponent;
+		
+		if(SOURCE_COMPONENT instanceof JTable) {
+			IS_COPIED_FROM_FILE_TABLE = true;
+			IS_COPIED_FROM_FILE_TREE = false;
+		} else if(SOURCE_COMPONENT instanceof JTree) {
+			IS_COPIED_FROM_FILE_TABLE = false;
+			IS_COPIED_FROM_FILE_TREE = true;
+		}
+	}
+	
+	public static Object getSourceComponent() {
+		return SOURCE_COMPONENT;
+	}
+	
+	public static boolean isCopiedFromFileTable() {
+		return IS_COPIED_FROM_FILE_TABLE;
+	}
+	
+	public static boolean isCopiedFromFileTree() {
+		return IS_COPIED_FROM_FILE_TREE;
 	}
 	
 }

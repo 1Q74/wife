@@ -7,11 +7,17 @@ import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
+import java.util.ArrayList;
+import java.util.List;
 
 import javax.swing.JOptionPane;
+import javax.swing.table.DefaultTableModel;
+import javax.swing.tree.DefaultMutableTreeNode;
+import javax.swing.tree.DefaultTreeModel;
 
 import org.apache.commons.io.FileUtils;
 import org.apache.commons.io.FilenameUtils;
+import org.apache.commons.lang3.StringUtils;
 
 import wife.heartcough.common.Synchronizer;
 import wife.heartcough.common.Progress.LogRowData;
@@ -20,6 +26,7 @@ public class Command implements Runnable {
 
 	private File[] sources;
 	private File target;
+	private List<File> newDirectories;
 	
 	private Progress progress = new Progress();
 	
@@ -146,7 +153,22 @@ public class Command implements Runnable {
 		}
 	}
 	
+	public void initNewDirectories() {
+		System.out.println("initNewDirectories()");
+		this.newDirectories = new ArrayList<File>();
+	}
+	
+	private void addNewDirectory(File newDir, int depth) {
+		System.out.println("addNewDirectory()");
+		if(depth == 0 && Synchronizer.isCopiedFromFileTree()) {
+			System.out.println("[newDir]" + newDir);
+			System.out.println("[this.newDirectories]" + this.newDirectories);
+			this.newDirectories.add(newDir);	
+		}
+	}
+	
 	private void process(File src, File tgt, int depth) {
+		System.out.println("process()");
 		if(src.isDirectory()) {
 			File newDir = new File(tgt, src.getName());
 			
@@ -154,7 +176,9 @@ public class Command implements Runnable {
 				newDir = getUniqueDirectory(newDir);
 			} 
 			newDir.mkdir();
-
+			addNewDirectory(newDir, depth);
+			System.out.println("====> after[addNewDirectory]");
+			
 			// 서브 디렉토리나 파일이 없을 경우 크기가 0인 디렉토리로 LogTable에 출력한다.
 			if(src.list().length == 0) {
 				progress.displayZeroByteDirectory(src, newDir);
@@ -174,25 +198,65 @@ public class Command implements Runnable {
 	}
 		
 	public void copy() {
-		sources = Synchronizer.getCurrentFiles();
+//		sources = Synchronizer.getCurrentFiles();
+//		System.out.println("sources = " + sources[0]);
+	}
+	
+	private File getTarget() {
+		System.out.println("getTarget()");
+		// FileTree에서는 복사되는 소스와 복사되어질 대상이 같다. 
+		boolean isEqualSourceAndTarget = StringUtils.equals(
+			sources[0].getAbsolutePath()
+			, Synchronizer.getDirectoryPath().getCurrentPath().getAbsolutePath()
+		);
+		
+		// FileTree에서 복사할 경우
+		if(isEqualSourceAndTarget) {
+			File currentPath = Synchronizer.getDirectoryPath().getCurrentPath();
+			String parentPath = FilenameUtils.getFullPath(currentPath.getAbsolutePath());
+//			target = new File(FilenameUtils.concat(parentPath, getUniqueDirectory(currentPath).getName()));
+			target = new File(parentPath);
+		// FileTable에서 복사할 경우
+		} else {
+			target = Synchronizer.getDirectoryPath().getCurrentPath();
+		}
+		System.out.println("[target] " + target);
+		
+		return target; 
+	}
+	
+	private void reload() {
+		System.out.println("reload()");
+		if(Synchronizer.isDirectoryFileCountChanged()
+			&& Synchronizer.isCopiedFromFileTree()
+			&& Synchronizer.getCurrentNode().equals(Synchronizer.getFileTree().getRootNode())) {
+			Synchronizer.getFileTree().reload(this.newDirectories);
+		} else {
+			Synchronizer.reload();
+		}
 	}
 
 	private void paste() {
-		target = Synchronizer.getDirectoryPath().getCurrentPath();
+		System.out.println("paste()");
+//		target = Synchronizer.getDirectoryPath().getCurrentPath();
+		target = getTarget();
 		if(target.isFile()) return;
 		
 		progress.show();
 		progress.setSumSize(sources);
-
+		
 		for(File source : sources) {
 			int depth = 0;
 			process(source, target, depth);
 		}
-		Synchronizer.reload();
+		
+		reload();
 	}
 
 	@Override
 	public void run() {
+		sources = Synchronizer.getCurrentFiles();
+		initNewDirectories();
 		paste();
 	}
 	

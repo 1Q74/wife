@@ -282,11 +282,11 @@ public class Synchronizer {
 		FILE_TREE.synchronize();
 	}
 	
-	public static void synchronize(DefaultMutableTreeNode currnetNode) {
-		setCurrentNode(currnetNode);
-		FILE_TREE.synchronize();
-	}
-	
+	/**
+	 * DirectoryPath변경 시 호출된다.
+	 * 
+	 * @param changedDirectory 변경된 디렉토리 전체 경로
+	 */
 	public static void change(File changedDirectory) {
 		setCurrentDirectory(changedDirectory);
 		// DirectoryPath 변경에 의해서 false로 되어 있다면 true로 초기화한다.

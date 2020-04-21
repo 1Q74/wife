@@ -58,47 +58,13 @@ public class FileTree {
 		}
 	}
 
-	public void refresh() {
-		DefaultMutableTreeNode currentTreeNode = Synchronizer.getCurrentNode();
-		Enumeration<?> children = currentTreeNode.children();
-		
-		while(children.hasMoreElements()) {
-			DefaultMutableTreeNode childNode = (DefaultMutableTreeNode)children.nextElement();
-			File file = (File)childNode.getUserObject();
-
-			if(!file.exists()) {
-				currentTreeNode.remove(childNode);
-			}
-		}
-		
-		DefaultTreeModel model = (DefaultTreeModel)tree.getModel();
-		model.reload(currentTreeNode);
-	}
-	
+	/**
+	 * 
+	 */
 	public void removeCurrentNodeChildren() {
 		Synchronizer.getCurrentNode().removeAllChildren();
 		DefaultTreeModel model = (DefaultTreeModel)getTree().getModel();
 		model.reload(Synchronizer.getCurrentNode());
-	}
-	
-	public boolean search(DefaultMutableTreeNode parentNode) {
-		boolean isFound = false;
-		Enumeration<?> children = parentNode.children();
-		
-		while(children.hasMoreElements()) {
-			DefaultMutableTreeNode childNode = (DefaultMutableTreeNode)children.nextElement();
-			File userObject = (File)childNode.getUserObject();
-			
-			if(Synchronizer.getCurrentDirectory().equals(userObject)) {
-				Synchronizer.synchronize((DefaultMutableTreeNode)childNode.getParent());
-				return true;
-			} else {
-				isFound = search(childNode);
-				if(isFound) break;
-			}
-		}
-		
-		return isFound;
 	}
 	
 	/**
@@ -111,6 +77,15 @@ public class FileTree {
 		return Pattern.matches("^[A-Z]:\\\\$", path);
 	}
 	
+	/**
+	 * 윈도위의 [내 PC]하위에 있는 노드가 변경된 경로와 매치되고, 
+	 * 읽어들여진 상태가 아니거나 검색할 변경된 디렉토리가 더 남아 있는 경우는
+	 * selectionPath를 실행하여 해당 노드를 선택하고, 변경된 경로와 매치되지 않는 경우는
+	 * 재귀적으로 더 검색을 진행한다.
+	 * 
+	 * @param parentNode 윈도위의 [내 PC]노드이거나, 재귀함수의 부모노드
+	 * @param depth 바탕화면(depth:0) > 내 PC(depth:1) > NODE(depth:2) > ...
+	 */
 	public void searchChildNode(DefaultMutableTreeNode parentNode, int depth) {
 		Enumeration<?> children = parentNode.children();
 		
@@ -127,7 +102,7 @@ public class FileTree {
 				// 한번 읽어들인 자식노드는 isLeaf() == false이기 때문에
 				// 변경된 가장 마지막 디렉토리일 경우 setSelectPath가 실행되도록 한다.
 				//---------------------------------------------------------------------------
-				// * 같은 depth의 자식노드를 읽어들어온 상태라면 마지막 디렉토리가 선택되지 않는 오류가 발생하기 때문에
+				// * 같은 depth의 자식노드를 읽어들여 온 상태라면 마지막 디렉토리가 선택되지 않는 오류가 발생하기 때문에
 				//    setSelectionPath가 실행되도록 한다.
 				//---------------------------------------------------------------------------
 				Synchronizer.checkHasMoreChanedDirectoryPaths((File)childNode.getUserObject());
@@ -141,6 +116,13 @@ public class FileTree {
 		}
 	}
 	
+	/**
+	 * DirectoryPath에서 변경된 경로로 트리노드의 선택노드를 자동으로 변경한다.
+	 * 
+	 * 검색의 시작은 무조건 root노드부터 시작하고, 윈도우의 [내 PC]가 선택되어진 상태라면
+	 * 하위 노드들의 검색을 시작하고, 윈도우의 [내 PC]가 선택되지 않은 상태라면
+	 * [내 PC]의 선택을 진행한 후에 나머지 노드들을 검색한다.
+	 */
 	public void change() {
 		// 변경된 경로를 디렉토리 구분자로 나눈다.
 		Synchronizer.setChangedDirectoryPaths();

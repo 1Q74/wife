@@ -11,6 +11,9 @@ import java.util.ArrayList;
 import java.util.List;
 
 import javax.swing.JOptionPane;
+import javax.swing.JTable;
+import javax.swing.JTree;
+import javax.swing.tree.DefaultMutableTreeNode;
 
 import org.apache.commons.io.FileUtils;
 import org.apache.commons.io.FilenameUtils;
@@ -150,7 +153,22 @@ public class Command implements Runnable {
 		}
 	}
 	
-	public void initNewDirectories() {
+	public void copy() {
+		Object source = Synchronizer.getSourceComponent();
+		
+		if(Synchronizer.isCopiedFromFileTable()) {
+			int[] rowIndexes = ((JTable)source).getSelectedRows();
+			Synchronizer.setCurrentFilesForTable(rowIndexes);
+		} else if(Synchronizer.isCopiedFromFileTree()) {
+			JTree tree = (JTree)source;
+			DefaultMutableTreeNode selectedNode = (DefaultMutableTreeNode)tree.getLastSelectedPathComponent();
+			Synchronizer.setCurrentFileForTree((File)selectedNode.getUserObject());
+		}
+		
+		sources = Synchronizer.getCurrentFiles();
+	}
+	
+	private void initNewDirectories() {
 		this.newDirectories = new ArrayList<File>();
 	}
 	
@@ -188,11 +206,6 @@ public class Command implements Runnable {
 		}
 	}
 		
-	public void copy() {
-//		sources = Synchronizer.getCurrentFiles();
-//		System.out.println("sources = " + sources[0]);
-	}
-	
 	private File getTarget() {
 		// FileTree에서는 복사되는 소스와 복사되어질 대상이 같다. 
 		boolean isEqualSourceAndTarget = StringUtils.equals(
@@ -204,7 +217,6 @@ public class Command implements Runnable {
 		if(isEqualSourceAndTarget) {
 			File currentPath = Synchronizer.getDirectoryPath().getCurrentPath();
 			String parentPath = FilenameUtils.getFullPath(currentPath.getAbsolutePath());
-//			target = new File(FilenameUtils.concat(parentPath, getUniqueDirectory(currentPath).getName()));
 			target = new File(parentPath);
 		// FileTable에서 복사할 경우
 		} else {
@@ -225,7 +237,6 @@ public class Command implements Runnable {
 	}
 
 	private void paste() {
-//		target = Synchronizer.getDirectoryPath().getCurrentPath();
 		target = getTarget();
 		if(target.isFile()) return;
 		
@@ -242,8 +253,10 @@ public class Command implements Runnable {
 
 	@Override
 	public void run() {
-		sources = Synchronizer.getCurrentFiles();
+		// KeyListener에서 호출될 때 NullPointerException이 발생할 경우가 있기 때문에
+		// run메소드에서 호출되도록 변경
 		initNewDirectories();
+		
 		paste();
 	}
 	

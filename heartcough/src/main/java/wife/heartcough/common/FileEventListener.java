@@ -5,11 +5,6 @@ import java.awt.event.FocusListener;
 import java.awt.event.KeyEvent;
 import java.awt.event.KeyListener;
 import java.awt.event.MouseListener;
-import java.io.File;
-
-import javax.swing.JTable;
-import javax.swing.JTree;
-import javax.swing.tree.DefaultMutableTreeNode;
 
 import wife.heartcough.common.Command;
 import wife.heartcough.common.ProgressHandler;
@@ -18,19 +13,6 @@ import wife.heartcough.common.Synchronizer;
 public abstract class FileEventListener {
 	
 	public abstract MouseListener getMouseListener();
-	
-	private void setSelectedFiles() {
-		Object source = Synchronizer.getSourceComponent();
-		
-		if(Synchronizer.isCopiedFromFileTable()) {
-			int[] rowIndexes = ((JTable)source).getSelectedRows();
-			Synchronizer.setCurrentFilesForTable(rowIndexes);
-		} else if(Synchronizer.isCopiedFromFileTree()) {
-			JTree tree = (JTree)source;
-			DefaultMutableTreeNode selectedNode = (DefaultMutableTreeNode)tree.getLastSelectedPathComponent();
-			Synchronizer.setCurrentFileForTree((File)selectedNode.getUserObject());
-		}
-	}
 	
 	public KeyListener getKeyListener() {
 		return
@@ -46,9 +28,8 @@ public abstract class FileEventListener {
 					
 					switch(keyCodeSum) {
 						case (CTRL + C):
-							setSelectedFiles();
-							if(Synchronizer.getCurrentFiles() == null) return;
 							command.copy();
+							if(Synchronizer.getCurrentFiles() == null) return;
 							break;
 						case (CTRL + V):
 							Synchronizer.isExpandingPath(true);

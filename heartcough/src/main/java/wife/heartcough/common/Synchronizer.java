@@ -175,7 +175,6 @@ public class Synchronizer {
 	}
 	
 	public static void setCurrentFilesForTable(int[] rowIndexes) {
-		System.out.println("setCurrentFilesForTable()");
 		CURRENT_FILES = new File[rowIndexes.length];
 		
 		for(int i = 0; i < rowIndexes.length; i++) {
@@ -186,7 +185,6 @@ public class Synchronizer {
 	}
 	
 	public static void setCurrentFileForTree(File userObject) {
-		System.out.println("setCurrentFileForTree()");
 		CURRENT_FILES = new File[1];
 		CURRENT_FILES[0] = userObject;
 		CURRENT_FILE = CURRENT_FILES[0];

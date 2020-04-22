@@ -58,9 +58,6 @@ public class FileTree {
 		}
 	}
 
-	/**
-	 * 
-	 */
 	public void removeCurrentNodeChildren() {
 		Synchronizer.getCurrentNode().removeAllChildren();
 		DefaultTreeModel model = (DefaultTreeModel)getTree().getModel();

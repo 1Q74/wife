@@ -29,9 +29,8 @@ public class Explorer {
 	
 	public Explorer() {
 		Synchronizer.setFileTree(fileTree);
-		Synchronizer.setFileTable(fileTable);
 		Synchronizer.setDirectoryPath(directoryPath);
-		Synchronizer.setWindow(window);
+//		Synchronizer.setWindow(window);
 	}
 	
 	private JSplitPane getSplitter() {

@@ -2,7 +2,6 @@ package wife.heartcough.common;
 
 import java.io.File;
 
-import javax.swing.JFrame;
 import javax.swing.JTable;
 import javax.swing.JTree;
 import javax.swing.tree.DefaultMutableTreeNode;
@@ -76,11 +75,6 @@ public class Synchronizer {
 	private static DirectoryPath DIRECTORY_PATH;
 	
 	/**
-	 * 메인 Window의 인스턴스를 저장합니다.
-	 */
-	private static JFrame WINDOW;
-	
-	/**
 	 * 파일 복사 등의 진행화면(Progress)의 인스턴스를 저장합니다.
 	 */
 	private static Progress PROGRESS;
@@ -110,70 +104,144 @@ public class Synchronizer {
 	 */
 	private static boolean IS_EXPANDING_PATH = false;
 	
+	/**
+	 * 파일 복사 등을 실행하기 위해 선택한 파일이 FileTree의 것인지 FileTable의 것인지 확인하기 위해
+	 * 마우스 클릭이 일어난 곳의 Component를 저장한다.
+	 */
 	private static Object SOURCE_COMPONENT;
+	
+	/**
+	 * 파일 복사(CTRL+C)가 FileTable에서 일어났는지 확인한다.
+	 */
 	private static boolean IS_COPIED_FROM_FILE_TABLE = false;
+	
+	/**
+	 * 파일 복사(CTRL+C)가 FileTree에서 일어났는지 확인한다.
+	 */
 	private static boolean IS_COPIED_FROM_FILE_TREE = false;
 	
+	/**
+	 * FileTree 객체를 저장한다.
+	 * 
+	 * @param fileTree FileTree 객체
+	 */
 	public static void setFileTree(FileTree fileTree) {
 		FILE_TREE = fileTree;
 	}
 	
+	/**
+	 * FileTree 객체를 리턴한다.
+	 * 
+	 * @return FileTree객체
+	 */
 	public static FileTree getFileTree() {
 		return FILE_TREE;
 	}
 	
+	/**
+	 * FileTable 객체를 저장한다.
+	 * 
+	 * @param fileTable FileTable 객체
+	 */
 	public static void setFileTable(FileTable fileTable) {
 		FILE_TABLE = fileTable;
 	}
 	
+	/**
+	 * DirectoryPath 객체를 저장한다.
+	 * 
+	 * @param directoryPath DirectoryPath 객체
+	 */
 	public static void setDirectoryPath(DirectoryPath directoryPath) {
 		DIRECTORY_PATH = directoryPath;
 	}
 	
+	/**
+	 * DirectoryPath 객체를 리턴한다.
+	 * 
+	 * @return DirectoryPath 객체
+	 */
 	public static DirectoryPath getDirectoryPath() {
 		return DIRECTORY_PATH;
 	}
 	
-	public static void setWindow(JFrame window) {
-		WINDOW = window;
-	}
-	
-	public static JFrame getWindow() {
-		return WINDOW;
-	}
-	
+	/**
+	 * Progress 객체를 저장한다.
+	 * 
+	 * @param progress Progress 객체
+	 */
 	public static void setProgress(Progress progress) {
 		PROGRESS = progress;
 	}
 	
+	/**
+	 * Progress 객체를 리턴한다.
+	 * 
+	 * @return Progress 객체
+	 */
 	public static Progress getProgress() {
 		return PROGRESS;
 	}
 
+	/**
+	 * FileTree에서 현재 선택된 노드를 저장한다.
+	 * 
+	 * @param currentNode FileTree에서 현재 선택된 노드
+	 */
 	public static void setCurrentNode(DefaultMutableTreeNode currentNode) {
 		CURRENT_NODE = currentNode;
 	}
 	
+	/**
+	 * FileTree에서 현재 선택된 노드를 리턴한다.
+	 * 
+	 * @return FileTree에서 현재 선택된 노드
+	 */
 	public static DefaultMutableTreeNode getCurrentNode() {
 		return CURRENT_NODE;
 	}
 	
+	/**
+	 * FileTree의 현재 선택된 노드에 매핑되어 있는 파일정보를 저장한다.
+	 * 
+	 * @param currentDirectory FileTree의 현재 선택된 노드에 매핑된 파일정보 
+	 */
 	public static void setCurrentDirectory(File currentDirectory) {
 		CURRENT_DIRECTORY = currentDirectory;
 	}
 	
+	/**
+	 * FileTree의 현재 선택된 노드에 매핑되어 있는 파일정보를 리턴한다.
+	 * 
+	 * @return FileTree의 현재 선택된 노드에 매핑된 파일정보
+	 */
 	public static File getCurrentDirectory() {
 		return CURRENT_DIRECTORY;
 	}
 	
+	/**
+	 * FileTable의 파일 리스트 정보에서 현재 선택된 행의 인덱스에 해당하는 파일을 저장한다.
+	 * 
+	 * @param rowIndex
+	 */
 	public static void setCurrentFile(int rowIndex) {
 		CURRENT_FILE = FILE_LIST[rowIndex];
 	}
 	
+	/**
+	 * FileTable에서 현재 선택된 파일을 리턴한다.
+	 * 
+	 * @return FileTable에서 현재 선택된 파일
+	 */
 	public static File getCurrentFile() {
 		return CURRENT_FILE;
 	}
 	
+	/**
+	 * FileTable에서 현재 선택된 행의 파일정보를 저장한다.
+	 * 
+	 * @param rowIndexes FileTable에서 선택된 행의 인덱스
+	 */
 	public static void setCurrentFilesForTable(int[] rowIndexes) {
 		CURRENT_FILES = new File[rowIndexes.length];
 		
@@ -184,48 +252,103 @@ public class Synchronizer {
 		CURRENT_FILE = CURRENT_FILES[rowIndexes.length - 1];
 	}
 	
+	/**
+	 * FileTree의 현재 선택 노드에 매핑된 파일정보를 저장한다.
+	 * 
+	 * @param userObject FileTree의 현재 선택 노드에 매핑된 파일정보
+	 */
 	public static void setCurrentFileForTree(File userObject) {
 		CURRENT_FILES = new File[1];
 		CURRENT_FILES[0] = userObject;
 		CURRENT_FILE = CURRENT_FILES[0];
 	}
 	
+	/**
+	 * FileTable 또는 FileTree에서 선택한 파일들을 리턴한다.
+	 * 
+	 * @return FileTable 또는 FileTree에서 선택한 파일들
+	 */
 	public static File[] getCurrentFiles() {
 		return CURRENT_FILES;
 	}
 
+	/**
+	 * FileTree에서 현재 선택된 노드에 매핑된 파일을 리턴한다.
+	 * 
+	 * @return FileTree에서 현재 선택된 노드에 매핑된 파일
+	 */
 	public static File getCurrentNodeDirectory() {
 		return (File)getCurrentNode().getUserObject();
 	}
 	
+	/**
+	 * FileTree에서 현재 선택된 노드에 매핑된 파일의 절대경로를 리턴한다.
+	 * 
+	 * @return FileTree에서 현재 선택된 노드에 매핑된 파일의 절대경로
+	 */
 	public static String getCurrentNodeDirectoryPath() {
 		return getCurrentNodeDirectory().getAbsolutePath();
 	}
 	
+	/**
+	 * FileTree에서 현재 선택된 노드에 매핑된 파일명을 리턴한다.
+	 * 
+	 * @return FileTree에서 현재 선택된 노드에 매핑된 파일명
+	 */
 	public static String getCurrentNodeDirectoryName() {
 		return getCurrentNodeDirectory().getName();
 	}
 	
+	/**
+	 * FileTable을 구성하는 디렉토리 및 파일을 저장한다.
+	 * 
+	 * @param fileList FileTable을 구성하는 디렉토리 및 파일
+	 */
 	public static void setFileList(File[] fileList) {
 		FILE_LIST = fileList;
 	}
 	
+	/**
+	 * FileTable을 구성하는 디렉토리 및 파일을 리턴한다.
+	 *  
+	 * @return FileTable을 구성하는 디렉토리 및 파일
+	 */
 	public static File[] getFileList() {
 		return FILE_LIST;
 	}
 	
+	/**
+	 * FileTable을 구성하는 디렉토리를 저장한다.
+	 * 
+	 * @param directories FileTable을 구성하는 디렉토리
+	 */
 	public static void setDirectories(File[] directories) {
 		DIRECTORIES = directories;
 	}
 	
+	/**
+	 * FileTable을 구성하는 디렉토리를 리턴한다.
+	 * 
+	 * @param directories FileTable을 구성하는 디렉토리
+	 */
 	public static File[] getDirectories() {
 		return DIRECTORIES;
 	}
 	
+	/**
+	 * FileTable을 구성하는 파일(not directory)을 저장한다.
+	 * 
+	 * @param files FileTable을 구성하는 파일(not directory)
+	 */
 	public static void setFiles(File[] files) {
 		FILES = files;
 	}
 	
+	/**
+	 * FileTable을 구성하는 파일(not directory)을 리턴한다.
+	 * 
+	 * @param files FileTable을 구성하는 파일(not directory)
+	 */
 	public static File[] getFiles() {
 		return FILES;
 	}
@@ -301,17 +424,27 @@ public class Synchronizer {
 	public static void pathChanged() {
 		DIRECTORY_PATH.pathChanged();
 	}
-	
+
+	/**
+	 * DirectoryPath 경로의 변경여부를 저장한다.
+	 * 
+	 * @param changed DirectoryPath가 변경되었으면 true, 그렇지 않으면 false
+	 */
 	public static void isDirectoryPathChanged(boolean changed) {
 		DIRECTORY_PATH_CHANGED = changed;
 	}
 	
+	/**
+	 * DirectoryPath 변경여부를 리턴한다.
+	 * 
+	 * @return DirectoryPath 변경여부
+	 */
 	public static boolean isDirectoryPathChanged() {
 		return DIRECTORY_PATH_CHANGED;
 	}
 	
 	/**
-	 * 변경된 경로를 디렉토리 구분자로 나눈다.
+	 * DirectoryPath에서 변경된 경로를 디렉토리 구분자로 나눈다.
 	 * 
 	 * ex) C:\Windows\System32
 	 *     => [0] : C:\ 
@@ -341,22 +474,47 @@ public class Synchronizer {
 		}
 	}
 	
+	/**
+	 * setChangedDirectoryPaths에서 디렉토리 구분자로 나눠진 디렉토리 배열을 리턴한다.
+	 * 
+	 * @return setChangedDirectoryPaths에서 디렉토리 구분자로 나눠진 디렉토리 배열
+	 */
 	public static File[] getChangedDirectoryPaths() {
 		return CHANED_DIRECTORY_PATHS;
 	}
 	
+	/**
+	 * CHANED_DIRECTORY_PATHS에 검색해야 할 다음 경로가 남아 있는지 확인한다.
+	 * 
+	 * @param childNode 다음에 검색해야 할 디렉토리가 남아 있다면 true, 그렇지 않으면 false
+	 */
 	public static void setNextChangedDirectoryTreePath(DefaultMutableTreeNode childNode) {
 		isNextChangedDirectoryTreeNode(childNode, true);
 	}
 	
+	/**
+	 * DirectoryPath의 변경된 디렉토리 중에서 다음에 선택되어야 하는 노드의 TreePath를 리턴한다.
+	 * 
+	 * @return DirectoryPath의 변경된 디렉토리 중에서 다음에 선택되어야 하는 노드의 TreePath
+	 */
 	public static TreePath getNextChangedDirectoryTreePath() {
 		return NEXT_CHANGED_DIRECTORY_TREE_PATH;
 	}
 	
+	/**
+	 * DirectoryPath의 변경된 디렉토리 중에서 검색할 디렉토리가 남아 있는지의 여부를 저장한다.
+	 * 
+	 * @param isExists의 변경된 디렉토리 중에서 검색할 디렉토리가 있는지의 여부
+	 */
 	public static void hasMoreChanedDirectoryPaths(boolean isExists) {
 		HAS_MORE_CHANGED_DIRECTORY_PATH = isExists;
 	}
 	
+	/**
+	 * DirectoryPath의 변경된 디렉토리 중에서 검색할 디렉토리가 남아 있는지의 여부를 리턴한다.
+	 * 
+	 * @return DirectoryPath의 변경된 디렉토리 중에서 검색할 디렉토리가 있는지의 여부
+	 */
 	public static boolean hasMoreChanedDirectoryPaths() {
 		return HAS_MORE_CHANGED_DIRECTORY_PATH;
 	}
@@ -441,9 +599,17 @@ public class Synchronizer {
 			&& getFileList().length != DIRECTORY_PATH.getCurrentPath().list().length;
 	}
 	
+	/**
+	 * 파일 복사 등을 실행하기 위해 선택한 파일이 FileTree의 것인지 FileTable의 것인지 확인하기 위해
+	 * 마우스 클릭이 일어난 곳의 Component를 저장한다.
+	 * 
+	 * @param sourceComponent 마우스 클릭이 일어나 곳의 Component
+	 */
 	public static void setSourceComponent(Object sourceComponent) {
 		SOURCE_COMPONENT = sourceComponent;
-		
+	
+		// 복사하기(CTRL+C)를 실행했을 경우 저장할 파일정보들을 읽어오기 위해
+		// 마우스 클릭이 어느 Component에서 일어났는지 저장한다.
 		if(SOURCE_COMPONENT instanceof JTable) {
 			IS_COPIED_FROM_FILE_TABLE = true;
 			IS_COPIED_FROM_FILE_TREE = false;
@@ -453,14 +619,29 @@ public class Synchronizer {
 		}
 	}
 	
+	/**
+	 * 마우스 클릭이 일어나 곳의 Component를 리턴한다.
+	 * 
+	 * @return 마우스 클릭이 일어나 곳의 Component
+	 */
 	public static Object getSourceComponent() {
 		return SOURCE_COMPONENT;
 	}
 	
+	/**
+	 * FileTable에서 마우스 클릭 여부를 리턴한다.
+	 * 
+	 * @return FileTable에서 마우스 클릭이 발생했다면 true, 그렇지 않으면 false
+	 */
 	public static boolean isCopiedFromFileTable() {
 		return IS_COPIED_FROM_FILE_TABLE;
 	}
 	
+	/**
+	 * FileTree에서 마우스 클릭 여부를 리턴한다.
+	 * 
+	 * @return FileTree에서 마우스 클릭이 발생했다면 true, 그렇지 않으면 false
+	 */
 	public static boolean isCopiedFromFileTree() {
 		return IS_COPIED_FROM_FILE_TREE;
 	}

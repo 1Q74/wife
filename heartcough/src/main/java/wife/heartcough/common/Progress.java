@@ -28,22 +28,51 @@ import org.apache.commons.io.FileUtils;
 import org.apache.commons.io.FilenameUtils;
 
 public class Progress {
+
+	/**
+	 * 진행상태 창의 가로 사이즈
+	 */
+	private static int WIDTH = 700;
 	
-	private static int WIDTH;
-	private static int HEIGHT;
+	/**
+	 * 진행상태 창의 세로 사이즈
+	 */
+	private static int HEIGHT = 200;
 	
-	static {
-		WIDTH = 700;
-		HEIGHT = 200;
-	}
 	
+	/**
+	 * 진행상태 바의 객체
+	 */
 	private JProgressBar bar;
+	
+	/**
+	 * 파일의 작업진행상태를 표시하기 위한 테이블
+	 */
 	private JTable logTable;
+	
+	/**
+	 * 파일 작업진행상태 테이블의 모델
+	 */
 	private DefaultTableModel logModel;
+	
+	/**
+	 * 작업하는 파일 크기의 합계
+	 */
 	private long sumSize = 0;
+	
+	/**
+	 * 현재 작업(복사 등)이 진행중인 파일의 작업완료 크기
+	 */
 	private long copiedSize = 0;
+	
+	/**
+	 * 작업상태 테이블을 스크롤 하기위한 스크롤 객체
+	 */
 	private JScrollPane logTableScrollPane;
 	
+	/**
+	 * 진행상태 바를 초기화한다.
+	 */
 	private void initProgressBar() {
 		sumSize = 0;
 		copiedSize = 0;
@@ -53,6 +82,13 @@ public class Progress {
 		bar.setStringPainted(true);
 	}
 	
+	/**
+	 * 작업상태 테이블의 CellRenender을 설정한다.
+	 * 
+	 * @param alignment 셀에 표시되는 텍스트의 정렬 방향
+	 * @param border 셀의 라인
+	 * @return TableCellRenderer
+	 */
 	private TableCellRenderer getLogTableDefaultCellRenderer(int alignment, Border border) {
 		return
 			new TableCellRenderer() {
@@ -71,6 +107,11 @@ public class Progress {
 			};
 	}
 	
+	/**
+	 * 진행상태 바의 CellRenender을 설정한다.
+	 * 
+	 * @return TableCellRenderer
+	 */
 	private TableCellRenderer getLogTableProgressBarCellRenderer() {
 		return
 			new TableCellRenderer() {
@@ -89,6 +130,9 @@ public class Progress {
 			};
 	}
 	
+	/**
+	 * 진행상태 테이블을 초기화한다.
+	 */
 	private void initLogTable() {
 		logTable = new JTable();
 		logTable.setAutoResizeMode(JTable.AUTO_RESIZE_LAST_COLUMN);
@@ -117,15 +161,15 @@ public class Progress {
 			column.sizeWidthToFit();
 
 			switch(i) {
-				case 0:
+				case 0:		// 진행상태 바
 					column.setCellRenderer(getLogTableProgressBarCellRenderer());
 					break;
-				case 1:
+				case 1:		// 파일명
 					column.setCellRenderer(
 						getLogTableDefaultCellRenderer(JLabel.RIGHT, new EmptyBorder(0, 0, 0, 5))
 					);
 					break;
-				case 2:
+				case 2:		// 파일의 절대경로
 					column.setCellRenderer(
 						getLogTableDefaultCellRenderer(JLabel.LEFT, new EmptyBorder(0, 5, 0, 0))
 					);
@@ -138,6 +182,9 @@ public class Progress {
 		);
 	}
 
+	/**
+	 * 진행상태 창을 표시한다.
+	 */
 	public void show() {
 		initProgressBar();
 		initLogTable();
@@ -158,6 +205,7 @@ public class Progress {
 		popup.setContentPane(bodyPanel);
 		popup.setVisible(true);
 		popup.addWindowListener(new WindowListener() {
+			// 창을 닫을 경우 작업 중인 쓰레드와 진행상태 쓰레드를 모두 종료한다.
 			@Override
 			public void windowClosing(WindowEvent e) {
 				ProgressHandler.isStopped(true);
@@ -187,17 +235,33 @@ public class Progress {
 		});
 	}
 	
+	/**
+	 * 진행상태 바의 퍼센트 값을 얻는다.
+	 * @param source 현재 작업완료 된 파일 크기
+	 * @param total 파일 원본의 크기
+	 * @return 진행상태 바의 퍼센트 값
+	 */
 	private int getSizePercent(double source, double total) {
 		if(source == 0) return 100;
 		return (int)Math.round((source / total) * 100);
 	}
 	
+	/**
+	 * 파일 원본의 전체 사이즈를 계산한다.
+	 * 
+	 * @param files 작업대상 파일들
+	 */
 	public void setSumSize(File[] files) {
 		for(File file : files) {
 			sumSize += file.isDirectory() ? FileUtils.sizeOfDirectory(file) : FileUtils.sizeOf(file);
 		}
 	}
 	
+	/**
+	 * 작업되는 파일의 전체 크기 중 몇 퍼세트가 작업되었는지 표시한다.
+	 * 
+	 * @param sizeGap 현재 작업완료된 파일의 크기
+	 */
 	public void refreshSizeProgress(long sizeGap) {
 		copiedSize += sizeGap;
 		int percent = getSizePercent(copiedSize, sumSize);
@@ -213,6 +277,9 @@ public class Progress {
 		);
 	}
 	
+	/**
+	 * 작업진행 테이블 행의 정보를 구성하는 클래스 
+	 */
 	public class LogRowData {
 		private int rowIndex;
 		private String filePath;
@@ -231,6 +298,13 @@ public class Progress {
 		}
 	}
 	
+	/**
+	 * 테이블 행의 데이터를 초기화한다.
+	 * 
+	 * @param sourceFile 파일크기 및 파일명을 출력하기 위한 원본 파일
+	 * @param newFilePath 새롭게 생성되는 파일의 절대경로
+	 * @return 초기화된 LogRowData의 객체
+	 */
 	public LogRowData init(File sourceFile, String newFilePath) {
 		int rowIndex = -1;
 
@@ -259,6 +333,13 @@ public class Progress {
 		return new LogRowData(rowIndex, newFilePath);
 	}
 	
+	/**
+	 * 파일 작업진행상태의 퍼센트 값을 업데이트한다.
+	 * 
+	 * @param sourceSize
+	 * @param targetSize
+	 * @param logRowData
+	 */
 	public void process(long sourceSize, long targetSize, LogRowData logRowData) {
 		int percent = getSizePercent(targetSize, sourceSize);
 		logTable.setValueAt(percent, logRowData.getRowIndex(), 0);

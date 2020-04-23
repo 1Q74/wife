@@ -6,9 +6,10 @@ import java.awt.event.KeyEvent;
 import java.awt.event.KeyListener;
 import java.awt.event.MouseListener;
 
-import wife.heartcough.common.Command;
-import wife.heartcough.common.ProgressHandler;
-import wife.heartcough.common.Synchronizer;
+import wife.heartcough.command.Command;
+import wife.heartcough.command.CommandHandler;
+import wife.heartcough.command.ProgressHandler;
+import wife.heartcough.system.Synchronizer;
 
 /**
  * FileTree, FileTable에서 발생하는 이벤트 Listener 클래스

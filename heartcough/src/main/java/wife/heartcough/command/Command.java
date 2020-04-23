@@ -1,4 +1,4 @@
-package wife.heartcough.common;
+package wife.heartcough.command;
 
 import java.io.File;
 import java.io.FileInputStream;
@@ -19,8 +19,8 @@ import org.apache.commons.io.FileUtils;
 import org.apache.commons.io.FilenameUtils;
 import org.apache.commons.lang3.StringUtils;
 
-import wife.heartcough.common.Synchronizer;
-import wife.heartcough.common.Progress.LogRowData;
+import wife.heartcough.command.Progress.LogRowData;
+import wife.heartcough.system.Synchronizer;
 
 public class Command implements Runnable {
 

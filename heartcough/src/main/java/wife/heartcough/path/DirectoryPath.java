@@ -2,8 +2,8 @@ package wife.heartcough.path;
 
 import java.io.File;
 
-import wife.heartcough.common.FileSystem;
-import wife.heartcough.common.Synchronizer;
+import wife.heartcough.system.FileSystem;
+import wife.heartcough.system.Synchronizer;
 
 /**
  * 파일 경로를 구성합니다.

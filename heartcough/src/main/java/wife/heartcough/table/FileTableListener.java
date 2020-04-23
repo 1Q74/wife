@@ -6,7 +6,7 @@ import java.awt.event.MouseListener;
 import javax.swing.JTable;
 
 import wife.heartcough.common.FileEventListener;
-import wife.heartcough.common.Synchronizer;
+import wife.heartcough.system.Synchronizer;
 
 public class FileTableListener extends FileEventListener {
 	

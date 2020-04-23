@@ -5,7 +5,7 @@ import java.io.File;
 import javax.swing.Icon;
 import javax.swing.table.AbstractTableModel;
 
-import wife.heartcough.common.FileSystem;
+import wife.heartcough.system.FileSystem;
 
 public class FileListModel extends AbstractTableModel {
 

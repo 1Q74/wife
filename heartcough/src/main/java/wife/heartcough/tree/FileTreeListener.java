@@ -4,7 +4,7 @@ import java.awt.event.MouseEvent;
 import java.awt.event.MouseListener;
 
 import wife.heartcough.common.FileEventListener;
-import wife.heartcough.common.Synchronizer;
+import wife.heartcough.system.Synchronizer;
 
 public class FileTreeListener extends FileEventListener {
 	

@@ -1,4 +1,4 @@
-package wife.heartcough.common;
+package wife.heartcough.system;
 
 import java.io.File;
 
@@ -9,6 +9,7 @@ import javax.swing.tree.TreePath;
 
 import org.apache.commons.lang3.StringUtils;
 
+import wife.heartcough.command.Progress;
 import wife.heartcough.path.DirectoryPath;
 import wife.heartcough.table.FileTable;
 import wife.heartcough.tree.FileTree;

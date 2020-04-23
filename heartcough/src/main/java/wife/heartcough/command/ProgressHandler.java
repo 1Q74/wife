@@ -1,4 +1,4 @@
-package wife.heartcough.common;
+package wife.heartcough.command;
 
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;

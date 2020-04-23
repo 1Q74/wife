@@ -1,4 +1,4 @@
-package wife.heartcough.common;
+package wife.heartcough.command;
 
 import java.awt.BorderLayout;
 import java.awt.Component;

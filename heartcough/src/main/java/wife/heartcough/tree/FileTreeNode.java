@@ -8,8 +8,8 @@ import javax.swing.SwingWorker;
 import javax.swing.tree.DefaultMutableTreeNode;
 import javax.swing.tree.TreePath;
 
-import wife.heartcough.common.FileSystem;
-import wife.heartcough.common.Synchronizer;
+import wife.heartcough.system.FileSystem;
+import wife.heartcough.system.Synchronizer;
 
 
 

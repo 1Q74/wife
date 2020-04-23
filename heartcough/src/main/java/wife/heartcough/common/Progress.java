@@ -237,6 +237,7 @@ public class Progress {
 	
 	/**
 	 * 진행상태 바의 퍼센트 값을 얻는다.
+	 * 
 	 * @param source 현재 작업완료 된 파일 크기
 	 * @param total 파일 원본의 크기
 	 * @return 진행상태 바의 퍼센트 값

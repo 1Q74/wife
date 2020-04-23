@@ -16,7 +16,9 @@ import wife.heartcough.tree.FileTree;
 /**
  * DirectoryPath, FileTree, FileTable중의 한 곳에서라도
  * 폴더의 변경이 발생하면, 나머지 객체들도 변경된 폴더로 변경하여
- * 동일한 폴더의 정보를 출력하도록 동기화를 실행하는 객체입니다.
+ * 동일한 폴더의 정보를 출력하도록 동기화를 실행하는 객체이다.
+ * 
+ * 각 Component의 데이터를 서로 참조하기 위한 역할도 수행한다.
  * 
  * @author jdk
  */

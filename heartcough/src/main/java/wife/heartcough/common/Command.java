@@ -24,12 +24,37 @@ import wife.heartcough.common.Progress.LogRowData;
 
 public class Command implements Runnable {
 
+	/**
+	 * 작업대상(원본) 파일들
+	 */
 	private File[] sources;
+	
+	/**
+	 * 작업(복사,이동 등) 되어질 디렉토리 경로
+	 */
 	private File target;
+	
+	/**
+	 * 원본과 동일한 이름이 존재할 경우 뒤에 '파일명(숫자)'로 자동생성된 디렉토리를 저장한다.
+	 * 
+	 * ■ 작업되어질 경로가 FileTree의 root노드의 Desktop일 경우 파일 데이터를 리로드 하지 않고
+	 *   TreeNode에 추가해서 보여준다.
+	 *   리로드 했을 경우 윈도우 스페셜 디렉토리나 기타 row index가 작은 노드들이 초기화 되기 때문에
+	 *   디렉토리를 선택한 경우라면 하위 디렉토리가 삭제되고 1Depth에 있는 부모폴더만 남게된다.
+	 * 
+	 * ■ 리로드의 로직이 자식 노드들을 지우고 새로 읽어 들이기 때문에 발생하는 문제이나
+	 *   적당한 해결책을 찾지 못하여 작업이 완료된 디렉토리를 추가하는 방식으로 보여준다.
+	 */
 	private List<File> newDirectories;
 	
+	/**
+	 * 진행상태를 표시하는 Progress의 객체
+	 */
 	private Progress progress = new Progress();
 	
+	/**
+	 * Progress객체를 Synchronizer쪽으로 별도 저장한다.
+	 */
 	public Command() {
 		Synchronizer.setProgress(this.progress);
 	}
@@ -52,6 +77,7 @@ public class Command implements Runnable {
 					in = new FileInputStream(src);
 					out = new FileOutputStream(newFile);
 					
+					// [To Do] 원본 파일의 크기에 따라 버퍼를 조절할 필요가 있어 보인다.
 					byte[] buffer = new byte[1024 * 1024];
 					int count = 0;
 					long size = 0;
@@ -89,6 +115,13 @@ public class Command implements Runnable {
 		}).start();
 	}
 	
+	/**
+	 * 동일한 디렉토리나 파일이 있을 경우 이름 뒤에 '(번호)'를 붙여서 이름을 자동생성한다.
+	 * 
+	 * @param newFile 새롭게 생성될 이름
+	 * @param index 중복방지를 위한 순차 번호
+	 * @return 새롭게 생성된 파일명
+	 */
 	private String getUniqueFileName(File newFile, int index) {
 		String fileName = "";
 		
@@ -104,6 +137,12 @@ public class Command implements Runnable {
 		return fileName;
 	}
 	
+	/**
+	 * 동일한 파일이 있을 경우에 번호를 붙여서 자동생성된 파일을 리턴한다.
+	 * 
+	 * @param newFile 새로 생성될 파일명
+	 * @return 번호를 붙여서 자동생성된 파일
+	 */
 	private File getUniqueFile(File newFile) {
 		File uniqueFile = null;
 		
@@ -119,10 +158,22 @@ public class Command implements Runnable {
 		return uniqueFile;
 	}
 	
+	/**
+	 * 동일한 디렉토리가 있을 경우에 번호를 붙여서 자동생성된 디렉토리를 리턴한다.
+	 * 
+	 * @param newDir 새로 생성될 디렉토리명
+	 * @return 번호를 붙여서 자동생성된 디렉토리
+	 */
 	private File getUniqueDirectory(File newDir) {
 		return getUniqueFile(newDir);
 	}
 	
+	/**
+	 * 동일한 이름이 존재할 경우 작업을 계속 진행할 지 확인하는 팝업창을 출력한다.
+	 * 
+	 * @param newFile 새로 생성될 파일, 디렉토리
+	 * @return 선택버튼의 정수값
+	 */
 	private int checkFileExistence(File newFile) {
 		int result = JOptionPane.YES_OPTION;
 		if(newFile.exists()) {
@@ -140,6 +191,16 @@ public class Command implements Runnable {
 		return result;
 	}
 	
+	/**
+	 * 파일 복사를 진행하면서 동일한 이름이 존재하는 지 확인하여 
+	 * '덮이쓰기(Overwrite)'를 할 지 '건너뛰기(Skip)'할 지를 결정한다.
+	 * 
+	 * @param src 원본 파일
+	 * @param newFile 새로 생성된 파일
+	 * @param depth 복사되는 디렉토리의 depth.
+	 *              1depth의 경우는 이름 뒤에 '(번호)'를 붙은 이름을 자동으로 생성하고,
+	 *              2depth부터는 진행여부를 확인하는 팝업을 출력한다.
+	 */
 	private void doCopyFile(File src, File newFile, int depth) {
 		if(newFile.exists()) {
 			if(depth == 0) {
@@ -153,6 +214,9 @@ public class Command implements Runnable {
 		}
 	}
 	
+	/**
+	 * CTRL+C가 어느 콤포넌트에서 발생했는지 확인해서 선택한 파일정보를 저장한다. 
+	 */
 	public void copy() {
 		Object source = Synchronizer.getSourceComponent();
 		
@@ -168,10 +232,22 @@ public class Command implements Runnable {
 		sources = Synchronizer.getCurrentFiles();
 	}
 	
+	/**
+	 * 중복되서 자동 생성된 디렉토리를 저장할 List객체를 초기화한다.
+	 */
 	private void initNewDirectories() {
 		this.newDirectories = new ArrayList<File>();
 	}
 	
+	/**
+	 * 중복되서 자동 생성된 디렉토리를 List객체에 추가한다.
+	 * FileTree의 root노드 Desktop에 붙여넣기가 되었는지만 구별하면 되기 때문에
+	 * depth가 '0'인지 아닌지, 그리고 파일복사가 FileTree에서 실행되었는지를
+	 * 확인한다.
+	 *  
+	 * @param newDir 새로 만들어진 디렉토리
+	 * @param depth 복사되는 디렉토리의 depth.
+	 */
 	private void addNewDirectory(File newDir, int depth) {
 		if(depth == 0 && Synchronizer.isCopiedFromFileTree()) {
 			this.newDirectories.add(newDir);	

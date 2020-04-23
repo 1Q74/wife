@@ -254,6 +254,14 @@ public class Command implements Runnable {
 		}
 	}
 	
+	/**
+	 * 복사를 진행한다.
+	 * 디렉토리는 재귀함수를 이용한다.
+	 * 
+	 * @param src 원본 소스
+	 * @param tgt 복사되어지는 경로
+	 * @param depth 복사되어지는 경로의 디렉토리 depth
+	 */
 	private void process(File src, File tgt, int depth) {
 		if(src.isDirectory()) {
 			File newDir = new File(tgt, src.getName());
@@ -281,7 +289,13 @@ public class Command implements Runnable {
 			doCopyFile(src, new File(tgt, src.getName()), depth);
 		}
 	}
-		
+	
+	/**
+	 * FileTree에서 복사할 때 원본과 복사되어지는 경로가 같은 경우
+	 * 부모 경로에 복사를 진행한다.
+	 * 
+	 * @return 복사되어질 경로의 디렉토리 객체
+	 */
 	private File getTarget() {
 		// FileTree에서는 복사되는 소스와 복사되어질 대상이 같다. 
 		boolean isEqualSourceAndTarget = StringUtils.equals(
@@ -302,6 +316,11 @@ public class Command implements Runnable {
 		return target; 
 	}
 	
+	/**
+	 * FileTree의 root노드 Desktop에 붙여넣기가 이루어진 경우
+	 * 디렉토리를 추가해서 보여주고, 그 외의 경우는 reload메소드 이용해서
+	 * 파일(디렉토리) 정보를 다시 읽어들인다.
+	 */
 	private void reload() {
 		if(Synchronizer.isDirectoryFileCountChanged()
 			&& Synchronizer.isCopiedFromFileTree()
@@ -312,6 +331,9 @@ public class Command implements Runnable {
 		}
 	}
 
+	/**
+	 * 붙여넣기를 진행한다.
+	 */
 	private void paste() {
 		target = getTarget();
 		if(target.isFile()) return;
@@ -327,6 +349,10 @@ public class Command implements Runnable {
 		reload();
 	}
 
+	/**
+	 * 작업진행상태 창이 강제종료되었을 경우에 작업(복사)을 중지시키키 위해
+	 * Thread형태로 실행한다.
+	 */
 	@Override
 	public void run() {
 		// KeyListener에서 호출될 때 NullPointerException이 발생할 경우가 있기 때문에

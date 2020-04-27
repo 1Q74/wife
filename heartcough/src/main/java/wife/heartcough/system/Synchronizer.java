@@ -124,6 +124,11 @@ public class Synchronizer {
 	private static boolean IS_COPIED_FROM_FILE_TREE = false;
 	
 	/**
+	 * 파일 복사(CTRL+C) 여부를 저장한다.
+	 */
+	private static boolean IS_FILE_COPIED = false;
+	
+	/**
 	 * FileTree 객체를 저장한다.
 	 * 
 	 * @param fileTree FileTree 객체
@@ -647,6 +652,19 @@ public class Synchronizer {
 	 */
 	public static boolean isCopiedFromFileTree() {
 		return IS_COPIED_FROM_FILE_TREE;
+	}
+	
+	public static void isFileCopied(boolean isCopied) {
+		IS_FILE_COPIED = isCopied;
+	}
+	
+	/**
+	 * 파일 복사 여부를 확인한다.
+	 * 
+	 * @return CTRL+C가 눌러졌다면 true, 그렇지 않으면 false
+	 */
+	public static boolean isFileCopied() {
+		return IS_FILE_COPIED;
 	}
 	
 }

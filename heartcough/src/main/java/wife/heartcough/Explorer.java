@@ -29,8 +29,8 @@ public class Explorer {
 	
 	public Explorer() {
 		Synchronizer.setFileTree(fileTree);
+		Synchronizer.setFileTable(fileTable);
 		Synchronizer.setDirectoryPath(directoryPath);
-//		Synchronizer.setWindow(window);
 	}
 	
 	private JSplitPane getSplitter() {
@@ -72,32 +72,6 @@ public class Explorer {
 		window.setSize(1024, 768);
 		window.setVisible(true);
 	}
-	
-	/*
-	public void refresh() {
-		DefaultMutableTreeNode currentTreeNode = fileTree.getCurrentNode();
-		Enumeration<?> children = currentTreeNode.children();
-		
-		while(children.hasMoreElements()) {
-			DefaultMutableTreeNode childNode = (DefaultMutableTreeNode)children.nextElement();
-			File file = (File)childNode.getUserObject();
-
-			if(!file.exists()) {
-				currentTreeNode.remove(childNode);
-			}
-		}
-		
-		DefaultTreeModel model = (DefaultTreeModel)fileTree.getTree().getModel();
-		model.reload(currentTreeNode);
-		
-		List<Integer> removedIndexes = fileTable.getFileTableModel().refresh();
-		FileListModel tableModel = new FileListModel(fileTable.getTableFileList());
-		fileTable.getFileTable().setModel(tableModel);
-//		tableModel.fireTableDataChanged();
-//		fileTable.getFileTable().revalidate();
-		fileTable.getFileTable().repaint();
-	}
-	*/
 	
 	public static void main(String[] args) throws IOException {
 		SwingUtilities.invokeLater(new Runnable() {

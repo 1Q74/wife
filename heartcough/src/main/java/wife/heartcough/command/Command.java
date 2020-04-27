@@ -217,7 +217,7 @@ public class Command implements Runnable {
 	/**
 	 * CTRL+C가 어느 콤포넌트에서 발생했는지 확인해서 선택한 파일정보를 저장한다. 
 	 */
-	public void copy() {
+	public boolean copy() {
 		Object source = Synchronizer.getSourceComponent();
 		
 		if(Synchronizer.isCopiedFromFileTable()) {
@@ -229,7 +229,9 @@ public class Command implements Runnable {
 			Synchronizer.setCurrentFileForTree((File)selectedNode.getUserObject());
 		}
 		
-		sources = Synchronizer.getCurrentFiles();
+		Synchronizer.isFileCopied(Synchronizer.getCurrentFiles() != null ? true : false);
+		
+		return Synchronizer.isFileCopied();
 	}
 	
 	/**
@@ -297,6 +299,7 @@ public class Command implements Runnable {
 	 * @return 복사되어질 경로의 디렉토리 객체
 	 */
 	private File getTarget() {
+		try {
 		// FileTree에서는 복사되는 소스와 복사되어질 대상이 같다. 
 		boolean isEqualSourceAndTarget = StringUtils.equals(
 			sources[0].getAbsolutePath()
@@ -311,6 +314,9 @@ public class Command implements Runnable {
 		// FileTable에서 복사할 경우
 		} else {
 			target = Synchronizer.getDirectoryPath().getCurrentPath();
+		}
+		} catch(Exception e) {
+			e.printStackTrace();
 		}
 		
 		return target; 
@@ -358,6 +364,8 @@ public class Command implements Runnable {
 		// KeyListener에서 호출될 때 NullPointerException이 발생할 경우가 있기 때문에
 		// run메소드에서 호출되도록 변경
 		initNewDirectories();
+		
+		sources = Synchronizer.getCurrentFiles();
 		
 		paste();
 	}

@@ -49,9 +49,7 @@ public abstract class FileEventListener {
 					
 					switch(keyCodeSum) {
 						case (CTRL + C):
-							command.copy();
-							// 복사할 원본 파일이 선택되지 않은 상태
-							if(Synchronizer.getCurrentFiles() == null) return;
+							if(!command.copy()) return;
 							break;
 						case (CTRL + V):
 							// 붙여넣기를 했을 경우 FileTree의 노드를 펼쳐서 보여준다.

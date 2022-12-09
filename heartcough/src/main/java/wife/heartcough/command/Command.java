@@ -65,8 +65,8 @@ public class Command implements Runnable {
 	 * @param src 원본 파일
 	 * @param newFile 대상 파일
 	 */
-	private void copyFile(File src, File newFile) {
- 		LogRowData logRowData = progress.init(src, newFile.getAbsolutePath());
+	private void copyFile(final File src, final File newFile) {
+ 		final LogRowData logRowData = progress.init(src, newFile.getAbsolutePath());
 		
 		new Thread(new Runnable() {
 			public void run() {

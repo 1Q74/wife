@@ -31,7 +31,7 @@ public class FileTree {
 		tree.setCellRenderer(new FileTreeNodeCellRenender());
 		tree.addTreeSelectionListener(new TreeSelectionListener() {
 			@Override
-			public void valueChanged(TreeSelectionEvent e) {
+			public void valueChanged(final TreeSelectionEvent e) {
 				SwingUtilities.invokeLater(new Runnable() {
 					public void run() {
 						Synchronizer.load((DefaultMutableTreeNode)e.getPath().getLastPathComponent());

@@ -1,6 +1,10 @@
 package wife.heartcough.table;
 
 import java.io.File;
+import java.io.IOException;
+import java.nio.file.DirectoryStream;
+import java.nio.file.Files;
+import java.nio.file.Path;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -66,7 +70,7 @@ public class FileTable {
 	 * 윈도우 스페셜 폴더는 별도로 취급한다.
 	 */
 	public void addFileList() {
-		String[] filenames = Synchronizer.getCurrentNodeDirectory().list();
+		// String[] filenames = Synchronizer.getCurrentNodeDirectory().list();
 		File[] files = null;
 		
 		if(FileSystem.isWindowsSpecialFolder(Synchronizer.getCurrentNodeDirectoryName())) {
@@ -74,7 +78,18 @@ public class FileTable {
 			Synchronizer.setDirectories(files);
 			Synchronizer.setFileList(files);
 		} else {
-			int end = filenames.length;
+			List<String> filenames = new ArrayList<String>();
+			try {
+				DirectoryStream<Path> dirStream = Files.newDirectoryStream(Synchronizer.getCurrentNodeDirectory().toPath());
+				for(Path path : dirStream) {
+					filenames.add(path.getFileName().toString());
+				}
+			} catch (IOException e) {
+				// TODO Auto-generated catch block
+				e.printStackTrace();
+			}
+			
+			int end = filenames.size();
 			files = new File[end];
 			
 			List<File> directoryList = new ArrayList<File>();
@@ -83,7 +98,7 @@ public class FileTable {
 			for(int i = 0; i < end; i++) {
 				String filePath = 	Synchronizer.getCurrentNodeDirectoryPath()
 									+ File.separatorChar
-									+ filenames[i];
+									+ filenames.get(i);
 
 				File file = new File(filePath);
 				if(file.isDirectory()) {
@@ -98,7 +113,7 @@ public class FileTable {
 	}
 	
 	/**
-	 * 테이블의 컬럼 사요즈를 설정한다.
+	 * 테이블의 컬럼 사이즈를 설정한다.
 	 */
 	private void setFileIconColumn() {
 		int width = 25;

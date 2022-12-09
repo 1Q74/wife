@@ -89,7 +89,7 @@ public class Progress {
 	 * @param border 셀의 라인
 	 * @return TableCellRenderer
 	 */
-	private TableCellRenderer getLogTableDefaultCellRenderer(int alignment, Border border) {
+	private TableCellRenderer getLogTableDefaultCellRenderer(final int alignment, final Border border) {
 		return
 			new TableCellRenderer() {
 				@Override
@@ -352,7 +352,7 @@ public class Progress {
 	 * @param src 원본 디렉토리
 	 * @param newDir 원본(src)의 이름으로 새롭게 생성된 디렉토리
 	 */
-	public void displayZeroByteDirectory(File src, File newDir) {
+	public void displayZeroByteDirectory(final File src, final File newDir) {
 		new Thread(new Runnable() {
 			public void run() {
 				LogRowData logRowData = init(src, newDir.getAbsolutePath());

@@ -26,6 +26,6 @@ Execute main() method in Explorer.java
 ### Screenshot
 ![Screenshot_313](https://user-images.githubusercontent.com/62123104/225788685-9082c184-6df5-4193-a103-873e5ef58eda.png)
 
-![Screenshot_314](https://user-images.githubusercontent.com/62123104/225788702-766db97b-3901-47c3-8430-dc6458843f1c.png)
+
 
 ![Screenshot_315](https://user-images.githubusercontent.com/62123104/225788710-92df163a-9906-4a03-bbc7-c02a3af44c2b.png)

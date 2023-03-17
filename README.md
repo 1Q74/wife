@@ -9,8 +9,11 @@ JTree.expandPath()에서 시간이 꽤 오래 걸립니다(몇 십초에서 몇 
  C:\Windows\WinSxS 폴더를 더블클릭해 보시기 바랍니다.)
 
 
-※ 본 프로그램을 이용하면서 발생하는 모든 종류의 문제에 대해\
-   민・형사상 및 다른 어떠한 형태의 책임도 지지 않습니다.
+///////////////////////////////////////////////////////////////////////////////////////////// \
+※ 본 프로그램을 이용하면서 발생하는 모든 종류의 문제(손실, 손해 등)에 대해\
+   민・형사상 및 다른 어떠한 형태의 책임도 지지 않습니다. \
+   사용자 본인의 책임하에 사용해주시기 바랍니다. \
+///////////////////////////////////////////////////////////////////////////////////////////// \
 <br/>
 <br/>
 ### Java verion
@@ -18,3 +21,11 @@ JTree.expandPath()에서 시간이 꽤 오래 걸립니다(몇 십초에서 몇 
 
 ### How to execute
 Execute main() method in Explorer.java
+
+
+### Screenshot
+![Screenshot_313](https://user-images.githubusercontent.com/62123104/225788685-9082c184-6df5-4193-a103-873e5ef58eda.png)
+
+![Screenshot_314](https://user-images.githubusercontent.com/62123104/225788702-766db97b-3901-47c3-8430-dc6458843f1c.png)
+
+![Screenshot_315](https://user-images.githubusercontent.com/62123104/225788710-92df163a-9906-4a03-bbc7-c02a3af44c2b.png)
